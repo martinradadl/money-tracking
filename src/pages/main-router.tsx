@@ -6,10 +6,11 @@ import { Transactions } from "./transactions";
 import { Debts } from "./debts";
 import { PageNotFound } from "./page-not-found";
 import { Profile } from "./profile";
+import { NavBar } from "../components/nav-bar";
 
 const router = createBrowserRouter([
   {
-    path: "/dashboard",
+    path: "/",
     element: <Dashboard />,
   },
   {
@@ -30,8 +31,11 @@ const router = createBrowserRouter([
   },
 ]);
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
-);
+export const MainRouter: React.FC = () => {
+  return (
+    <div>
+      <RouterProvider router={router} />
+      <NavBar />
+    </div>
+  );
+};
