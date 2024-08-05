@@ -1,41 +1,57 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Route, RouterProvider } from "react-router-dom";
 import { Dashboard } from "./dashboard";
 import { Transactions } from "./transactions";
 import { Debts } from "./debts";
 import { PageNotFound } from "./page-not-found";
 import { Profile } from "./profile";
-import { NavBar } from "../components/nav-bar";
+import { NavBar } from "../components/nav-bar/nav-bar";
+import { MainLayout } from "./main-layout";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Dashboard />,
+    element: (
+      <MainLayout>
+        <Dashboard />
+      </MainLayout>
+    ),
   },
   {
     path: "/transactions",
-    element: <Transactions />,
+    element: (
+      <MainLayout>
+        <Transactions />
+      </MainLayout>
+    ),
   },
   {
     path: "/debts",
-    element: <Debts />,
+    element: (
+      <MainLayout>
+        <Debts />
+      </MainLayout>
+    ),
   },
   {
     path: "/profile",
-    element: <Profile />,
+    element: (
+      <MainLayout>
+        <Profile />
+      </MainLayout>
+    ),
   },
   {
     path: "*",
-    element: <PageNotFound />,
+    element: (
+      <MainLayout>
+        <PageNotFound />
+      </MainLayout>
+    ),
   },
 ]);
 
 export const MainRouter: React.FC = () => {
-  return (
-    <div>
-      <RouterProvider router={router} />
-      <NavBar />
-    </div>
-  );
+  return <RouterProvider router={router} />;
 };
