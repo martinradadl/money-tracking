@@ -47,7 +47,7 @@ export default function AddTransactionModal() {
               <AiOutlineArrowLeft className="text-3xl my-2" onClick={close} />
 
               <DialogTitle>
-                <h1 className="text-3xl py-2">Add Transaction</h1>
+                <h2 className="text-3xl py-2">Add Transaction</h2>
               </DialogTitle>
 
               <div className="flex flex-col gap-4 mt-2">
