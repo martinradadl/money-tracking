@@ -14,13 +14,13 @@ export const transactions: Array<TransactionI> = [
     amount: 56,
   },
   {
-    type: "outcome",
+    type: "expenses",
     concept: "Bought new headphones",
     category: "Tech",
     amount: 130,
   },
   {
-    type: "outcome",
+    type: "expenses",
     concept: "Went to a Restaurant",
     category: "Food",
     amount: 24,
