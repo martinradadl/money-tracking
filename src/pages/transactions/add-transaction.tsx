@@ -13,7 +13,7 @@ const categories: string[] = [
 ];
 
 export default function AddTransactionModal() {
-  let [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   function open() {
     setIsOpen(true);
