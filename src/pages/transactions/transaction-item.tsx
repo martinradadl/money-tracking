@@ -27,7 +27,7 @@ export const TransactionItem = ({
           <input
             id={label}
             name={label}
-            className="w-full h-8 border border-navy rounded"
+            className="w-full h-9 border border-navy rounded"
           />
         );
       case "amount":
@@ -37,7 +37,7 @@ export const TransactionItem = ({
             id={label}
             name={label}
             min="0.1"
-            className="w-full h-8 border border-navy rounded"
+            className="w-full h-9 border border-navy rounded"
           />
         );
       case "type":
@@ -49,7 +49,7 @@ export const TransactionItem = ({
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               onChangeType(e);
             }}
-            className="w-full h-8 border border-navy rounded"
+            className="w-full h-9 border border-navy rounded"
           >
             <option value="income">Income</option>
             <option value="expenses">Expenses</option>
@@ -64,7 +64,7 @@ export const TransactionItem = ({
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               onChangeCategory(e);
             }}
-            className="w-full h-8 border border-navy rounded"
+            className="w-full h-9 border border-navy rounded"
           >
             <option style={{ display: "none" }}></option>
             {categories.map((elem, i) => {
