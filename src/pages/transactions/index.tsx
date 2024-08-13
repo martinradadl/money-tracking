@@ -14,7 +14,7 @@ export const Transactions: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col px-4 gap-4">
+    <div className="flex flex-col flex-1 pb-3 px-4 gap-4 overflow-y-auto">
       <h1 className="mx-auto py-2 text-4xl text-beige font-semibold">
         Transactions
       </h1>
