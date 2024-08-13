@@ -42,7 +42,7 @@ export default function AddTransactionModal() {
           <div className="flex min-h-full items-center justify-center text-navy">
             <DialogPanel
               transition
-              className="w-full flex flex-col place-content-between h-screen overflow-y-auto bg-beige p-4 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+              className="relative w-full flex flex-col place-content-between h-screen overflow-y-auto bg-beige p-4 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
             >
               <div>
                 <AiOutlineArrowLeft className="text-3xl my-2" onClick={close} />
@@ -58,13 +58,14 @@ export default function AddTransactionModal() {
                   <TransactionItem label="amount" categories={[]} />
                 </div>
               </div>
-
-              <Button
-                className="rounded-md bg-green w-full mt-6 py-1.5 px-3 text-2xl font-semibold"
-                onClick={close}
-              >
-                Add
-              </Button>
+              <div className="absolute left-0 right-0 bottom-0 p-4 bg-beige">
+                <Button
+                  className="w-full rounded-md bg-green py-1.5 px-3 text-2xl font-semibold"
+                  onClick={close}
+                >
+                  Add
+                </Button>
+              </div>
             </DialogPanel>
           </div>
         </div>
