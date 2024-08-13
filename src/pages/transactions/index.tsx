@@ -1,13 +1,21 @@
 import React from "react";
 import { Transaction } from "./transaction";
-import { transactions } from "../../data/transactions";
+import { TransactionI, transactions } from "../../data/transactions";
 import AddTransactionModal from "./add-transaction";
 import classNames from "classnames";
+import { atom, useRecoilState } from "recoil";
+
+export const transactionsListState = atom<TransactionI[]>({
+  key: "transactionsListState",
+  default: transactions,
+});
 
 export const Transactions: React.FC = () => {
+  const [transactionsList] = useRecoilState(transactionsListState);
+
   const getBalance = () => {
     let balance = 0;
-    transactions.forEach((elem) => {
+    transactionsList.forEach((elem) => {
       balance += elem.amount * (elem.type === "income" ? 1 : -1);
     });
     return balance;
@@ -35,7 +43,7 @@ export const Transactions: React.FC = () => {
         </p>
       </div>
       <div className="flex flex-col gap-3">
-        {transactions.map((elem, i) => {
+        {transactionsList.map((elem, i) => {
           return <Transaction key={i} transaction={elem} />;
         })}
       </div>
