@@ -45,6 +45,14 @@ export const transactionsListState = atom<TransactionI[]>({
   default: transactions,
 });
 
+export const getBalance = (transactions: TransactionI[]) => {
+  let balance = 0;
+  transactions.forEach((elem) => {
+    balance += elem.amount * (elem.type === "income" ? 1 : -1);
+  });
+  return balance;
+};
+
 export function addTransaction(arr: TransactionI[], newItem: TransactionI) {
   return [...arr, newItem];
 }
