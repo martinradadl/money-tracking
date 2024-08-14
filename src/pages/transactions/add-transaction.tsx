@@ -3,7 +3,12 @@ import { useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { TransactionItem } from "./transaction-item";
 import { useRecoilState } from "recoil";
-import { newTransactionState, transactionsListState } from "../../data/transactions";
+import {
+  addTransaction,
+  newTransactionInitialState,
+  newTransactionState,
+  transactionsListState,
+} from "../../data/transactions";
 
 const categories: string[] = [
   "Salary",
@@ -14,13 +19,13 @@ const categories: string[] = [
   "Tech",
 ];
 
-
 export default function AddTransactionModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
-  const [newTransaction] = useRecoilState(newTransactionState);
+  const [newTransaction, setNewTransaction] =
+    useRecoilState(newTransactionState);
 
   function open() {
     setIsOpen(true);
@@ -28,6 +33,7 @@ export default function AddTransactionModal() {
 
   function close() {
     setIsOpen(false);
+    setNewTransaction(newTransactionInitialState);
   }
 
   const onSubmit = () => {
@@ -38,7 +44,7 @@ export default function AddTransactionModal() {
     ) {
       alert("Faltan campos por llenar");
     } else {
-      setTransactionsList([...transactionsList, newTransaction]);
+      setTransactionsList(addTransaction(transactionsList, newTransaction));
       close();
     }
   };
