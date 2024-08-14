@@ -1,14 +1,9 @@
 import React from "react";
 import { Transaction } from "./transaction";
-import { TransactionI, transactions } from "../../data/transactions";
 import AddTransactionModal from "./add-transaction";
 import classNames from "classnames";
-import { atom, useRecoilState } from "recoil";
-
-export const transactionsListState = atom<TransactionI[]>({
-  key: "transactionsListState",
-  default: transactions,
-});
+import { useRecoilState } from "recoil";
+import { transactionsListState } from "../../data/transactions";
 
 export const Transactions: React.FC = () => {
   const [transactionsList] = useRecoilState(transactionsListState);

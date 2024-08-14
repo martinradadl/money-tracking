@@ -2,9 +2,8 @@ import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { TransactionItem } from "./transaction-item";
-import { atom, useRecoilState } from "recoil";
-import { transactionsListState } from ".";
-import { TransactionI } from "../../data/transactions";
+import { useRecoilState } from "recoil";
+import { newTransactionState, transactionsListState } from "../../data/transactions";
 
 const categories: string[] = [
   "Salary",
@@ -15,15 +14,6 @@ const categories: string[] = [
   "Tech",
 ];
 
-export const newTransactionState = atom<TransactionI>({
-  key: "newTransactionState",
-  default: {
-    type: "income",
-    concept: "",
-    category: "",
-    amount: 0,
-  },
-});
 
 export default function AddTransactionModal() {
   const [isOpen, setIsOpen] = useState(false);

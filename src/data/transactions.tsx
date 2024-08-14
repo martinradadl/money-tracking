@@ -1,3 +1,4 @@
+import { atom } from "recoil";
 
 export interface TransactionI {
       type: string;
@@ -26,3 +27,18 @@ export const transactions: Array<TransactionI> = [
     amount: 24,
   },
 ];
+
+export const newTransactionState = atom<TransactionI>({
+  key: "newTransactionState",
+  default: {
+    type: "income",
+    concept: "",
+    category: "",
+    amount: 0,
+  },
+});
+
+export const transactionsListState = atom<TransactionI[]>({
+  key: "transactionsListState",
+  default: transactions,
+});

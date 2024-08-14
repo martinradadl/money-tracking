@@ -1,6 +1,6 @@
 import React from "react";
 import { useRecoilState } from "recoil";
-import { newTransactionState } from "./add-transaction";
+import { newTransactionState } from "../../data/transactions";
 
 interface TransactionItemProps {
   label: string;
