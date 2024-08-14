@@ -1,17 +1,12 @@
 import React from "react";
 import { Transaction } from "./transaction";
-import { transactions } from "../../data/transactions";
 import AddTransactionModal from "./add-transaction";
 import classNames from "classnames";
+import { useRecoilState } from "recoil";
+import { getBalance, transactionsListState } from "../../data/transactions";
 
 export const Transactions: React.FC = () => {
-  const getBalance = () => {
-    let balance = 0;
-    transactions.forEach((elem) => {
-      balance += elem.amount * (elem.type === "income" ? 1 : -1);
-    });
-    return balance;
-  };
+  const [transactionsList] = useRecoilState(transactionsListState);
 
   return (
     <div className="flex flex-col flex-1 pb-3 px-4 gap-4 overflow-y-auto">
@@ -22,7 +17,7 @@ export const Transactions: React.FC = () => {
         <p className="text-beige">My Balance:</p>
         <p
           className={classNames(
-            getBalance() >= 0
+            getBalance(transactionsList) >= 0
               ? "bg-green-pastel text-navy"
               : "bg-red-pastel text-beige",
             "rounded px-2 py-0.5"
@@ -31,11 +26,11 @@ export const Transactions: React.FC = () => {
           {`${new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
-          }).format(getBalance())}`}
+          }).format(getBalance(transactionsList))}`}
         </p>
       </div>
       <div className="flex flex-col gap-3">
-        {transactions.map((elem, i) => {
+        {transactionsList.map((elem, i) => {
           return <Transaction key={i} transaction={elem} />;
         })}
       </div>

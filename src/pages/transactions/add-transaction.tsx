@@ -2,6 +2,13 @@ import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { TransactionItem } from "./transaction-item";
+import { useRecoilState } from "recoil";
+import {
+  addTransaction,
+  newTransactionInitialState,
+  newTransactionState,
+  transactionsListState,
+} from "../../data/transactions";
 
 const categories: string[] = [
   "Salary",
@@ -14,6 +21,11 @@ const categories: string[] = [
 
 export default function AddTransactionModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [transactionsList, setTransactionsList] = useRecoilState(
+    transactionsListState
+  );
+  const [newTransaction, setNewTransaction] =
+    useRecoilState(newTransactionState);
 
   function open() {
     setIsOpen(true);
@@ -21,7 +33,21 @@ export default function AddTransactionModal() {
 
   function close() {
     setIsOpen(false);
+    setNewTransaction(newTransactionInitialState);
   }
+
+  const onSubmit = () => {
+    if (
+      newTransaction.concept === "" ||
+      newTransaction.amount === 0 ||
+      newTransaction.category === ""
+    ) {
+      alert("Faltan campos por llenar");
+    } else {
+      setTransactionsList(addTransaction(transactionsList, newTransaction));
+      close();
+    }
+  };
 
   return (
     <>
@@ -61,7 +87,7 @@ export default function AddTransactionModal() {
               <div className="mt-auto pt-4 bg-beige">
                 <Button
                   className="w-full rounded-md bg-green py-1.5 px-3 text-2xl font-semibold"
-                  onClick={close}
+                  onClick={onSubmit}
                 >
                   Add
                 </Button>

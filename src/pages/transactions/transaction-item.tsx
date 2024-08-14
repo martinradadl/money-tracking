@@ -1,4 +1,6 @@
 import React from "react";
+import { useRecoilState } from "recoil";
+import { newTransactionState } from "../../data/transactions";
 
 interface TransactionItemProps {
   label: string;
@@ -9,15 +11,21 @@ export const TransactionItem = ({
   label,
   categories,
 }: TransactionItemProps) => {
-  const [selectedType, setSelectedType] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState("");
+  const [newTransaction, setNewTransaction] =
+    useRecoilState(newTransactionState);
 
-  const onChangeType = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedType(event.target.value);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewTransaction({
+      ...newTransaction,
+      [event.target.name]: event.target.value,
+    });
   };
 
-  const onChangeCategory = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(event.target.value);
+  const handleChangeSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setNewTransaction({
+      ...newTransaction,
+      [event.target.name]: event.target.value,
+    });
   };
 
   const getInput = () => {
@@ -25,19 +33,23 @@ export const TransactionItem = ({
       case "concept":
         return (
           <input
+            className="w-full h-9 px-2 border border-navy rounded"
             id={label}
             name={label}
-            className="w-full h-9 border border-navy rounded"
+            value={newTransaction.concept}
+            onChange={handleChange}
           />
         );
       case "amount":
         return (
           <input
+            className="w-full h-9 px-2 border border-navy rounded"
             type="number"
             id={label}
             name={label}
             min="0.1"
-            className="w-full h-9 border border-navy rounded"
+            value={newTransaction.amount}
+            onChange={handleChange}
           />
         );
       case "type":
@@ -45,10 +57,8 @@ export const TransactionItem = ({
           <select
             name={label}
             id={label}
-            value={selectedType}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              onChangeType(e);
-            }}
+            value={newTransaction.type}
+            onChange={handleChangeSelect}
             className="w-full h-9 border border-navy rounded"
           >
             <option value="income">Income</option>
@@ -60,10 +70,8 @@ export const TransactionItem = ({
           <select
             name={label}
             id={label}
-            value={selectedCategory}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              onChangeCategory(e);
-            }}
+            value={newTransaction.category}
+            onChange={handleChangeSelect}
             className="w-full h-9 border border-navy rounded"
           >
             <option style={{ display: "none" }}></option>
