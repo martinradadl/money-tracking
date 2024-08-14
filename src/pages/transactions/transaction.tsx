@@ -11,7 +11,7 @@ export const Transaction = ({ transaction }: TransactionProps) => {
   return (
     <div
       className={classNames(
-        "p-1 flex flex-col text-[1.5rem] rounded-md gap-1 font-semibold",
+        "px-2 pt-2 pb-3 flex flex-col text-[1.5rem] rounded-md gap-3 font-semibold",
         type === "income"
           ? "bg-green-pastel text-navy	ml-4"
           : "bg-red-pastel text-beige mr-4"
@@ -19,7 +19,7 @@ export const Transaction = ({ transaction }: TransactionProps) => {
     >
       <p>{concept}</p>
       <div className="flex place-content-between">
-        <p className="px-1 rounded-md bg-yellow-category text-navy">
+        <p className="px-2 rounded-md bg-yellow-category text-navy">
           {category}
         </p>
         <p>{`${new Intl.NumberFormat("en-US", {
