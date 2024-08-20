@@ -1,3 +1,4 @@
+import axios from "axios";
 import { atom } from "recoil";
 
 export interface TransactionI {
@@ -53,18 +54,59 @@ export const getBalance = (transactions: TransactionI[]) => {
   return balance;
 };
 
-export function addTransaction(arr: TransactionI[], newItem: TransactionI) {
-  return [...arr, newItem];
-}
+export const addTransaction = async (newItem: TransactionI) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/transactions/",
+      newItem
+    );
+    return response.data;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error(err.message);
+    }
+  }
+};
 
-export function editTransaction(
-  arr: TransactionI[],
-  index: number,
+export const getTransactions = async (userId: string) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:3000/transactions/${userId}`
+    );
+    return response.data;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error(err.message);
+    }
+  }
+};
+
+export const editTransaction = async (
+  id: string,
   updatedItem: TransactionI
-) {
-  return [...arr.slice(0, index), updatedItem, ...arr.slice(index + 1)];
-}
+) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:3000/transactions/${id}`,
+      updatedItem
+    );
+    return response.data;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error(err.message);
+    }
+  }
+};
 
-export function removeTransaction(arr: TransactionI[], index: number) {
-  return [...arr.slice(0, index), ...arr.slice(index + 1)];
-}
+export const deleteTransaction = async (id: string) => {
+  try {
+    const response = await axios.delete(
+      `http://localhost:3000/transactions/${id}`
+    );
+    return response.data;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error(err.message);
+    }
+  }
+};
