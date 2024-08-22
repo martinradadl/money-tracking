@@ -1,13 +1,12 @@
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { TransactionItem } from "./transaction-item";
 import { useRecoilState } from "recoil";
 import {
-  addTransaction,
   newTransactionInitialState,
   newTransactionState,
-  transactionsListState,
+  useTranscations,
 } from "../../data/transactions";
 
 const categories: string[] = [
@@ -19,13 +18,15 @@ const categories: string[] = [
   "Tech",
 ];
 
-export default function AddTransactionModal() {
+export interface UserId {
+  userId: string;
+}
+
+export default function AddTransactionModal({ userId }: UserId) {
   const [isOpen, setIsOpen] = useState(false);
-  const [transactionsList, setTransactionsList] = useRecoilState(
-    transactionsListState
-  );
   const [newTransaction, setNewTransaction] =
     useRecoilState(newTransactionState);
+  const { addTransaction } = useTranscations();
 
   function open() {
     setIsOpen(true);
@@ -36,6 +37,13 @@ export default function AddTransactionModal() {
     setNewTransaction(newTransactionInitialState);
   }
 
+  useEffect(() => {
+    setNewTransaction({
+      ...newTransaction,
+      userId,
+    });
+  }, []);
+
   const onSubmit = () => {
     if (
       newTransaction.concept === "" ||
@@ -44,7 +52,7 @@ export default function AddTransactionModal() {
     ) {
       alert("Faltan campos por llenar");
     } else {
-      setTransactionsList(addTransaction(transactionsList, newTransaction));
+      addTransaction(newTransaction);
       close();
     }
   };

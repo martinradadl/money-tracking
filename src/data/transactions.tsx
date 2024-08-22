@@ -1,39 +1,21 @@
 import axios from "axios";
-import { atom } from "recoil";
+import { atom, useRecoilState } from "recoil";
 
 export interface TransactionI {
+  _id?: string;
   type: string;
   concept: string;
   category: string;
   amount: number;
+  userId: string;
 }
-
-export const transactions: Array<TransactionI> = [
-  {
-    type: "income",
-    concept: "Sold clothes from Temu",
-    category: "Sellings",
-    amount: 56,
-  },
-  {
-    type: "expenses",
-    concept: "Bought new headphones",
-    category: "Tech",
-    amount: 130,
-  },
-  {
-    type: "expenses",
-    concept: "Went to a Restaurant",
-    category: "Food",
-    amount: 24,
-  },
-];
 
 export const newTransactionInitialState: TransactionI = {
   type: "income",
   concept: "",
   category: "",
   amount: 0,
+  userId: "",
 };
 
 export const newTransactionState = atom<TransactionI>({
@@ -43,7 +25,7 @@ export const newTransactionState = atom<TransactionI>({
 
 export const transactionsListState = atom<TransactionI[]>({
   key: "transactionsListState",
-  default: transactions,
+  default: [],
 });
 
 export const getBalance = (transactions: TransactionI[]) => {
@@ -54,59 +36,81 @@ export const getBalance = (transactions: TransactionI[]) => {
   return balance;
 };
 
-export const addTransaction = async (newItem: TransactionI) => {
-  try {
-    const response = await axios.post(
-      "http://localhost:3000/transactions/",
-      newItem
-    );
-    return response.data;
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error(err.message);
+export const useTranscations = () => {
+  const [transactionsList, setTransactionsList] = useRecoilState(
+    transactionsListState
+  );
+  const getTransaction = async (userId: string) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/transactions/${userId}`
+      );
+      setTransactionsList(response.data);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
     }
-  }
-};
+  };
 
-export const getTransactions = async (userId: string) => {
-  try {
-    const response = await axios.get(
-      `http://localhost:3000/transactions/${userId}`
-    );
-    return response.data;
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error(err.message);
+  const addTransaction = async (newItem: TransactionI) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/transactions/",
+        newItem
+      );
+      setTransactionsList([...transactionsList, response.data]);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
     }
-  }
-};
+  };
+  const editTransaction = async (id: string, updatedItem: TransactionI) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/transactions/${id}`,
+        updatedItem
+      );
+      const i = transactionsList.findIndex((elem) => elem._id === id);
+      if (i !== -1) {
+        setTransactionsList([
+          ...transactionsList.slice(0, i),
+          response.data,
+          ...transactionsList.slice(i + 1),
+        ]);
+      } else {
+        throw new Error("ID not found updating transactions list");
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
+  };
 
-export const editTransaction = async (
-  id: string,
-  updatedItem: TransactionI
-) => {
-  try {
-    const response = await axios.put(
-      `http://localhost:3000/transactions/${id}`,
-      updatedItem
-    );
-    return response.data;
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error(err.message);
+  const deleteTransaction = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:3000/transactions/${id}`);
+      const i = transactionsList.findIndex((elem) => elem._id === id);
+      if (i !== -1) {
+        setTransactionsList([
+          ...transactionsList.slice(0, i),
+          ...transactionsList.slice(i + 1),
+        ]);
+      } else {
+        throw new Error("ID not found deleting transaction");
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
     }
-  }
-};
-
-export const deleteTransaction = async (id: string) => {
-  try {
-    const response = await axios.delete(
-      `http://localhost:3000/transactions/${id}`
-    );
-    return response.data;
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error(err.message);
-    }
-  }
+  };
+  return {
+    getTransaction,
+    addTransaction,
+    editTransaction,
+    deleteTransaction,
+  };
 };
