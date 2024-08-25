@@ -18,6 +18,15 @@ export const newTransactionInitialState: TransactionI = {
   userId: "",
 };
 
+export const firstTransaction = {
+  _id: "01",
+  type: "income",
+  concept: "August Salary",
+  category: "Salary",
+  amount: 999,
+  userId: "1234",
+};
+
 export const newTransactionState = atom<TransactionI>({
   key: "newTransactionState",
   default: newTransactionInitialState,
@@ -25,7 +34,7 @@ export const newTransactionState = atom<TransactionI>({
 
 export const transactionsListState = atom<TransactionI[]>({
   key: "transactionsListState",
-  default: [],
+  default: [firstTransaction],
 });
 
 export const getBalance = (transactions: TransactionI[]) => {
@@ -40,7 +49,7 @@ export const useTranscations = () => {
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
-  const getTransaction = async (userId: string) => {
+  const getTransactions = async (userId: string) => {
     try {
       const response = await axios.get(
         `http://localhost:3000/transactions/${userId}`
@@ -108,9 +117,10 @@ export const useTranscations = () => {
     }
   };
   return {
-    getTransaction,
+    getTransactions,
     addTransaction,
     editTransaction,
     deleteTransaction,
+    transactionsList,
   };
 };
