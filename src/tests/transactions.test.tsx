@@ -112,14 +112,5 @@ test("deleteTransaction", async () => {
 });
 
 test("getBalance", async () => {
-  const wrapper = createWrapper();
-  const { result } = renderHook(() => useTranscations(), { wrapper });
-
-  vi.mocked(axios, true).post.mockResolvedValueOnce({
-    data: newTransaction,
-  });
-  await act(async () => {
-    result.current.addTransaction(newTransaction);
-  });
-  expect(getBalance(result.current.transactionsList)).toEqual(999);
+  expect(getBalance([newTransaction])).toEqual(999);
 });
