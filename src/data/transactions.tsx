@@ -18,15 +18,6 @@ export const newTransactionInitialState: TransactionI = {
   userId: "",
 };
 
-export const firstTransaction = {
-  _id: "01",
-  type: "income",
-  concept: "August Salary",
-  category: "Salary",
-  amount: 999,
-  userId: "1234",
-};
-
 export const newTransactionState = atom<TransactionI>({
   key: "newTransactionState",
   default: newTransactionInitialState,
@@ -34,7 +25,7 @@ export const newTransactionState = atom<TransactionI>({
 
 export const transactionsListState = atom<TransactionI[]>({
   key: "transactionsListState",
-  default: [firstTransaction],
+  default: [],
 });
 
 export const getBalance = (transactions: TransactionI[]) => {
@@ -49,11 +40,11 @@ export const useTranscations = () => {
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
+  const port = "http://localhost:3000";
+
   const getTransactions = async (userId: string) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/transactions/${userId}`
-      );
+      const response = await axios.get(`${port}/transactions/${userId}`);
       setTransactionsList(response.data);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -64,10 +55,7 @@ export const useTranscations = () => {
 
   const addTransaction = async (newItem: TransactionI) => {
     try {
-      const response = await axios.post(
-        "http://localhost:3000/transactions/",
-        newItem
-      );
+      const response = await axios.post(`${port}/transactions/`, newItem);
       setTransactionsList([...transactionsList, response.data]);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -78,7 +66,7 @@ export const useTranscations = () => {
   const editTransaction = async (id: string, updatedItem: TransactionI) => {
     try {
       const response = await axios.put(
-        `http://localhost:3000/transactions/${id}`,
+        `${port}/transactions/${id}`,
         updatedItem
       );
       const i = transactionsList.findIndex((elem) => elem._id === id);
@@ -100,7 +88,7 @@ export const useTranscations = () => {
 
   const deleteTransaction = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:3000/transactions/${id}`);
+      await axios.delete(`${port}/transactions/${id}`);
       const i = transactionsList.findIndex((elem) => elem._id === id);
       if (i !== -1) {
         setTransactionsList([
