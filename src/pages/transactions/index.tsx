@@ -1,12 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Transaction } from "./transaction";
 import AddTransactionModal from "./add-transaction";
 import classNames from "classnames";
 import { useRecoilState } from "recoil";
-import { getBalance, transactionsListState } from "../../data/transactions";
+import {
+  getBalance,
+  transactionsListState,
+  useTranscations,
+} from "../../data/transactions";
 
 export const Transactions: React.FC = () => {
   const [transactionsList] = useRecoilState(transactionsListState);
+  const { getTransaction } = useTranscations();
+  const userId = "1234";
+  const balance = getBalance(transactionsList);
+
+  useEffect(() => {
+    getTransaction(userId);
+  }, [userId]);
 
   return (
     <div className="flex flex-col flex-1 pb-14 px-4 gap-4 overflow-y-auto">
@@ -17,7 +28,7 @@ export const Transactions: React.FC = () => {
         <p className="text-beige">My Balance:</p>
         <p
           className={classNames(
-            getBalance(transactionsList) >= 0
+            balance >= 0
               ? "bg-green-pastel text-navy"
               : "bg-red-pastel text-beige",
             "rounded px-2 py-0.5 font-semibold"
@@ -26,7 +37,7 @@ export const Transactions: React.FC = () => {
           {`${new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
-          }).format(getBalance(transactionsList))}`}
+          }).format(balance)}`}
         </p>
       </div>
       <div className="flex flex-col gap-3">
@@ -35,7 +46,7 @@ export const Transactions: React.FC = () => {
         })}
       </div>
       <div className="fixed bottom-[4.5rem] right-3">
-        <AddTransactionModal />
+        <AddTransactionModal userId={userId}/>
       </div>
     </div>
   );
