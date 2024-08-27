@@ -11,12 +11,12 @@ import {
 
 export const Transactions: React.FC = () => {
   const [transactionsList] = useRecoilState(transactionsListState);
-  const { getTransaction } = useTranscations();
+  const { getTransactions } = useTranscations();
   const userId = "1234";
   const balance = getBalance(transactionsList);
 
   useEffect(() => {
-    getTransaction(userId);
+    getTransactions(userId);
   }, [userId]);
 
   return (
