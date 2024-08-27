@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint && eslint . --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "vitest --config vitest.config.ts",
+    "test": "vitest --config vitest.config.ts --watch=false",
     "prepare": "husky"
   },
   "dependencies": {
