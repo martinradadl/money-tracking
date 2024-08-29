@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import React from "react";
 import { TransactionI } from "../../data/transactions";
 
 interface TransactionProps {
@@ -25,6 +24,7 @@ export const Transaction = ({ transaction }: TransactionProps) => {
         <p>{`${new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: "USD",
+          minimumFractionDigits: 0,
         }).format(type === "income" ? amount : -amount)}`}</p>
       </div>
     </div>
