@@ -9,6 +9,7 @@ export default {
       beige: "#FFF5E0",
       "red-pastel": "#FF7272",
       "yellow-category": "#FABC60",
+      red: "rgb(220,38,38)",
     },
     extend: {},
   },
