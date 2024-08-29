@@ -10,22 +10,19 @@ export interface TransactionI {
   userId: string;
 }
 
-export const newTransactionInitialState: TransactionI = {
-  type: "income",
-  concept: "",
-  category: "",
-  amount: 0,
-  userId: "",
-};
-
-export const newTransactionState = atom<TransactionI>({
+export const newTransactionState = atom<TransactionI | null>({
   key: "newTransactionState",
-  default: newTransactionInitialState,
+  default: null,
 });
 
 export const transactionsListState = atom<TransactionI[]>({
   key: "transactionsListState",
   default: [],
+});
+
+export const selectedTransactionState = atom<TransactionI | null>({
+  key: "selectedTransactionState",
+  default: null,
 });
 
 export const getBalance = (transactions: TransactionI[]) => {
