@@ -6,27 +6,22 @@ import { TransactionForm } from "./transaction-form";
 import { useRecoilState } from "recoil";
 import {
   newTransactionState,
-  TransactionI,
+  selectedTransactionState,
   useTranscations,
 } from "../../data/transactions";
 
 export interface props {
   userId: string;
-  selectedTransaction: TransactionI | null;
-  open: () => void;
   close: () => void;
   isOpen: boolean;
 }
 
-export default function TransactionModal({
-  userId,
-  selectedTransaction,
-  open,
-  close,
-  isOpen,
-}: props) {
+export default function TransactionModal({ userId, close, isOpen }: props) {
   const [newTransaction, setNewTransaction] =
     useRecoilState(newTransactionState);
+  const [selectedTransaction, setSelectedTransaction] = useRecoilState(
+    selectedTransactionState
+  );
   const { addTransaction, editTransaction } = useTranscations();
 
   useEffect(() => {
@@ -41,7 +36,7 @@ export default function TransactionModal({
         userId,
       });
     }
-  }, []);
+  }, [selectedTransaction]);
 
   const isSameTransaction = () => {
     return (
@@ -65,8 +60,13 @@ export default function TransactionModal({
       if (hasEmptyFields()) {
         alert("Faltan campos por llenar");
       } else {
-        if (selectedTransaction?._id && !isSameTransaction()) {
-          editTransaction(selectedTransaction._id, newTransaction);
+        if (selectedTransaction?._id) {
+          if (isSameTransaction()) {
+            alert("No hay cambios");
+            return;
+          } else {
+            editTransaction(selectedTransaction._id, newTransaction);
+          }
         } else {
           addTransaction(newTransaction);
         }
@@ -75,28 +75,8 @@ export default function TransactionModal({
     }
   };
 
-  useEffect(() => {
-    console.log(selectedTransaction);
-  }, [selectedTransaction]);
-
   return (
     <>
-      {selectedTransaction ? (
-        <Button
-          onClick={open}
-          className="bg-beige text-navy rounded-full p-1 text-lg"
-        >
-          <AiFillEdit />
-        </Button>
-      ) : (
-        <Button
-          onClick={open}
-          className="bg-green text-beige font-bold w-40 rounded-full py-2 px-4 text-base focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"
-        >
-          Add Transaction
-        </Button>
-      )}
-
       <Dialog
         open={isOpen}
         as="div"

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { AiFillDelete } from "react-icons/ai";
+import React, { Ref, RefObject, useEffect, useRef, useState } from "react";
+import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { Transaction } from "./transaction";
 import TransactionModal from "./transaction-modal";
 import classNames from "classnames";
@@ -22,15 +22,15 @@ export const Transactions: React.FC = () => {
   const { getTransactions } = useTranscations();
   const userId = "1234";
   const balance = getBalance(transactionsList);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  function open() {
-    setIsOpen(true);
+  function openModal() {
+    setIsModalOpen(true);
   }
 
-  function close() {
-    setIsOpen(false);
-    setNewTransaction(null);
+  function closeModal() {
+    setIsModalOpen(false);
+    setSelectedTransaction(null);
   }
 
   useEffect(() => {
@@ -38,12 +38,32 @@ export const Transactions: React.FC = () => {
   }, [userId]);
 
   const showOptions = (transaction: TransactionI) => {
-    const timer = setTimeout(() => {
-      setSelectedTransaction(transaction);
-    }, 500);
-    return timer;
-    // setSelectedTransaction(transaction);
+    // const timer = setTimeout(() => {
+    //   setSelectedTransaction(transaction);
+    // }, 500);
+    // return timer;
+    setSelectedTransaction(transaction);
   };
+
+  const useOutsideClick = (callback: Function) => {
+    const ref: RefObject<HTMLDivElement> = useRef(null);
+    useEffect(() => {
+      const handleClick = (event: Event) => {
+        callback();
+      };
+      document.addEventListener("click", handleClick);
+      return () => {
+        document.removeEventListener("click", handleClick);
+      };
+    }, []);
+    return ref;
+  };
+
+  const handleClickOutside = () => {
+    setSelectedTransaction(null);
+  };
+
+  const ref = useOutsideClick(handleClickOutside);
 
   return (
     <div className="flex flex-col flex-1 pb-14 px-4 gap-4 overflow-y-auto">
@@ -70,18 +90,15 @@ export const Transactions: React.FC = () => {
       <div className="flex flex-col gap-3">
         {transactionsList.map((elem, i) => {
           return (
-            <div key={i} className="relative">
+            <div ref={ref} key={i} className="relative">
               {selectedTransaction?._id === elem._id ? (
                 <div className="absolute -top-4 right-2 flex gap-3">
-                  <TransactionModal
-                    {...{
-                      userId,
-                      selectedTransaction,
-                      open,
-                      close,
-                      isOpen,
-                    }}
-                  />
+                  <div
+                    onClick={openModal}
+                    className="bg-beige text-navy rounded-full p-1 text-lg"
+                  >
+                    <AiFillEdit />
+                  </div>
                   <div className="bg-beige text-red rounded-full p-1 text-lg">
                     <AiFillDelete />
                   </div>
@@ -99,13 +116,17 @@ export const Transactions: React.FC = () => {
         })}
       </div>
       <div className="fixed bottom-[4.5rem] right-3">
+        <button
+          onClick={openModal}
+          className="bg-green text-beige font-bold w-40 rounded-full py-2 px-4 text-base focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"
+        >
+          Add Transaction
+        </button>
         <TransactionModal
           {...{
             userId,
-            selectedTransaction: null,
-            open,
-            close,
-            isOpen,
+            close: closeModal,
+            isOpen: isModalOpen,
           }}
         />
       </div>
