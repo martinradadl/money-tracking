@@ -23,7 +23,9 @@ export const Transactions: React.FC = () => {
   const userId = "1234";
   const balance = getBalance(transactionsList);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  let timer = useRef(0)
+  const ref = useRef<HTMLDivElement | null>(null);
+  
   function openModal() {
     setIsModalOpen(true);
   }
@@ -37,33 +39,30 @@ export const Transactions: React.FC = () => {
     getTransactions(userId);
   }, [userId]);
 
-  const showOptions = (transaction: TransactionI) => {
-    // const timer = setTimeout(() => {
-    //   setSelectedTransaction(transaction);
-    // }, 500);
-    // return timer;
-    setSelectedTransaction(transaction);
+  const removeListener = () =>{
+    console.log("removio listener")
+    document.removeEventListener("touchstart", handleClickedOutside, true);
+  }
+
+
+  const handleClickedOutside = (event: Event) => {
+    if (ref.current && !ref.current.contains(event.target as Node)) {
+      setSelectedTransaction(null);
+      removeListener()
+    }
   };
 
-  const useOutsideClick = (callback: Function) => {
-    const ref: RefObject<HTMLDivElement> = useRef(null);
-    useEffect(() => {
-      const handleClick = (event: Event) => {
-        callback();
-      };
-      document.addEventListener("click", handleClick);
-      return () => {
-        document.removeEventListener("click", handleClick);
-      };
-    }, []);
-    return ref;
-  };
+  const handleTouchStart = (transaction: TransactionI) => {
+    timer.current = setTimeout(() => {
+      document.addEventListener("touchstart", handleClickedOutside);
+      console.count("creo el listener")
+      setSelectedTransaction(transaction);
+    }, 700);
+  }
 
-  const handleClickOutside = () => {
-    setSelectedTransaction(null);
-  };
-
-  const ref = useOutsideClick(handleClickOutside);
+  const handleTouchEnd = () => {
+    clearTimeout(timer.current)
+  }
 
   return (
     <div className="flex flex-col flex-1 pb-14 px-4 gap-4 overflow-y-auto">
@@ -90,11 +89,14 @@ export const Transactions: React.FC = () => {
       <div className="flex flex-col gap-3">
         {transactionsList.map((elem, i) => {
           return (
-            <div ref={ref} key={i} className="relative">
+            <div key={i} className="relative">
               {selectedTransaction?._id === elem._id ? (
-                <div className="absolute -top-4 right-2 flex gap-3">
+                <div ref={ref} className="absolute -top-4 right-2 flex gap-3">
                   <div
-                    onClick={openModal}
+                    onClick={()=>{
+                      removeListener()
+                      openModal()
+                    }}
                     className="bg-beige text-navy rounded-full p-1 text-lg"
                   >
                     <AiFillEdit />
@@ -106,8 +108,9 @@ export const Transactions: React.FC = () => {
               ) : null}
               <div
                 onTouchStart={() => {
-                  showOptions(elem);
+                  handleTouchStart(elem);
                 }}
+                onTouchEnd={handleTouchEnd}
               >
                 <Transaction key={i} transaction={elem} />
               </div>

@@ -63,7 +63,6 @@ export default function TransactionModal({ userId, close, isOpen }: props) {
         if (selectedTransaction?._id) {
           if (isSameTransaction()) {
             alert("No hay cambios");
-            return;
           } else {
             editTransaction(selectedTransaction._id, newTransaction);
           }
