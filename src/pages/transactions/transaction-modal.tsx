@@ -1,5 +1,4 @@
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { AiFillEdit } from "react-icons/ai";
 import { useEffect } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { TransactionForm } from "./transaction-form";
@@ -19,7 +18,7 @@ export interface props {
 export default function TransactionModal({ userId, close, isOpen }: props) {
   const [newTransaction, setNewTransaction] =
     useRecoilState(newTransactionState);
-  const [selectedTransaction, setSelectedTransaction] = useRecoilState(
+  const [selectedTransaction] = useRecoilState(
     selectedTransactionState
   );
   const { addTransaction, editTransaction } = useTranscations();
