@@ -1,4 +1,4 @@
-import React, { Ref, RefObject, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { Transaction } from "./transaction";
 import TransactionModal from "./transaction-modal";
@@ -10,7 +10,6 @@ import {
   useTranscations,
   selectedTransactionState,
   TransactionI,
-  newTransactionState,
 } from "../../data/transactions";
 
 export const Transactions: React.FC = () => {
@@ -18,14 +17,13 @@ export const Transactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
     selectedTransactionState
   );
-  const [_, setNewTransaction] = useRecoilState(newTransactionState);
   const { getTransactions } = useTranscations();
   const userId = "1234";
   const balance = getBalance(transactionsList);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  let timer = useRef(0)
-  const ref = useRef<HTMLDivElement | null>(null);
-  
+  const timer = useRef(0);
+  const selectedContainer = useRef<HTMLDivElement | null>(null);
+
   function openModal() {
     setIsModalOpen(true);
   }
@@ -39,30 +37,28 @@ export const Transactions: React.FC = () => {
     getTransactions(userId);
   }, [userId]);
 
-  const removeListener = () =>{
-    console.log("removio listener")
-    document.removeEventListener("touchstart", handleClickedOutside, true);
-  }
-
-
   const handleClickedOutside = (event: Event) => {
-    if (ref.current && !ref.current.contains(event.target as Node)) {
+    if (
+      selectedContainer.current &&
+      !selectedContainer.current.contains(event.target as Node) &&
+      !isModalOpen
+    ) {
       setSelectedTransaction(null);
-      removeListener()
     }
   };
 
   const handleTouchStart = (transaction: TransactionI) => {
     timer.current = setTimeout(() => {
-      document.addEventListener("touchstart", handleClickedOutside);
-      console.count("creo el listener")
+      document.addEventListener("touchstart", handleClickedOutside, {
+        once: true,
+      });
       setSelectedTransaction(transaction);
     }, 700);
-  }
+  };
 
   const handleTouchEnd = () => {
-    clearTimeout(timer.current)
-  }
+    clearTimeout(timer.current);
+  };
 
   return (
     <div className="flex flex-col flex-1 pb-14 px-4 gap-4 overflow-y-auto">
@@ -91,17 +87,22 @@ export const Transactions: React.FC = () => {
           return (
             <div key={i} className="relative">
               {selectedTransaction?._id === elem._id ? (
-                <div ref={ref} className="absolute -top-4 right-2 flex gap-3">
+                <div
+                  ref={selectedContainer}
+                  className={classNames(
+                    "absolute -top-4 flex gap-3",
+                    elem.type === "income" ? "right-1" : "right-5"
+                  )}
+                >
                   <div
-                    onClick={()=>{
-                      removeListener()
-                      openModal()
+                    onClick={() => {
+                      openModal();
                     }}
-                    className="bg-beige text-navy rounded-full p-1 text-lg"
+                    className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl"
                   >
                     <AiFillEdit />
                   </div>
-                  <div className="bg-beige text-red rounded-full p-1 text-lg">
+                  <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
                     <AiFillDelete />
                   </div>
                 </div>
