@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Transition } from "@headlessui/react";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { Transaction } from "./transaction";
 import TransactionModal from "./transaction-modal";
@@ -86,11 +87,11 @@ export const Transactions: React.FC = () => {
         {transactionsList.map((elem, i) => {
           return (
             <div key={i} className="relative">
-              {selectedTransaction?._id === elem._id ? (
+              <Transition show={selectedTransaction?._id === elem._id}>
                 <div
                   ref={selectedContainer}
                   className={classNames(
-                    "absolute -top-4 flex gap-3",
+                    "absolute -top-4 flex gap-3 transition duration-300 ease-in data-[closed]:opacity-0",
                     elem.type === "income" ? "right-1" : "right-5"
                   )}
                 >
@@ -106,7 +107,7 @@ export const Transactions: React.FC = () => {
                     <AiFillDelete />
                   </div>
                 </div>
-              ) : null}
+              </Transition>
               <div
                 onTouchStart={() => {
                   handleTouchStart(elem);
