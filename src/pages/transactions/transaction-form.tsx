@@ -26,11 +26,9 @@ export const TransactionForm = () => {
   };
 
   const handleChangeAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let inputValue = event.target.value;
+    const inputValue = event.target.value;
     const lastValue = inputValue.substring(inputValue.length - 1);
-    // const notAllowedValues = ["+", "-", "e", "E", "."];
-    // inputValue = inputValue.replace(/[\+]/g, "");
-    // pattern="[^eE\x22]+"
+    const firstValue = inputValue.substring(0, 1);
     const allowedValues = new RegExp("[0-9]+");
     const hasAllowedValues = inputValue
       .split("")
@@ -38,7 +36,8 @@ export const TransactionForm = () => {
     if (
       newTransaction &&
       inputValue.length <= 12 &&
-      (!lastValue || hasAllowedValues)
+      (!lastValue || hasAllowedValues) &&
+      firstValue !== "0"
     ) {
       setNewTransaction({
         ...newTransaction,
@@ -108,7 +107,6 @@ export const TransactionForm = () => {
           type="text"
           id="amount"
           name="amount"
-          // min="0.1"
           value={newTransaction?.amount}
           onChange={handleChangeAmount}
         />
