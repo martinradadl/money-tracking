@@ -1,23 +1,66 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Transition } from "@headlessui/react";
+import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { Transaction } from "./transaction";
-import AddTransactionModal from "./add-transaction";
+import TransactionModal from "./transaction-modal";
 import classNames from "classnames";
 import { useRecoilState } from "recoil";
 import {
   getBalance,
   transactionsListState,
   useTranscations,
+  selectedTransactionState,
+  TransactionI,
+  TransactionFormI,
 } from "../../data/transactions";
 
 export const Transactions: React.FC = () => {
   const [transactionsList] = useRecoilState(transactionsListState);
+  const [selectedTransaction, setSelectedTransaction] = useRecoilState(
+    selectedTransactionState
+  );
   const { getTransactions } = useTranscations();
   const userId = "1234";
   const balance = getBalance(transactionsList);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const timer = useRef(0);
+  const selectedContainer = useRef<HTMLDivElement | null>(null);
+
+  function openModal() {
+    setIsModalOpen(true);
+  }
+
+  function closeModal() {
+    setIsModalOpen(false);
+    setSelectedTransaction(null);
+  }
 
   useEffect(() => {
     getTransactions(userId);
   }, [userId]);
+
+  const handleClickedOutside = (event: Event) => {
+    if (
+      selectedContainer.current &&
+      !selectedContainer.current.contains(event.target as Node) &&
+      !isModalOpen
+    ) {
+      setSelectedTransaction(null);
+    }
+  };
+
+  const handleTouchStart = (transaction: TransactionI) => {
+    timer.current = setTimeout(() => {
+      document.addEventListener("touchstart", handleClickedOutside, {
+        once: true,
+      });
+      setSelectedTransaction(transaction as unknown as TransactionFormI);
+    }, 500);
+  };
+
+  const handleTouchEnd = () => {
+    clearTimeout(timer.current);
+  };
 
   return (
     <div className="flex flex-col flex-1 pb-14 px-4 gap-4 overflow-y-auto">
@@ -37,16 +80,61 @@ export const Transactions: React.FC = () => {
           {`${new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
+            minimumFractionDigits: 0,
           }).format(balance)}`}
         </p>
       </div>
       <div className="flex flex-col gap-3">
         {transactionsList.map((elem, i) => {
-          return <Transaction key={i} transaction={elem} />;
+          return (
+            <div key={i} className="relative">
+              <Transition show={selectedTransaction?._id === elem._id}>
+                <div
+                  ref={selectedContainer}
+                  className={classNames(
+                    "absolute -top-4 flex gap-3 transition duration-300 ease-in data-[closed]:opacity-0",
+                    elem.type === "income" ? "right-1" : "right-5"
+                  )}
+                >
+                  <div
+                    onClick={() => {
+                      openModal();
+                    }}
+                    className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl"
+                  >
+                    <AiFillEdit />
+                  </div>
+                  <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
+                    <AiFillDelete />
+                  </div>
+                </div>
+              </Transition>
+              <div
+                onTouchStart={() => {
+                  handleTouchStart(elem);
+                }}
+                onTouchEnd={handleTouchEnd}
+              >
+                <Transaction key={i} transaction={elem} />
+              </div>
+            </div>
+          );
         })}
       </div>
       <div className="fixed bottom-[4.5rem] right-3">
-        <AddTransactionModal userId={userId}/>
+        <button
+          onClick={openModal}
+          className="bg-green text-beige font-bold w-40 rounded-full py-2 px-4 text-base focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"
+        >
+          Add Transaction
+        </button>
+        <TransactionModal
+          {...{
+            userId,
+            close: closeModal,
+            isOpen: isModalOpen,
+          }}
+        />
       </div>
     </div>
   );

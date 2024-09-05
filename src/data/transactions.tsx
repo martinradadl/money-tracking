@@ -10,22 +10,23 @@ export interface TransactionI {
   userId: string;
 }
 
-export const newTransactionInitialState: TransactionI = {
-  type: "income",
-  concept: "",
-  category: "",
-  amount: 0,
-  userId: "",
-};
+export interface TransactionFormI extends Omit<TransactionI, "amount"> {
+  amount: string;
+}
 
-export const newTransactionState = atom<TransactionI>({
+export const newTransactionState = atom<TransactionFormI | null>({
   key: "newTransactionState",
-  default: newTransactionInitialState,
+  default: null,
 });
 
 export const transactionsListState = atom<TransactionI[]>({
   key: "transactionsListState",
   default: [],
+});
+
+export const selectedTransactionState = atom<TransactionFormI | null>({
+  key: "selectedTransactionState",
+  default: null,
 });
 
 export const getBalance = (transactions: TransactionI[]) => {
@@ -53,9 +54,10 @@ export const useTranscations = () => {
     }
   };
 
-  const addTransaction = async (newItem: TransactionI) => {
+  const addTransaction = async (newItem: TransactionFormI) => {
     try {
-      const response = await axios.post(`${port}/transactions/`, newItem);
+      const parsedItem = { ...newItem, amount: parseInt(newItem.amount) };
+      const response = await axios.post(`${port}/transactions/`, parsedItem);
       setTransactionsList([...transactionsList, response.data]);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -63,11 +65,12 @@ export const useTranscations = () => {
       }
     }
   };
-  const editTransaction = async (id: string, updatedItem: TransactionI) => {
+  const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
     try {
+      const parsedItem = { ...updatedItem, amount: parseInt(updatedItem.amount) };
       const response = await axios.put(
         `${port}/transactions/${id}`,
-        updatedItem
+        parsedItem
       );
       const i = transactionsList.findIndex((elem) => elem._id === id);
       if (i !== -1) {
