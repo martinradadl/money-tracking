@@ -11,6 +11,7 @@ import {
   useTranscations,
   selectedTransactionState,
   TransactionI,
+  TransactionFormI,
 } from "../../data/transactions";
 
 export const Transactions: React.FC = () => {
@@ -53,8 +54,8 @@ export const Transactions: React.FC = () => {
       document.addEventListener("touchstart", handleClickedOutside, {
         once: true,
       });
-      setSelectedTransaction(transaction);
-    }, 700);
+      setSelectedTransaction(transaction as unknown as TransactionFormI);
+    }, 500);
   };
 
   const handleTouchEnd = () => {

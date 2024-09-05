@@ -25,7 +25,7 @@ export const Transaction = ({ transaction }: TransactionProps) => {
           style: "currency",
           currency: "USD",
           minimumFractionDigits: 0,
-        }).format(type === "income" ? amount : -amount)}`}</p>
+        }).format(type === "income" && amount ? amount : -amount)}`}</p>
       </div>
     </div>
   );

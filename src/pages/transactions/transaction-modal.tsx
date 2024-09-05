@@ -31,7 +31,7 @@ export default function TransactionModal({ userId, close, isOpen }: props) {
         type: "income",
         concept: "",
         category: "",
-        amount: 0,
+        amount: "",
         userId,
       });
     }
@@ -49,7 +49,8 @@ export default function TransactionModal({ userId, close, isOpen }: props) {
   const hasEmptyFields = () => {
     return (
       newTransaction?.concept === "" ||
-      newTransaction?.amount === 0 ||
+      newTransaction?.amount === "" ||
+      newTransaction?.amount === "0" ||
       newTransaction?.category === ""
     );
   };
