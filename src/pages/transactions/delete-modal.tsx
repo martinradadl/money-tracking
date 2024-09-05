@@ -33,11 +33,11 @@ export const DeleteTransactionModal = () => {
           <div className="flex items-center justify-center w-full text-navy">
             <DialogPanel
               transition
-              className="w-[90%] rounded-md shadow-[0_0_60px_4px_rgba(0,0,0,0.3)] flex flex-col place-content-between h-fit overflow-scroll bg-beige p-4 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+              className="w-[90%] rounded-md shadow-[0_0_60px_4px_rgba(0,0,0,0.3)] flex flex-col place-content-between h-fit overflow-y-scroll bg-beige p-4 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
             >
-              <div className="overflow-auto flex flex-col gap-4 items-center justify-center">
+              <div className="flex flex-col gap-4 items-center justify-center">
                 <AiOutlineWarning className="text-4xl text-red" />
-                <div className="overflow-auto flex flex-col gap-1 items-center justify-center text-center">
+                <div className="flex flex-col gap-1 items-center justify-center text-center">
                   <h3>
                     <b>Delete Transaction</b>
                   </h3>
