@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Transition } from "@headlessui/react";
-import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { AiFillEdit } from "react-icons/ai";
 import { Transaction } from "./transaction";
 import TransactionModal from "./transaction-modal";
 import classNames from "classnames";
@@ -13,6 +13,7 @@ import {
   TransactionI,
   TransactionFormI,
 } from "../../data/transactions";
+import { DeleteTransactionModal } from "./delete-modal";
 
 export const Transactions: React.FC = () => {
   const [transactionsList] = useRecoilState(transactionsListState);
@@ -105,7 +106,7 @@ export const Transactions: React.FC = () => {
                     <AiFillEdit />
                   </div>
                   <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
-                    <AiFillDelete />
+                    <DeleteTransactionModal />
                   </div>
                 </div>
               </Transition>
