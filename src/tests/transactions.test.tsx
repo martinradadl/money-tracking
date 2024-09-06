@@ -7,7 +7,7 @@ import React from "react";
 
 vi.mock("axios");
 
-export const newTransaction = {
+const newTransaction = {
   _id: "01",
   type: "income",
   concept: "August Salary",
@@ -25,6 +25,8 @@ const updatedTransaction = {
   userId: "1234",
 };
 
+const category = [{ _id: "01", label: "Salary" }];
+
 const createWrapper = () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <RecoilRoot>{children}</RecoilRoot>
@@ -32,9 +34,9 @@ const createWrapper = () => {
   return wrapper;
 };
 
-test("addTransaction", async () => {
-  const wrapper = createWrapper();
+const wrapper = createWrapper();
 
+test("addTransaction", async () => {
   vi.mocked(axios, true).post.mockResolvedValueOnce({
     data: newTransaction,
   });
@@ -47,11 +49,6 @@ test("addTransaction", async () => {
 });
 
 test("getTransaction", async () => {
-  const wrapper = createWrapper();
-
-  vi.mocked(axios, true).post.mockResolvedValueOnce({
-    data: newTransaction,
-  });
   vi.mocked(axios, true).get.mockResolvedValueOnce({
     data: [newTransaction],
   });
@@ -59,17 +56,12 @@ test("getTransaction", async () => {
   const { result } = renderHook(() => useTranscations(), { wrapper });
 
   await act(async () => {
-    result.current.addTransaction(newTransaction);
-  });
-  await act(async () => {
     result.current.getTransactions("1234");
   });
   expect(result.current.transactionsList).toEqual([newTransaction]);
 });
 
 test("editTransaction", async () => {
-  const wrapper = createWrapper();
-
   vi.mocked(axios, true).post.mockResolvedValueOnce({
     data: newTransaction,
   });
@@ -90,14 +82,10 @@ test("editTransaction", async () => {
 });
 
 test("deleteTransaction", async () => {
-  const wrapper = createWrapper();
-
   vi.mocked(axios, true).post.mockResolvedValueOnce({
     data: newTransaction,
   });
-  vi.mocked(axios, true).delete.mockResolvedValueOnce({
-    data: [],
-  });
+  vi.mocked(axios, true).delete.mockResolvedValueOnce({});
 
   const { result } = renderHook(() => useTranscations(), { wrapper });
 
@@ -109,4 +97,17 @@ test("deleteTransaction", async () => {
     result.current.deleteTransaction("01");
   });
   expect(result.current.transactionsList).toEqual([]);
+});
+
+test("getCategories", async () => {
+  vi.mocked(axios, true).get.mockResolvedValueOnce({
+    data: [category],
+  });
+
+  const { result } = renderHook(() => useTranscations(), { wrapper });
+
+  await act(async () => {
+    result.current.getCategories();
+  });
+  expect(result.current.categories).toEqual([category]);
 });

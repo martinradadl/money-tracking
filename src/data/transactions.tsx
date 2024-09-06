@@ -51,8 +51,8 @@ export const useTranscations = () => {
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
-  const [, setCategories] = useRecoilState(categoriesState);
-  const [, setNewTransaction] = useRecoilState(newTransactionState);
+  const [categories, setCategories] = useRecoilState(categoriesState);
+
   const port = "http://localhost:3000";
 
   const getTransactions = async (userId: string) => {
@@ -125,7 +125,6 @@ export const useTranscations = () => {
           ...transactionsList.slice(0, i),
           ...transactionsList.slice(i + 1),
         ]);
-        setNewTransaction(null);
       } else {
         throw new Error("ID not found deleting transaction");
       }
@@ -142,5 +141,6 @@ export const useTranscations = () => {
     deleteTransaction,
     transactionsList,
     getCategories,
+    categories,
   };
 };
