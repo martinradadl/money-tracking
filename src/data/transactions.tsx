@@ -5,13 +5,18 @@ export interface TransactionI {
   _id?: string;
   type: string;
   concept: string;
-  category: string;
+  category: CategoryI;
   amount: number;
   userId: string;
 }
 
 export interface TransactionFormI extends Omit<TransactionI, "amount"> {
   amount: string;
+}
+
+export interface CategoryI {
+  _id: string;
+  label: string;
 }
 
 export const newTransactionState = atom<TransactionFormI | null>({
@@ -29,7 +34,7 @@ export const selectedTransactionState = atom<TransactionFormI | null>({
   default: null,
 });
 
-export const categoriesState = atom<string[]>({
+export const categoriesState = atom<CategoryI[]>({
   key: "categoriesState",
   default: [],
 });
@@ -47,6 +52,7 @@ export const useTranscations = () => {
     transactionsListState
   );
   const [, setCategories] = useRecoilState(categoriesState);
+  const [, setNewTransaction] = useRecoilState(newTransactionState);
   const port = "http://localhost:3000";
 
   const getTransactions = async (userId: string) => {
@@ -82,6 +88,7 @@ export const useTranscations = () => {
       }
     }
   };
+
   const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
     try {
       const parsedItem = {
@@ -118,6 +125,7 @@ export const useTranscations = () => {
           ...transactionsList.slice(0, i),
           ...transactionsList.slice(i + 1),
         ]);
+        setNewTransaction(null);
       } else {
         throw new Error("ID not found deleting transaction");
       }

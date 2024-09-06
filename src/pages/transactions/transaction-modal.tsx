@@ -18,9 +18,7 @@ export interface props {
 export default function TransactionModal({ userId, close, isOpen }: props) {
   const [newTransaction, setNewTransaction] =
     useRecoilState(newTransactionState);
-  const [selectedTransaction] = useRecoilState(
-    selectedTransactionState
-  );
+  const [selectedTransaction] = useRecoilState(selectedTransactionState);
   const { addTransaction, editTransaction } = useTranscations();
 
   useEffect(() => {
@@ -30,7 +28,7 @@ export default function TransactionModal({ userId, close, isOpen }: props) {
       setNewTransaction({
         type: "income",
         concept: "",
-        category: "",
+        category: { _id: "", label: "" },
         amount: "",
         userId,
       });
@@ -42,7 +40,7 @@ export default function TransactionModal({ userId, close, isOpen }: props) {
       newTransaction?.type === selectedTransaction?.type &&
       newTransaction?.concept === selectedTransaction?.concept &&
       newTransaction?.amount === selectedTransaction?.amount &&
-      newTransaction?.category === selectedTransaction?.category
+      newTransaction?.category._id === selectedTransaction?.category._id
     );
   };
 
@@ -51,7 +49,7 @@ export default function TransactionModal({ userId, close, isOpen }: props) {
       newTransaction?.concept === "" ||
       newTransaction?.amount === "" ||
       newTransaction?.amount === "0" ||
-      newTransaction?.category === ""
+      newTransaction?.category._id === ""
     );
   };
 

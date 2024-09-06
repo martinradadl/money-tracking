@@ -1,22 +1,15 @@
 import React from "react";
 import { useRecoilState } from "recoil";
-import { newTransactionState } from "../../data/transactions";
+import { categoriesState, newTransactionState } from "../../data/transactions";
 import { Select } from "@headlessui/react";
-
-const categories: string[] = [
-  "Salary",
-  "Food",
-  "Transport",
-  "Entertainment",
-  "Sellings",
-  "Tech",
-];
 
 export const TransactionForm = () => {
   const [newTransaction, setNewTransaction] =
     useRecoilState(newTransactionState);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [categories] = useRecoilState(categoriesState);
+
+  const handleChangeConcept = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (newTransaction) {
       setNewTransaction({
         ...newTransaction,
@@ -46,11 +39,22 @@ export const TransactionForm = () => {
     }
   };
 
-  const handleChangeSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChangeType = (event: React.ChangeEvent<HTMLSelectElement>) => {
     if (newTransaction) {
       setNewTransaction({
         ...newTransaction,
         [event.target.name]: event.target.value,
+      });
+    }
+  };
+
+  const handleChangeCategory = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    if (newTransaction) {
+      setNewTransaction({
+        ...newTransaction,
+        category: { _id: event.target.value, label: "" },
       });
     }
   };
@@ -63,7 +67,7 @@ export const TransactionForm = () => {
           name="type"
           id="type"
           value={newTransaction?.type}
-          onChange={handleChangeSelect}
+          onChange={handleChangeType}
           className="w-full h-9 border border-navy rounded"
         >
           <option value="income">Income</option>
@@ -77,7 +81,7 @@ export const TransactionForm = () => {
           id="concept"
           name="concept"
           value={newTransaction?.concept}
-          onChange={handleChange}
+          onChange={handleChangeConcept}
           maxLength={40}
         />
       </label>
@@ -86,15 +90,15 @@ export const TransactionForm = () => {
         <Select
           name="category"
           id="category"
-          value={newTransaction?.category}
-          onChange={handleChangeSelect}
+          value={newTransaction?.category._id}
+          onChange={handleChangeCategory}
           className="w-full h-9 border border-navy rounded"
         >
           <option style={{ display: "none" }}></option>
           {categories.map((elem, i) => {
             return (
-              <option key={i} value={elem}>
-                {elem}
+              <option key={i} value={elem._id}>
+                {elem.label}
               </option>
             );
           })}

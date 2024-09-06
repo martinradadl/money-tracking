@@ -11,7 +11,7 @@ export const newTransaction = {
   _id: "01",
   type: "income",
   concept: "August Salary",
-  category: "Salary",
+  category: { _id: "66da1b9328ba43a7f62749d2", label: "Salary" },
   amount: "999",
   userId: "1234",
 };
@@ -20,7 +20,7 @@ const updatedTransaction = {
   _id: "01",
   type: "income",
   concept: "September Salary",
-  category: "Salary",
+  category: { _id: "66da1b9328ba43a7f62749d2", label: "Salary" },
   amount: "888",
   userId: "1234",
 };

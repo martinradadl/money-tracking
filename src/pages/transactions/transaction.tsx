@@ -19,7 +19,7 @@ export const Transaction = ({ transaction }: TransactionProps) => {
       <p>{concept}</p>
       <div className="flex place-content-between">
         <p className="px-2 rounded-md bg-yellow-category text-navy">
-          {category}
+          {category.label}
         </p>
         <p>{`${new Intl.NumberFormat("en-US", {
           style: "currency",
