@@ -29,6 +29,11 @@ export const selectedTransactionState = atom<TransactionFormI | null>({
   default: null,
 });
 
+export const categoriesState = atom<string[]>({
+  key: "categoriesState",
+  default: [],
+});
+
 export const getBalance = (transactions: TransactionI[]) => {
   let balance = 0;
   transactions.forEach((elem) => {
@@ -54,6 +59,21 @@ export const useTranscations = () => {
     }
   };
 
+  const getCategories = async () => {
+    const [, setCategories] = useRecoilState(categoriesState);
+    const port = "http://localhost:3000";
+    console.log("hola");
+    try {
+      const response = await axios.get(`${port}/transactions/categories`);
+      console.log(response.data);
+      setCategories(response.data);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
+  };
+
   const addTransaction = async (newItem: TransactionFormI) => {
     try {
       const parsedItem = { ...newItem, amount: parseInt(newItem.amount) };
@@ -67,7 +87,10 @@ export const useTranscations = () => {
   };
   const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
     try {
-      const parsedItem = { ...updatedItem, amount: parseInt(updatedItem.amount) };
+      const parsedItem = {
+        ...updatedItem,
+        amount: parseInt(updatedItem.amount),
+      };
       const response = await axios.put(
         `${port}/transactions/${id}`,
         parsedItem
@@ -113,5 +136,6 @@ export const useTranscations = () => {
     editTransaction,
     deleteTransaction,
     transactionsList,
+    getCategories,
   };
 };

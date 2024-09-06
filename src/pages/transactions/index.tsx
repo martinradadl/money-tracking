@@ -20,7 +20,7 @@ export const Transactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
     selectedTransactionState
   );
-  const { getTransactions } = useTranscations();
+  const { getTransactions, getCategories } = useTranscations();
   const userId = "1234";
   const balance = getBalance(transactionsList);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,6 +37,7 @@ export const Transactions: React.FC = () => {
   }
 
   useEffect(() => {
+    getCategories();
     getTransactions(userId);
   }, [userId]);
 
