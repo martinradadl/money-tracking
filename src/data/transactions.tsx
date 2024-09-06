@@ -46,6 +46,7 @@ export const useTranscations = () => {
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
+  const [, setCategories] = useRecoilState(categoriesState);
   const port = "http://localhost:3000";
 
   const getTransactions = async (userId: string) => {
@@ -60,12 +61,8 @@ export const useTranscations = () => {
   };
 
   const getCategories = async () => {
-    const [, setCategories] = useRecoilState(categoriesState);
-    const port = "http://localhost:3000";
-    console.log("hola");
     try {
       const response = await axios.get(`${port}/transactions/categories`);
-      console.log(response.data);
       setCategories(response.data);
     } catch (err: unknown) {
       if (err instanceof Error) {
