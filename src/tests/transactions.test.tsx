@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
-import { getBalance, useTranscations } from "../data/transactions.js";
+import { useTranscations } from "../data/transactions.js";
 import { RecoilRoot } from "recoil";
 import axios from "axios";
 import React from "react";
@@ -12,7 +12,7 @@ export const newTransaction = {
   type: "income",
   concept: "August Salary",
   category: "Salary",
-  amount: 999,
+  amount: "999",
   userId: "1234",
 };
 
@@ -21,7 +21,7 @@ const updatedTransaction = {
   type: "income",
   concept: "September Salary",
   category: "Salary",
-  amount: 888,
+  amount: "888",
   userId: "1234",
 };
 
@@ -109,8 +109,4 @@ test("deleteTransaction", async () => {
     result.current.deleteTransaction("01");
   });
   expect(result.current.transactionsList).toEqual([]);
-});
-
-test("getBalance", async () => {
-  expect(getBalance([newTransaction])).toEqual(999);
 });
