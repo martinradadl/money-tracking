@@ -8,7 +8,9 @@ import { AiFillDelete, AiOutlineWarning } from "react-icons/ai";
 import { Dialog, DialogPanel } from "@headlessui/react";
 
 export const DeleteTransactionModal = () => {
-  const [selectedTransaction] = useRecoilState(selectedTransactionState);
+  const [selectedTransaction, setSelectedTransaction] = useRecoilState(
+    selectedTransactionState
+  );
   const { deleteTransaction } = useTranscations();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -54,6 +56,7 @@ export const DeleteTransactionModal = () => {
                     onClick={() => {
                       if (selectedTransaction?._id) {
                         deleteTransaction(selectedTransaction._id);
+                        setSelectedTransaction(null);
                       }
                     }}
                     className="bg-red text-beige font-bold w-28 rounded-full py-2 px-4 text-sm focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"

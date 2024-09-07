@@ -5,13 +5,18 @@ export interface TransactionI {
   _id?: string;
   type: string;
   concept: string;
-  category: string;
+  category: CategoryI;
   amount: number;
   userId: string;
 }
 
 export interface TransactionFormI extends Omit<TransactionI, "amount"> {
   amount: string;
+}
+
+export interface CategoryI {
+  _id: string;
+  label: string;
 }
 
 export const newTransactionState = atom<TransactionFormI | null>({
@@ -29,6 +34,11 @@ export const selectedTransactionState = atom<TransactionFormI | null>({
   default: null,
 });
 
+export const categoriesState = atom<CategoryI[]>({
+  key: "categoriesState",
+  default: [],
+});
+
 export const getBalance = (transactions: TransactionI[]) => {
   let balance = 0;
   transactions.forEach((elem) => {
@@ -41,12 +51,25 @@ export const useTranscations = () => {
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
+  const [categories, setCategories] = useRecoilState(categoriesState);
+
   const port = "http://localhost:3000";
 
   const getTransactions = async (userId: string) => {
     try {
       const response = await axios.get(`${port}/transactions/${userId}`);
       setTransactionsList(response.data);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
+  };
+
+  const getCategories = async () => {
+    try {
+      const response = await axios.get(`${port}/transactions/categories`);
+      setCategories(response.data);
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);
@@ -65,9 +88,13 @@ export const useTranscations = () => {
       }
     }
   };
+
   const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
     try {
-      const parsedItem = { ...updatedItem, amount: parseInt(updatedItem.amount) };
+      const parsedItem = {
+        ...updatedItem,
+        amount: parseInt(updatedItem.amount),
+      };
       const response = await axios.put(
         `${port}/transactions/${id}`,
         parsedItem
@@ -113,5 +140,7 @@ export const useTranscations = () => {
     editTransaction,
     deleteTransaction,
     transactionsList,
+    getCategories,
+    categories,
   };
 };
