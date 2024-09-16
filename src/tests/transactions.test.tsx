@@ -1,13 +1,13 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
-import { useTranscations } from "../data/transactions.js";
+import { TransactionFormI, useTranscations } from "../data/transactions.js";
 import { RecoilRoot } from "recoil";
 import axios from "axios";
 import React from "react";
 
 vi.mock("axios");
 
-const newTransaction = {
+export const newTransaction: TransactionFormI = {
   _id: "01",
   type: "income",
   concept: "August Salary",
@@ -16,7 +16,7 @@ const newTransaction = {
   userId: "1234",
 };
 
-const updatedTransaction = {
+const updatedTransaction: TransactionFormI = {
   _id: "01",
   type: "income",
   concept: "September Salary",

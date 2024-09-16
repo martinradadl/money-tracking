@@ -42,7 +42,7 @@ export const categoriesState = atom<CategoryI[]>({
 export const getBalance = (transactions: TransactionI[]) => {
   let balance = 0;
   transactions.forEach((elem) => {
-    balance += elem.amount * (elem.type === "income" ? 1 : -1);
+    balance += Number(elem.amount) * (elem.type === "income" ? 1 : -1);
   });
   return balance;
 };
