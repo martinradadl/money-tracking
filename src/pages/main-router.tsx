@@ -6,47 +6,40 @@ import { Debts } from "./debts";
 import { PageNotFound } from "./page-not-found";
 import { Profile } from "./profile";
 import { MainLayout } from "./main-layout";
+import { Login } from "./auth/login";
+import { SignUp } from "./auth/sign-up";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <MainLayout>
-        <Dashboard />
-      </MainLayout>
-    ),
+    Component: MainLayout,
+    children: [
+      { path: "/", element: <Dashboard /> },
+      {
+        path: "/transactions",
+        element: <Transactions />,
+      },
+      {
+        path: "/debts",
+        element: <Debts />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
+    ],
   },
   {
-    path: "/transactions",
-    element: (
-      <MainLayout>
-        <Transactions />
-      </MainLayout>
-    ),
+    path: "/sign-up",
+    element: <SignUp />,
   },
   {
-    path: "/debts",
-    element: (
-      <MainLayout>
-        <Debts />
-      </MainLayout>
-    ),
-  },
-  {
-    path: "/profile",
-    element: (
-      <MainLayout>
-        <Profile />
-      </MainLayout>
-    ),
+    path: "/login",
+    element: <Login />,
   },
   {
     path: "*",
-    element: (
-      <MainLayout>
-        <PageNotFound />
-      </MainLayout>
-    ),
+    element: <PageNotFound />,
   },
 ]);
 
