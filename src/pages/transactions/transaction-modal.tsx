@@ -85,7 +85,7 @@ export default function TransactionModal({ userId, close, isOpen }: props) {
           <div className="flex min-h-full items-center justify-center text-navy">
             <DialogPanel
               transition
-              className="w-full flex flex-col place-content-between h-screen overflow-scroll bg-beige p-4 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+              className="w-full flex flex-col place-content-between h-screen overflow-scroll bg-green font-semibold py-4 px-5 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
             >
               <div className="overflow-auto">
                 <AiOutlineArrowLeft className="text-3xl my-2" onClick={close} />
@@ -96,9 +96,9 @@ export default function TransactionModal({ userId, close, isOpen }: props) {
 
                 <TransactionForm />
               </div>
-              <div className="mt-auto pt-4 bg-beige">
+              <div className="mt-auto pt-4 bg-green">
                 <Button
-                  className="w-full rounded-md bg-green py-1.5 px-3 text-2xl font-semibold"
+                  className="w-full rounded-md bg-navy text-beige py-1.5 px-3 text-2xl font-semibold"
                   onClick={onSubmit}
                 >
                   Submit
