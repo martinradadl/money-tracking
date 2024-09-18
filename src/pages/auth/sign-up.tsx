@@ -49,7 +49,7 @@ export const SignUp: React.FC = () => {
         />
       </label>
       <div className="mt-4 flex flex-col gap-2 justify-items-center items-center">
-        <button className="bg-green w-28 text-xl font-semibold py-4 rounded">
+        <button className="bg-green w-28 text-xl font-semibold py-2 rounded">
           Sign Up
         </button>
         <p
