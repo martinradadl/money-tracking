@@ -68,7 +68,7 @@ export const TransactionForm = () => {
           id="type"
           value={newTransaction?.type}
           onChange={handleChangeType}
-          className="w-full h-9 border border-navy rounded"
+          className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
           <option value="income">Income</option>
           <option value="expenses">Expenses</option>
@@ -77,7 +77,7 @@ export const TransactionForm = () => {
       <label>
         <p className="capitalize text-2xl mb-2">concept</p>
         <input
-          className="w-full h-9 px-2 border border-navy rounded"
+          className="w-full h-9 px-2 border-navy bg-green border-b-2"
           id="concept"
           name="concept"
           value={newTransaction?.concept}
@@ -92,7 +92,7 @@ export const TransactionForm = () => {
           id="category"
           value={newTransaction?.category._id}
           onChange={handleChangeCategory}
-          className="w-full h-9 border border-navy rounded"
+          className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
           <option style={{ display: "none" }}></option>
           {categories.map((elem, i) => {
@@ -107,7 +107,7 @@ export const TransactionForm = () => {
       <label>
         <p className="capitalize text-2xl mb-2">amount</p>
         <input
-          className="w-full h-9 px-2 border border-navy rounded"
+          className="w-full h-9 px-2 border-navy bg-green border-b-2"
           type="text"
           id="amount"
           name="amount"
