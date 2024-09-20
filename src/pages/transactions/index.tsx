@@ -6,23 +6,23 @@ import TransactionModal from "./transaction-modal";
 import classNames from "classnames";
 import { useRecoilState } from "recoil";
 import {
-  getBalance,
   transactionsListState,
   useTranscations,
   selectedTransactionState,
   TransactionI,
   TransactionFormI,
+  balanceState,
 } from "../../data/transactions";
 import { DeleteTransactionModal } from "./delete-modal";
 
 export const Transactions: React.FC = () => {
+  const userId = "66ec90d4b70ffd335b3248a2";
   const [transactionsList] = useRecoilState(transactionsListState);
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
     selectedTransactionState
   );
-  const { getTransactions, getCategories } = useTranscations();
-  const userId = "1234";
-  const balance = getBalance(transactionsList);
+  const { getTransactions, getCategories, getBalance } = useTranscations();
+  const [balance] = useRecoilState(balanceState);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef(0);
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -40,6 +40,10 @@ export const Transactions: React.FC = () => {
     getCategories();
     getTransactions(userId);
   }, [userId]);
+
+  useEffect(() => {
+    getBalance(userId);
+  }, [userId, transactionsList]);
 
   const handleClickedOutside = (event: Event) => {
     if (
