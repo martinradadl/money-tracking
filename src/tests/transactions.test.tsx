@@ -111,3 +111,16 @@ test("getCategories", async () => {
   });
   expect(result.current.categories).toEqual([category]);
 });
+
+test("getBalance", async () => {
+  vi.mocked(axios, true).get.mockResolvedValueOnce({
+    data: 100,
+  });
+
+  const { result } = renderHook(() => useTranscations(), { wrapper });
+
+  await act(async () => {
+    result.current.getBalance("1234");
+  });
+  expect(result.current.balance).toEqual(100);
+});

@@ -39,19 +39,17 @@ export const categoriesState = atom<CategoryI[]>({
   default: [],
 });
 
-export const getBalance = (transactions: TransactionI[]) => {
-  let balance = 0;
-  transactions.forEach((elem) => {
-    balance += Number(elem.amount) * (elem.type === "income" ? 1 : -1);
-  });
-  return balance;
-};
+export const balanceState = atom<number>({
+  key: "balanceState",
+  default: 0,
+});
 
 export const useTranscations = () => {
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
   const [categories, setCategories] = useRecoilState(categoriesState);
+  const [balance, setBalance] = useRecoilState(balanceState);
 
   const port = "http://localhost:3000";
 
@@ -134,6 +132,20 @@ export const useTranscations = () => {
       }
     }
   };
+
+  const getBalance = async (userId: string) => {
+    try {
+      const response = await axios.get(
+        `${port}/transactions/balance/${userId}`
+      );
+      setBalance(response.data);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
+  };
+
   return {
     getTransactions,
     addTransaction,
@@ -142,5 +154,7 @@ export const useTranscations = () => {
     transactionsList,
     getCategories,
     categories,
+    getBalance,
+    balance,
   };
 };
