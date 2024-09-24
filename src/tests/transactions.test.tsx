@@ -39,6 +39,7 @@ const wrapper = createWrapper();
 test("addTransaction", async () => {
   vi.mocked(axios, true).post.mockResolvedValueOnce({
     data: newTransaction,
+    status: 200,
   });
 
   const { result } = renderHook(() => useTranscations(), { wrapper });
