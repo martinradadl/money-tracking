@@ -44,8 +44,9 @@ export const Transactions: React.FC = () => {
   }, [userId]);
 
   useEffect(() => {
+    if (userId)
     getBalance(userId);
-  }, [userId, transactionsList]);
+  }, [userId]);
 
   const handleClickedOutside = (event: Event) => {
     if (
