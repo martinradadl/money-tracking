@@ -52,6 +52,7 @@ test("addTransaction", async () => {
 test("getTransaction", async () => {
   vi.mocked(axios, true).get.mockResolvedValueOnce({
     data: [newTransaction],
+    status: 200,
   });
 
   const { result } = renderHook(() => useTranscations(), { wrapper });
@@ -65,9 +66,11 @@ test("getTransaction", async () => {
 test("editTransaction", async () => {
   vi.mocked(axios, true).post.mockResolvedValueOnce({
     data: newTransaction,
+    status: 200,
   });
   vi.mocked(axios, true).put.mockResolvedValueOnce({
     data: updatedTransaction,
+    status: 200,
   });
 
   const { result } = renderHook(() => useTranscations(), { wrapper });
@@ -103,6 +106,7 @@ test("deleteTransaction", async () => {
 test("getCategories", async () => {
   vi.mocked(axios, true).get.mockResolvedValueOnce({
     data: [category],
+    status: 200,
   });
 
   const { result } = renderHook(() => useTranscations(), { wrapper });
