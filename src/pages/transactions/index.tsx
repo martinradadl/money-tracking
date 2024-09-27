@@ -12,6 +12,8 @@ import {
   TransactionFormI,
 } from "../../data/transactions";
 import { DeleteTransactionModal } from "./delete-modal";
+import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
 export const Transactions: React.FC = () => {
   const userId = "66ec90d4b70ffd335b3248a2";
@@ -28,6 +30,14 @@ export const Transactions: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef(0);
   const selectedContainer = useRef<HTMLDivElement | null>(null);
+  const [cookies] = useCookies(["user"]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!cookies.user) {
+      navigate(`/login`);
+    }
+  }, []);
 
   function openModal() {
     setIsModalOpen(true);
@@ -44,8 +54,7 @@ export const Transactions: React.FC = () => {
   }, [userId]);
 
   useEffect(() => {
-    if (userId)
-    getBalance(userId);
+    if (userId) getBalance(userId);
   }, [userId]);
 
   const handleClickedOutside = (event: Event) => {
