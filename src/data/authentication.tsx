@@ -1,7 +1,7 @@
 import axios from "axios";
 import { atom, useRecoilState } from "recoil";
 import Toastify from "toastify-js";
-import { useCookies /* Cookies*/ } from "react-cookie";
+import { useCookies } from "react-cookie";
 
 export interface UserI {
   _id?: string;
@@ -14,8 +14,6 @@ export interface LoginI {
   email: string;
   password: string;
 }
-
-// const cookies = new Cookies();
 
 export const userState = atom<UserI | null>({
   key: "userState",
@@ -34,7 +32,7 @@ export const useAuth = () => {
       });
       if (response.status === 200) {
         setUser(response.data);
-        setCookie("user", JSON.stringify(response.data));
+        setCookie("user", JSON.stringify(response.data), { path: "/" });
       } else {
         Toastify({
           text: "Register not successful",
@@ -59,10 +57,9 @@ export const useAuth = () => {
       const response = await axios.post(`${port}/auth/login`, loggedUser, {
         withCredentials: true,
       });
-      console.log(response.headers["Set-ookie"]);
       if (response.status === 200) {
         setUser(response.data);
-        setCookie("user", JSON.stringify(response.data));
+        setCookie("user", JSON.stringify(response.data), { path: "/" });
       } else {
         Toastify({
           text: "Login not successful",
