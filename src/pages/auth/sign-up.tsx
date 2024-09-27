@@ -1,19 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../data/authentication";
-import { useCookies } from "react-cookie";
 
 export const SignUp: React.FC = () => {
   const [user, setUser] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
   const { register } = useAuth();
-  const [cookies] = useCookies(["user"]);
-
-  useEffect(() => {
-    if (cookies.user) {
-      navigate(`/`);
-    }
-  }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (user) {
@@ -21,6 +13,17 @@ export const SignUp: React.FC = () => {
         ...user,
         [event.target.name]: event.target.value,
       });
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await register(user);
+      navigate("/");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
     }
   };
 
@@ -61,9 +64,7 @@ export const SignUp: React.FC = () => {
       <div className="mt-4 flex flex-col gap-2 justify-items-center items-center">
         <button
           className="bg-green w-28 text-xl font-semibold py-2 rounded"
-          onClick={() => {
-            register(user);
-          }}
+          onClick={handleSubmit}
         >
           Sign Up
         </button>
