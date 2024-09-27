@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { expect, test, vi } from "vitest";
+import { expect, vi, describe, it } from "vitest";
 import { RecoilRoot } from "recoil";
 import axios from "axios";
 import React from "react";
@@ -35,57 +35,119 @@ const createWrapper = () => {
 
 const wrapper = createWrapper();
 
-test("register", async () => {
-  vi.mocked(axios, true).post.mockResolvedValueOnce({
-    data: newUser,
-    status: 200,
+describe("useAuthentication", () => {
+  describe("register", async () => {
+    it("should return user as null when status is not 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        result.current.register(newUser);
+      });
+      expect(result.current.user).toEqual(null);
+    });
+
+    it("should return created user and statusCode 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        data: newUser,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        result.current.register(newUser);
+      });
+      expect(result.current.user).toEqual(newUser);
+    });
   });
 
-  const { result } = renderHook(() => useAuth(), { wrapper });
-  await act(async () => {
-    result.current.register(newUser);
-  });
-  expect(result.current.user).toEqual(newUser);
-});
+  describe("login", async () => {
+    it("should return user as null when status is not 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        status: 500,
+      });
 
-test("login", async () => {
-  vi.mocked(axios, true).post.mockResolvedValueOnce({
-    data: newUser,
-    status: 200,
-  });
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        result.current.login(loggedUser);
+      });
+      expect(result.current.user).toEqual(null);
+    });
 
-  const { result } = renderHook(() => useAuth(), { wrapper });
-  await act(async () => {
-    result.current.login(loggedUser);
-  });
-  expect(result.current.user).toEqual(newUser);
-});
+    it("should return 200 and logged user", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        data: newUser,
+        status: 200,
+      });
 
-test("editUser", async () => {
-  vi.mocked(axios, true).put.mockResolvedValueOnce({
-    data: updatedUser,
-    status: 200,
-  });
-
-  const { result } = renderHook(() => useAuth(), { wrapper });
-  await act(async () => {
-    if (newUser._id) {
-      result.current.editUser(newUser._id, updatedUser);
-    }
-  });
-  expect(result.current.user).toEqual(updatedUser);
-});
-
-test("deleteUser", async () => {
-  vi.mocked(axios, true).delete.mockResolvedValueOnce({
-    status: 200,
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        result.current.login(loggedUser);
+      });
+      expect(result.current.user).toEqual(newUser);
+    });
   });
 
-  const { result } = renderHook(() => useAuth(), { wrapper });
-  await act(async () => {
-    if (newUser._id) {
-      result.current.deleteUser(newUser._id);
-    }
+  describe("edit user", async () => {
+    it("Should not update User", async () => {
+      vi.mocked(axios, true).put.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        if (newUser._id) {
+          result.current.editUser(newUser._id, updatedUser);
+        }
+      });
+      expect(result.current.user).toEqual(null);
+    });
+
+    it("Should return updated User and statusCode 200", async () => {
+      vi.mocked(axios, true).put.mockResolvedValueOnce({
+        data: updatedUser,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        if (newUser._id) {
+          result.current.editUser(newUser._id, updatedUser);
+        }
+      });
+      expect(result.current.user).toEqual(updatedUser);
+    });
   });
-  expect(result.current.user).toEqual(null);
+
+  describe("delete user", async () => {
+    it("Should not delete User", async () => {
+      vi.mocked(axios, true).delete.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        if (newUser._id) {
+          result.current.deleteUser(newUser._id);
+        }
+      });
+      expect(result.current.user).toEqual(null);
+    });
+
+    it("Should delete User", async () => {
+      vi.mocked(axios, true).delete.mockResolvedValueOnce({
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        if (newUser._id) {
+          result.current.deleteUser(newUser._id);
+        }
+      });
+      expect(result.current.user).toEqual(null);
+    });
+  });
 });
