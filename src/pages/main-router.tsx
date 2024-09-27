@@ -8,6 +8,7 @@ import { Profile } from "./profile";
 import { MainLayout } from "./main-layout";
 import { Login } from "./auth/login";
 import { SignUp } from "./auth/sign-up";
+import { NonAuthLayout } from "./non-auth-layout";
 
 const router = createBrowserRouter([
   {
@@ -30,12 +31,18 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/sign-up",
-    element: <SignUp />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
+    path: "/",
+    Component: NonAuthLayout,
+    children: [
+      {
+        path: "/sign-up",
+        element: <SignUp />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+    ],
   },
   {
     path: "*",
