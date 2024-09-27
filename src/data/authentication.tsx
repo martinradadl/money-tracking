@@ -22,7 +22,7 @@ export const userState = atom<UserI | null>({
 
 export const useAuth = () => {
   const [user, setUser] = useRecoilState(userState);
-  const [userCookie, setCookie /*removeCookie*/] = useCookies(["user"]);
+  const [userCookie, setCookie] = useCookies(["user"]);
   const port = "http://localhost:3000";
 
   const register = async (newUser: UserI) => {
