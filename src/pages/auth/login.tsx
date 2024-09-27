@@ -16,10 +16,18 @@ export const Login: React.FC = () => {
     }
   };
 
+  const hasEmptyFields = () => {
+    return user.email === "" || user.password === "";
+  };
+
   const handleSubmit = async () => {
     try {
-      await login(user);
-      navigate("/");
+      if (hasEmptyFields()) {
+        alert("Faltan campos por llenar");
+      } else {
+        await login(user);
+        navigate("/");
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);
