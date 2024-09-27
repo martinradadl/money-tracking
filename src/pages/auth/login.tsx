@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../data/authentication";
+import { useCookies } from "react-cookie";
 
 export const Login: React.FC = () => {
   const [user, setUser] = useState({ email: "", password: "" });
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [cookies] = useCookies(["user"]);
+
+  useEffect(() => {
+    if (cookies.user) {
+      navigate(`/`);
+    }
+  }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (user) {
@@ -41,8 +49,12 @@ export const Login: React.FC = () => {
         />
       </label>
       <div className="mt-4 flex flex-col gap-2 justify-items-center items-center">
-        <button className="bg-green w-28 text-xl font-semibold py-2 rounded"
-        onClick={() => {login(user)}}>
+        <button
+          className="bg-green w-28 text-xl font-semibold py-2 rounded"
+          onClick={() => {
+            login(user);
+          }}
+        >
           Log in
         </button>
         <p className="text-lg">Forgot your password?</p>
