@@ -42,12 +42,12 @@ export const useAuth = () => {
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error(err.message);
         Toastify({
           text: "An error ocurred",
           duration: 3000,
           style: { background: "red" },
         }).showToast();
+        throw new Error(err.message);
       }
     }
   };
@@ -69,12 +69,12 @@ export const useAuth = () => {
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error(err.message);
         Toastify({
           text: "An error ocurred",
           duration: 3000,
           style: { background: "red" },
         }).showToast();
+        throw new Error(err.message);
       }
     }
   };
