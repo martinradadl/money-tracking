@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../data/authentication";
+import { createToastify } from "../../helpers/toastify";
 
 export const SignUp: React.FC = () => {
   const [user, setUser] = useState({ name: "", email: "", password: "" });
@@ -23,7 +24,7 @@ export const SignUp: React.FC = () => {
   const handleSubmit = async () => {
     try {
       if (hasEmptyFields()) {
-        alert("Faltan campos por llenar");
+        createToastify({ text: "Faltan campos por llenar", type: "warning" });
       } else {
         await register(user);
         navigate("/");

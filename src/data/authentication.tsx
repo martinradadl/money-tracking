@@ -1,7 +1,7 @@
 import axios from "axios";
 import { atom, useRecoilState } from "recoil";
-import Toastify from "toastify-js";
 import { useCookies } from "react-cookie";
+import { createToastify } from "../helpers/toastify";
 
 export interface UserI {
   _id?: string;
@@ -34,19 +34,14 @@ export const useAuth = () => {
         setUser(response.data);
         setCookie("user", JSON.stringify(response.data), { path: "/" });
       } else {
-        Toastify({
-          text: "Register not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "Register not successful", type: "error" });
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({
+          text: "Something went wrong, please contact support",
+          type: "error",
+        });
         throw new Error(err.message);
       }
     }
@@ -61,19 +56,14 @@ export const useAuth = () => {
         setUser(response.data);
         setCookie("user", JSON.stringify(response.data), { path: "/" });
       } else {
-        Toastify({
-          text: "Login not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "Login not successful", type: "error" });
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({
+          text: "Something went wrong, please contact support",
+          type: "error",
+        });
         throw new Error(err.message);
       }
     }
@@ -85,20 +75,15 @@ export const useAuth = () => {
       if (response.status === 200) {
         setUser(response.data);
       } else {
-        Toastify({
-          text: "Edit not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "Edit not successful", type: "error" });
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({
+          text: "Something went wrong, please contact support",
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
@@ -109,20 +94,15 @@ export const useAuth = () => {
       if (response.status === 200) {
         setUser(null);
       } else {
-        Toastify({
-          text: "Delete not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "Delete not successful", type: "error" });
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({
+          text: "Something went wrong, please contact support",
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
