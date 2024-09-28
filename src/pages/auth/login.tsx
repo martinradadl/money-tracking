@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../data/authentication";
+import { createToastify } from "../../helpers/toastify";
 
 export const Login: React.FC = () => {
   const [user, setUser] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (user) {
@@ -11,6 +14,25 @@ export const Login: React.FC = () => {
         ...user,
         [event.target.name]: event.target.value,
       });
+    }
+  };
+
+  const hasEmptyFields = () => {
+    return user.email === "" || user.password === "";
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (hasEmptyFields()) {
+        createToastify({ text: "Faltan campos por llenar", type: "warning" });
+      } else {
+        await login(user);
+        navigate("/");
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
     }
   };
 
@@ -39,7 +61,10 @@ export const Login: React.FC = () => {
         />
       </label>
       <div className="mt-4 flex flex-col gap-2 justify-items-center items-center">
-        <button className="bg-green w-28 text-xl font-semibold py-2 rounded">
+        <button
+          className="bg-green w-28 text-xl font-semibold py-2 rounded"
+          onClick={handleSubmit}
+        >
           Log in
         </button>
         <p className="text-lg">Forgot your password?</p>

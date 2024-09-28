@@ -3,12 +3,15 @@
 @tailwind utilities;
 @keyframes entranceAnim {
   0% {
-    opacity: 0;
+    opacity: 0.1;
   }
-
   100% {
     opacity: 1;
   }
+}
+
+:root {
+  background: #141e46;
 }
 
 .entrance-anim {
