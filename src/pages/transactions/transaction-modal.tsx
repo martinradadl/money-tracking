@@ -10,7 +10,7 @@ import {
 } from "../../data/transactions";
 
 export interface props {
-  userId: string;
+  userId?: string;
   close: () => void;
   isOpen: boolean;
 }

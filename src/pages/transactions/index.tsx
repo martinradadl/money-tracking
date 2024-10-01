@@ -12,12 +12,13 @@ import {
   TransactionFormI,
 } from "../../data/transactions";
 import { DeleteTransactionModal } from "./delete-modal";
+import { userState } from "../../data/authentication";
 
 export const Transactions: React.FC = () => {
-  const userId = "66ec90d4b70ffd335b3248a2";
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
     selectedTransactionState
   );
+  const [user] = useRecoilState(userState);
   const {
     getTransactions,
     getCategories,
@@ -26,7 +27,7 @@ export const Transactions: React.FC = () => {
     balance,
   } = useTranscations();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const timer = useRef(0);
+  const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
 
   function openModal() {
@@ -40,12 +41,12 @@ export const Transactions: React.FC = () => {
 
   useEffect(() => {
     getCategories();
-    getTransactions(userId);
-  }, [userId]);
+    getTransactions();
+  }, [user]);
 
   useEffect(() => {
-    if (userId) getBalance(userId);
-  }, [userId]);
+    if (user) getBalance();
+  }, [user]);
 
   const handleClickedOutside = (event: Event) => {
     if (
@@ -138,7 +139,7 @@ export const Transactions: React.FC = () => {
         </button>
         <TransactionModal
           {...{
-            userId,
+            userId: user?._id,
             close: closeModal,
             isOpen: isModalOpen,
           }}
