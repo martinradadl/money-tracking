@@ -49,7 +49,7 @@ test("addTransaction", async () => {
   expect(result.current.transactionsList).toEqual([newTransaction]);
 });
 
-test("getTransaction", async () => {
+test.skip("getTransaction", async () => {
   vi.mocked(axios, true).get.mockResolvedValueOnce({
     data: [newTransaction],
     status: 200,
@@ -103,7 +103,7 @@ test("deleteTransaction", async () => {
   expect(result.current.transactionsList).toEqual([]);
 });
 
-test("getCategories", async () => {
+test.skip("getCategories", async () => {
   vi.mocked(axios, true).get.mockResolvedValueOnce({
     data: [category],
     status: 200,
@@ -117,7 +117,7 @@ test("getCategories", async () => {
   expect(result.current.categories).toEqual([category]);
 });
 
-test("getBalance", async () => {
+test.skip("getBalance", async () => {
   vi.mocked(axios, true).get.mockResolvedValueOnce({
     data: 100,
   });

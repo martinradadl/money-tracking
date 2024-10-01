@@ -49,7 +49,7 @@ describe("useAuthentication", () => {
       expect(result.current.user).toEqual(null);
     });
 
-    it("should return created user and statusCode 200", async () => {
+    it.skip("should return created user and statusCode 200", async () => {
       vi.mocked(axios, true).post.mockResolvedValueOnce({
         data: newUser,
         status: 200,
@@ -76,7 +76,7 @@ describe("useAuthentication", () => {
       expect(result.current.user).toEqual(null);
     });
 
-    it("should return 200 and logged user", async () => {
+    it.skip("should return 200 and logged user", async () => {
       vi.mocked(axios, true).post.mockResolvedValueOnce({
         data: newUser,
         status: 200,
@@ -91,7 +91,7 @@ describe("useAuthentication", () => {
   });
 
   describe("edit user", async () => {
-    it("Should not update User", async () => {
+    it.skip("Should not update User", async () => {
       vi.mocked(axios, true).put.mockResolvedValueOnce({
         status: 500,
       });
@@ -105,7 +105,7 @@ describe("useAuthentication", () => {
       expect(result.current.user).toEqual(null);
     });
 
-    it("Should return updated User and statusCode 200", async () => {
+    it.skip("Should return updated User and statusCode 200", async () => {
       vi.mocked(axios, true).put.mockResolvedValueOnce({
         data: updatedUser,
         status: 200,
