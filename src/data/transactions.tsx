@@ -1,7 +1,9 @@
 import axios from "axios";
 import { atom, useRecoilState } from "recoil";
-import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
+import { createToastify } from "../helpers/toastify";
+import { userState } from "./authentication";
+import { useCookies } from "react-cookie";
 
 export interface TransactionI {
   _id?: string;
@@ -9,7 +11,7 @@ export interface TransactionI {
   concept: string;
   category: CategoryI;
   amount: number;
-  userId: string;
+  userId?: string;
 }
 
 export interface TransactionFormI extends Omit<TransactionI, "amount"> {
@@ -50,31 +52,31 @@ export const useTranscations = () => {
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
+  const [user] = useRecoilState(userState);
   const [categories, setCategories] = useRecoilState(categoriesState);
   const [balance, setBalance] = useRecoilState(balanceState);
+  const [cookies] = useCookies(["jwt"]);
 
   const port = "http://localhost:3000";
 
-  const getTransactions = async (userId: string) => {
+  const getTransactions = async () => {
     try {
-      const response = await axios.get(`${port}/transactions/${userId}`);
-      if (response.status === 200) {
-        setTransactionsList(response.data);
-      } else {
-        Toastify({
-          text: "Transactions not found",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+      if (user) {
+        const response = await axios.get(`${port}/transactions/${user?._id}`, {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        });
+        if (response.status === 200) {
+          setTransactionsList(response.data);
+        } else {
+          createToastify({ text: "Transactions not found", type: "error" });
+        }
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "An error ocurred", type: "error" });
       }
     }
   };
@@ -85,20 +87,12 @@ export const useTranscations = () => {
       if (response.status === 200) {
         setCategories(response.data);
       } else {
-        Toastify({
-          text: "Categories not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "Categories not found", type: "error" });
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "An error ocurred", type: "error" });
       }
     }
   };
@@ -110,20 +104,15 @@ export const useTranscations = () => {
       if (response.status === 200) {
         setTransactionsList([...transactionsList, response.data]);
       } else {
-        Toastify({
-          text: "Add not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({
+          text: "Add Transaction not successful",
+          type: "error",
+        });
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "An error ocurred", type: "error" });
       }
     }
   };
@@ -150,20 +139,15 @@ export const useTranscations = () => {
           throw new Error("ID not found updating transactions list");
         }
       } else {
-        Toastify({
-          text: "Edit not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({
+          text: "Edit Transaction not successful",
+          type: "error",
+        });
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "An error ocurred", type: "error" });
       }
     }
   };
@@ -182,38 +166,36 @@ export const useTranscations = () => {
           throw new Error("ID not found deleting transaction");
         }
       } else {
-        Toastify({
-          text: "Add not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({
+          text: "Add Transaction not successful",
+          type: "error",
+        });
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "An error ocurred", type: "error" });
       }
     }
   };
 
-  const getBalance = async (userId: string) => {
+  const getBalance = async () => {
     try {
-      const response = await axios.get(
-        `${port}/transactions/balance/${userId}`
-      );
-      setBalance(response.data);
+      if (user) {
+        const response = await axios.get(
+          `${port}/transactions/balance/${user?._id}`,
+          {
+            headers: {
+              Authorization: "Bearer " + cookies.jwt,
+            },
+          }
+        );
+        setBalance(response.data);
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "An error ocurred", type: "error" });
       }
     }
   };
