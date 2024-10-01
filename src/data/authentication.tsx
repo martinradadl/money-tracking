@@ -22,7 +22,7 @@ export const userState = atom<UserI | null>({
 
 export const useAuth = () => {
   const [user, setUser] = useRecoilState(userState);
-  const [userCookie, setCookie] = useCookies(["user"]);
+  const [userCookie, setCookie] = useCookies(["user", "jwt"]);
   const port = "http://localhost:3000";
 
   const register = async (newUser: UserI) => {
@@ -31,8 +31,9 @@ export const useAuth = () => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        setUser(response.data);
-        setCookie("user", JSON.stringify(response.data), { path: "/" });
+        setUser(response.data.user);
+        setCookie("user", JSON.stringify(response.data.user), { path: "/" });
+        setCookie("jwt", JSON.stringify(response.data.token), { path: "/" });
       } else {
         createToastify({ text: "Register not successful", type: "error" });
       }
@@ -53,8 +54,9 @@ export const useAuth = () => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        setUser(response.data);
-        setCookie("user", JSON.stringify(response.data), { path: "/" });
+        setUser(response.data.user);
+        setCookie("user", JSON.stringify(response.data.user), { path: "/", });
+        setCookie("jwt", response.data.token, )
       } else {
         createToastify({ text: "Login not successful", type: "error" });
       }
@@ -69,9 +71,14 @@ export const useAuth = () => {
     }
   };
 
-  const editUser = async (id: string, updatedItem: UserI) => {
+  const editUser = async (id: string, updatedItem: UserI, token: string) => {
     try {
-      const response = await axios.put(`${port}/auth/${id}`, updatedItem);
+      const response = await axios.put(`${port}/auth/${id}`, {
+        updatedItem,
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      });
       if (response.status === 200) {
         setUser(response.data);
       } else {
