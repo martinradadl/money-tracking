@@ -1,131 +1,237 @@
 import { renderHook, act } from "@testing-library/react";
-import { expect, test, vi } from "vitest";
-import { TransactionFormI, useTranscations } from "../data/transactions.js";
+import { expect, vi } from "vitest";
+import { useTranscations } from "../data/transactions.js";
 import { RecoilRoot } from "recoil";
 import axios from "axios";
 import React from "react";
+import { userState } from "../data/authentication.js";
+import {
+  categories,
+  newTransaction,
+  newUser,
+  updatedTransaction,
+} from "./utils.js";
 
 vi.mock("axios");
 
-export const newTransaction: TransactionFormI = {
-  _id: "01",
-  type: "income",
-  concept: "August Salary",
-  category: { _id: "66da1b9328ba43a7f62749d2", label: "Salary" },
-  amount: "999",
-  userId: "1234",
-};
-
-const updatedTransaction: TransactionFormI = {
-  _id: "01",
-  type: "income",
-  concept: "September Salary",
-  category: { _id: "66da1b9328ba43a7f62749d2", label: "Salary" },
-  amount: "888",
-  userId: "1234",
-};
-
-const category = [{ _id: "01", label: "Salary" }];
-
-const createWrapper = () => {
+const createWrapper = (withUser: boolean) => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <RecoilRoot>{children}</RecoilRoot>
+    <RecoilRoot
+      initializeState={
+        withUser
+          ? ({ set }) => {
+              set(userState, newUser);
+            }
+          : undefined
+      }
+    >
+      {children}
+    </RecoilRoot>
   );
   return wrapper;
 };
 
-const wrapper = createWrapper();
+const wrapper = createWrapper(true);
 
-test("addTransaction", async () => {
-  vi.mocked(axios, true).post.mockResolvedValueOnce({
-    data: newTransaction,
-    status: 200,
+describe("useTransactions", () => {
+  describe("addTransaction", async () => {
+    it("should return empty transactions list when status is not 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useTranscations(), { wrapper });
+      await act(async () => {
+        result.current.addTransaction(newTransaction);
+      });
+      expect(result.current.transactionsList).toEqual([]);
+    });
+
+    it("should return created transaction and statusCode 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        data: newTransaction,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useTranscations(), { wrapper });
+      await act(async () => {
+        result.current.addTransaction(newTransaction);
+      });
+      expect(result.current.transactionsList).toEqual([newTransaction]);
+    });
   });
 
-  const { result } = renderHook(() => useTranscations(), { wrapper });
-  await act(async () => {
-    result.current.addTransaction(newTransaction);
-  });
-  expect(result.current.transactionsList).toEqual([newTransaction]);
-});
+  describe("getTransactions", () => {
+    it("should return empty transactions list when status is not 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        status: 500,
+      });
 
-test.skip("getTransaction", async () => {
-  vi.mocked(axios, true).get.mockResolvedValueOnce({
-    data: [newTransaction],
-    status: 200,
-  });
+      const { result } = renderHook(() => useTranscations(), { wrapper });
+      await act(async () => {
+        result.current.getTransactions();
+      });
+      expect(result.current.transactionsList).toEqual([]);
+    });
 
-  const { result } = renderHook(() => useTranscations(), { wrapper });
+    it("should return transactions list with elements and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [newTransaction],
+        status: 200,
+      });
 
-  await act(async () => {
-    result.current.getTransactions("1234");
-  });
-  expect(result.current.transactionsList).toEqual([newTransaction]);
-});
+      const { result } = renderHook(() => useTranscations(), { wrapper });
 
-test("editTransaction", async () => {
-  vi.mocked(axios, true).post.mockResolvedValueOnce({
-    data: newTransaction,
-    status: 200,
-  });
-  vi.mocked(axios, true).put.mockResolvedValueOnce({
-    data: updatedTransaction,
-    status: 200,
+      await act(async () => {
+        result.current.getTransactions();
+      });
+      expect(result.current.transactionsList).toEqual([newTransaction]);
+    });
   });
 
-  const { result } = renderHook(() => useTranscations(), { wrapper });
+  describe("editTransaction", () => {
+    it("should return empty transactions list when status is not 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        data: newTransaction,
+        status: 200,
+      });
+      vi.mocked(axios, true).put.mockResolvedValueOnce({
+        data: updatedTransaction,
+        status: 500,
+      });
 
-  await act(async () => {
-    result.current.addTransaction(newTransaction);
+      const { result } = renderHook(() => useTranscations(), { wrapper });
+      await act(async () => {
+        result.current.addTransaction(newTransaction);
+      });
+
+      await act(async () => {
+        result.current.editTransaction("01", updatedTransaction);
+      });
+      expect(result.current.transactionsList).toEqual([]);
+    });
+
+    it("should return updated transaction and statusCode 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        data: newTransaction,
+        status: 200,
+      });
+      vi.mocked(axios, true).put.mockResolvedValueOnce({
+        data: updatedTransaction,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useTranscations(), { wrapper });
+
+      await act(async () => {
+        result.current.addTransaction(newTransaction);
+      });
+
+      await act(async () => {
+        result.current.editTransaction("01", updatedTransaction);
+      });
+      expect(result.current.transactionsList).toEqual([updatedTransaction]);
+    });
   });
 
-  await act(async () => {
-    result.current.editTransaction("01", updatedTransaction);
+  describe("deleteTransaction", () => {
+    it("should return empty transactions list when status is not 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        data: newTransaction,
+        status: 200,
+      });
+      vi.mocked(axios, true).delete.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useTranscations(), { wrapper });
+      await act(async () => {
+        result.current.addTransaction(newTransaction);
+      });
+
+      await act(async () => {
+        result.current.deleteTransaction("01");
+      });
+      expect(result.current.transactionsList).toEqual([newTransaction]);
+    });
+
+    it("should delete transaction and statusCode 200", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        data: newTransaction,
+        status: 200,
+      });
+      vi.mocked(axios, true).delete.mockResolvedValueOnce({
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useTranscations(), { wrapper });
+
+      await act(async () => {
+        result.current.addTransaction(newTransaction);
+      });
+
+      await act(async () => {
+        result.current.deleteTransaction("01");
+      });
+      expect(result.current.transactionsList).toEqual([]);
+    });
   });
-  expect(result.current.transactionsList).toEqual([updatedTransaction]);
-});
 
-test("deleteTransaction", async () => {
-  vi.mocked(axios, true).post.mockResolvedValueOnce({
-    data: newTransaction,
-  });
-  vi.mocked(axios, true).delete.mockResolvedValueOnce({});
+  describe("getCategories", () => {
+    it("should return empty categories list when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
 
-  const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTranscations(), { wrapper });
 
-  await act(async () => {
-    result.current.addTransaction(newTransaction);
-  });
+      await act(async () => {
+        result.current.getCategories();
+      });
+      expect(result.current.categories).toEqual([]);
+    });
 
-  await act(async () => {
-    result.current.deleteTransaction("01");
-  });
-  expect(result.current.transactionsList).toEqual([]);
-});
+    it("should return categories list and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: categories,
+        status: 200,
+      });
 
-test.skip("getCategories", async () => {
-  vi.mocked(axios, true).get.mockResolvedValueOnce({
-    data: [category],
-    status: 200,
-  });
+      const { result } = renderHook(() => useTranscations(), { wrapper });
 
-  const { result } = renderHook(() => useTranscations(), { wrapper });
-
-  await act(async () => {
-    result.current.getCategories();
-  });
-  expect(result.current.categories).toEqual([category]);
-});
-
-test.skip("getBalance", async () => {
-  vi.mocked(axios, true).get.mockResolvedValueOnce({
-    data: 100,
+      await act(async () => {
+        result.current.getCategories();
+      });
+      expect(result.current.categories).toEqual(categories);
+    });
   });
 
-  const { result } = renderHook(() => useTranscations(), { wrapper });
+  describe("getBalance", () => {
+    it("should not return balance when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
 
-  await act(async () => {
-    result.current.getBalance("1234");
+      const { result } = renderHook(() => useTranscations(), { wrapper });
+
+      await act(async () => {
+        result.current.getBalance();
+      });
+      expect(result.current.balance).toEqual(0);
+    });
+
+    it("should return balance and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useTranscations(), { wrapper });
+
+      await act(async () => {
+        result.current.getBalance();
+      });
+      expect(result.current.balance).toEqual(100);
+    });
   });
-  expect(result.current.balance).toEqual(100);
 });
