@@ -1,6 +1,7 @@
 import { RecoilRoot } from "recoil";
 import { LoginI, UserI, userState } from "../data/authentication";
 import { TransactionFormI } from "../data/transactions";
+import React from "react";
 
 export const newUser: UserI = {
   _id: "fakeId",
