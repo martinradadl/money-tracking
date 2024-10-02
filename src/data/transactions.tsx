@@ -100,7 +100,11 @@ export const useTranscations = () => {
   const addTransaction = async (newItem: TransactionFormI) => {
     try {
       if (user) {
-        const parsedItem = { ...newItem, amount: parseInt(newItem.amount) };
+        const parsedItem = {
+          ...newItem,
+          amount: parseInt(newItem.amount),
+          userId: user._id,
+        };
         const response = await axios.post(`${port}/transactions/`, parsedItem, {
           headers: {
             Authorization: "Bearer " + cookies.jwt,
@@ -129,6 +133,7 @@ export const useTranscations = () => {
         const parsedItem = {
           ...updatedItem,
           amount: parseInt(updatedItem.amount),
+          userId: user._id,
         };
         const response = await axios.put(
           `${port}/transactions/${id}`,
