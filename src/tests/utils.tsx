@@ -1,4 +1,5 @@
-import { LoginI, UserI } from "../data/authentication";
+import { RecoilRoot } from "recoil";
+import { LoginI, UserI, userState } from "../data/authentication";
 import { TransactionFormI } from "../data/transactions";
 
 export const newUser: UserI = {
@@ -40,3 +41,20 @@ export const newTransaction: TransactionFormI = {
   };
   
   export const categories = [{ _id: "01", label: "Salary" }];
+
+  export const createWrapper = (withUser: boolean) => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <RecoilRoot
+        initializeState={
+          withUser
+            ? ({ set }) => {
+                set(userState, newUser);
+              }
+            : undefined
+        }
+      >
+        {children}
+      </RecoilRoot>
+    );
+    return wrapper;
+  };

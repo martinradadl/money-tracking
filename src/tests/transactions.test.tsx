@@ -1,35 +1,15 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, vi } from "vitest";
 import { useTranscations } from "../data/transactions.js";
-import { RecoilRoot } from "recoil";
 import axios from "axios";
-import React from "react";
-import { userState } from "../data/authentication.js";
 import {
   categories,
+  createWrapper,
   newTransaction,
-  newUser,
   updatedTransaction,
 } from "./utils.js";
 
 vi.mock("axios");
-
-const createWrapper = (withUser: boolean) => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <RecoilRoot
-      initializeState={
-        withUser
-          ? ({ set }) => {
-              set(userState, newUser);
-            }
-          : undefined
-      }
-    >
-      {children}
-    </RecoilRoot>
-  );
-  return wrapper;
-};
 
 const wrapper = createWrapper(true);
 

@@ -1,21 +1,12 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, vi, describe, it } from "vitest";
-import { RecoilRoot } from "recoil";
 import axios from "axios";
-import React from "react";
 import { useAuth } from "../data/authentication";
-import { loggedUser, newUser, updatedUser } from "./utils";
+import { createWrapper, loggedUser, newUser, updatedUser } from "./utils";
 
 vi.mock("axios");
 
-const createWrapper = () => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <RecoilRoot>{children}</RecoilRoot>
-  );
-  return wrapper;
-};
-
-const wrapper = createWrapper();
+const wrapper = createWrapper(false);
 
 describe("useAuthentication", () => {
   describe("register", async () => {
