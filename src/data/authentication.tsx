@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { atom, useRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { createToastify } from "../helpers/toastify";
@@ -22,7 +22,7 @@ export const userState = atom<UserI | null>({
 
 export const useAuth = () => {
   const [user, setUser] = useRecoilState(userState);
-  const [userCookie, setCookie] = useCookies(["user"]);
+  const [userCookie, setCookie] = useCookies(["user", "jwt"]);
   const port = "http://localhost:3000";
 
   const register = async (newUser: UserI) => {
@@ -31,8 +31,9 @@ export const useAuth = () => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        setUser(response.data);
-        setCookie("user", JSON.stringify(response.data), { path: "/" });
+        setUser(response.data.user);
+        setCookie("user", JSON.stringify(response.data.user), { path: "/" });
+        setCookie("jwt", JSON.stringify(response.data.token), { path: "/" });
       } else {
         createToastify({ text: "Register not successful", type: "error" });
       }
@@ -53,15 +54,16 @@ export const useAuth = () => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        setUser(response.data);
-        setCookie("user", JSON.stringify(response.data), { path: "/" });
+        setUser(response.data.user);
+        setCookie("user", JSON.stringify(response.data.user), { path: "/" });
+        setCookie("jwt", response.data.token);
       } else {
         createToastify({ text: "Login not successful", type: "error" });
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      if (err instanceof AxiosError) {
         createToastify({
-          text: "Something went wrong, please contact support",
+          text: err.response?.data.message || err.message,
           type: "error",
         });
         throw new Error(err.message);
@@ -69,18 +71,23 @@ export const useAuth = () => {
     }
   };
 
-  const editUser = async (id: string, updatedItem: UserI) => {
+  const editUser = async (id: string, updatedItem: UserI, token: string) => {
     try {
-      const response = await axios.put(`${port}/auth/${id}`, updatedItem);
+      const response = await axios.put(`${port}/auth/${id}`, {
+        updatedItem,
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      });
       if (response.status === 200) {
         setUser(response.data);
       } else {
         createToastify({ text: "Edit not successful", type: "error" });
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      if (err instanceof AxiosError) {
         createToastify({
-          text: "Something went wrong, please contact support",
+          text: err.response?.data.message || err.message,
           type: "error",
         });
         throw new Error(err.message);
@@ -97,9 +104,9 @@ export const useAuth = () => {
         createToastify({ text: "Delete not successful", type: "error" });
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      if (err instanceof AxiosError) {
         createToastify({
-          text: "Something went wrong, please contact support",
+          text: err.response?.data.message || err.message,
           type: "error",
         });
         throw new Error(err.message);

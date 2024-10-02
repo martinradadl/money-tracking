@@ -1,7 +1,9 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { atom, useRecoilState } from "recoil";
-import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
+import { createToastify } from "../helpers/toastify";
+import { userState } from "./authentication";
+import { useCookies } from "react-cookie";
 
 export interface TransactionI {
   _id?: string;
@@ -9,7 +11,7 @@ export interface TransactionI {
   concept: string;
   category: CategoryI;
   amount: number;
-  userId: string;
+  userId?: string;
 }
 
 export interface TransactionFormI extends Omit<TransactionI, "amount"> {
@@ -50,31 +52,34 @@ export const useTranscations = () => {
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
+  const [user] = useRecoilState(userState);
   const [categories, setCategories] = useRecoilState(categoriesState);
   const [balance, setBalance] = useRecoilState(balanceState);
+  const [cookies] = useCookies(["jwt"]);
 
   const port = "http://localhost:3000";
 
-  const getTransactions = async (userId: string) => {
+  const getTransactions = async () => {
     try {
-      const response = await axios.get(`${port}/transactions/${userId}`);
-      if (response.status === 200) {
-        setTransactionsList(response.data);
-      } else {
-        Toastify({
-          text: "Transactions not found",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+      if (user) {
+        const response = await axios.get(`${port}/transactions/${user?._id}`, {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        });
+        if (response.status === 200) {
+          setTransactionsList(response.data);
+        } else {
+          createToastify({ text: "Transactions not found", type: "error" });
+        }
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
@@ -85,135 +90,161 @@ export const useTranscations = () => {
       if (response.status === 200) {
         setCategories(response.data);
       } else {
-        Toastify({
-          text: "Categories not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+        createToastify({ text: "Categories not found", type: "error" });
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
 
   const addTransaction = async (newItem: TransactionFormI) => {
     try {
-      const parsedItem = { ...newItem, amount: parseInt(newItem.amount) };
-      const response = await axios.post(`${port}/transactions/`, parsedItem);
-      if (response.status === 200) {
-        setTransactionsList([...transactionsList, response.data]);
-      } else {
-        Toastify({
-          text: "Add not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+      if (user) {
+        const parsedItem = {
+          ...newItem,
+          amount: parseInt(newItem.amount),
+          userId: user._id,
+        };
+        const response = await axios.post(`${port}/transactions/`, parsedItem, {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        });
+        if (response.status === 200) {
+          setTransactionsList([...transactionsList, response.data]);
+        } else {
+          createToastify({
+            text: "Add Transaction not successful",
+            type: "error",
+          });
+        }
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
 
   const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
     try {
-      const parsedItem = {
-        ...updatedItem,
-        amount: parseInt(updatedItem.amount),
-      };
-      const response = await axios.put(
-        `${port}/transactions/${id}`,
-        parsedItem
-      );
-      if (response.status === 200) {
-        const i = transactionsList.findIndex((elem) => elem._id === id);
-        if (i !== -1) {
-          setTransactionsList([
-            ...transactionsList.slice(0, i),
-            response.data,
-            ...transactionsList.slice(i + 1),
-          ]);
+      if (user) {
+        const parsedItem = {
+          ...updatedItem,
+          amount: parseInt(updatedItem.amount),
+          userId: user._id,
+        };
+        const response = await axios.put(
+          `${port}/transactions/${id}`,
+          parsedItem,
+          {
+            headers: {
+              Authorization: "Bearer " + cookies.jwt,
+            },
+          }
+        );
+        if (response.status === 200) {
+          const i = transactionsList.findIndex((elem) => elem._id === id);
+          if (i !== -1) {
+            setTransactionsList([
+              ...transactionsList.slice(0, i),
+              response.data,
+              ...transactionsList.slice(i + 1),
+            ]);
+          } else {
+            throw new Error("ID not found updating transactions list");
+          }
         } else {
-          throw new Error("ID not found updating transactions list");
+          createToastify({
+            text: "Edit Transaction not successful",
+            type: "error",
+          });
         }
-      } else {
-        Toastify({
-          text: "Edit not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
 
   const deleteTransaction = async (id: string) => {
     try {
-      const response = await axios.delete(`${port}/transactions/${id}`);
-      if (response.status === 200) {
-        const i = transactionsList.findIndex((elem) => elem._id === id);
-        if (i !== -1) {
-          setTransactionsList([
-            ...transactionsList.slice(0, i),
-            ...transactionsList.slice(i + 1),
-          ]);
+      if (user) {
+        const response = await axios.delete(`${port}/transactions/${id}`, {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        });
+        if (response.status === 200) {
+          const i = transactionsList.findIndex((elem) => elem._id === id);
+          if (i !== -1) {
+            setTransactionsList([
+              ...transactionsList.slice(0, i),
+              ...transactionsList.slice(i + 1),
+            ]);
+          } else {
+            throw new Error("ID not found deleting transaction");
+          }
         } else {
-          throw new Error("ID not found deleting transaction");
+          createToastify({
+            text: "Add Transaction not successful",
+            type: "error",
+          });
         }
-      } else {
-        Toastify({
-          text: "Add not successful",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
 
-  const getBalance = async (userId: string) => {
+  const getBalance = async () => {
     try {
-      const response = await axios.get(
-        `${port}/transactions/balance/${userId}`
-      );
-      setBalance(response.data);
+      if (user) {
+        const response = await axios.get(
+          `${port}/transactions/balance/${user?._id}`,
+          {
+            headers: {
+              Authorization: "Bearer " + cookies.jwt,
+            },
+          }
+        );
+        if (response.status === 200) {
+          setBalance(response.data);
+        } else {
+          createToastify({
+            text: "Could not calculate balance",
+            type: "error",
+          });
+        }
+      }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        Toastify({
-          text: "An error ocurred",
-          duration: 3000,
-          style: { background: "red" },
-        }).showToast();
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };

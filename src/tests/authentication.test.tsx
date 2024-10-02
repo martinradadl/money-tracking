@@ -1,39 +1,12 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, vi, describe, it } from "vitest";
-import { RecoilRoot } from "recoil";
 import axios from "axios";
-import React from "react";
-import { LoginI, useAuth, UserI } from "../data/authentication";
+import { useAuth } from "../data/authentication";
+import { createWrapper, loggedUser, newUser, updatedUser } from "./utils";
 
 vi.mock("axios");
 
-export const newUser: UserI = {
-  _id: "fakeId",
-  name: "fakeName",
-  email: "fakeEmail",
-  password: "fakePassword",
-};
-
-export const updatedUser: UserI = {
-  _id: "fakeId",
-  name: "fakeUpdatedName",
-  email: "fakeUpdatedEmail",
-  password: "fakeUpdatedPassword",
-};
-
-export const loggedUser: LoginI = {
-  email: "fakeEmail",
-  password: "fakePassword",
-};
-
-const createWrapper = () => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <RecoilRoot>{children}</RecoilRoot>
-  );
-  return wrapper;
-};
-
-const wrapper = createWrapper();
+const wrapper = createWrapper(false);
 
 describe("useAuthentication", () => {
   describe("register", async () => {
@@ -51,7 +24,7 @@ describe("useAuthentication", () => {
 
     it("should return created user and statusCode 200", async () => {
       vi.mocked(axios, true).post.mockResolvedValueOnce({
-        data: newUser,
+        data: { user: newUser },
         status: 200,
       });
 
@@ -78,7 +51,7 @@ describe("useAuthentication", () => {
 
     it("should return 200 and logged user", async () => {
       vi.mocked(axios, true).post.mockResolvedValueOnce({
-        data: newUser,
+        data: { user: newUser },
         status: 200,
       });
 
@@ -99,7 +72,7 @@ describe("useAuthentication", () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
       await act(async () => {
         if (newUser._id) {
-          result.current.editUser(newUser._id, updatedUser);
+          result.current.editUser(newUser._id, updatedUser, "token");
         }
       });
       expect(result.current.user).toEqual(null);
@@ -114,7 +87,7 @@ describe("useAuthentication", () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
       await act(async () => {
         if (newUser._id) {
-          result.current.editUser(newUser._id, updatedUser);
+          result.current.editUser(newUser._id, updatedUser, "token");
         }
       });
       expect(result.current.user).toEqual(updatedUser);
