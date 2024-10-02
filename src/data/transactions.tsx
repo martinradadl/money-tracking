@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { atom, useRecoilState } from "recoil";
 import "toastify-js/src/toastify.css";
 import { createToastify } from "../helpers/toastify";
@@ -74,9 +74,12 @@ export const useTranscations = () => {
         }
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        createToastify({ text: "An error ocurred", type: "error" });
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
@@ -90,9 +93,12 @@ export const useTranscations = () => {
         createToastify({ text: "Categories not found", type: "error" });
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        createToastify({ text: "An error ocurred", type: "error" });
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
@@ -120,9 +126,12 @@ export const useTranscations = () => {
         }
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        createToastify({ text: "An error ocurred", type: "error" });
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
@@ -163,9 +172,12 @@ export const useTranscations = () => {
         }
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        createToastify({ text: "An error ocurred", type: "error" });
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
@@ -196,9 +208,12 @@ export const useTranscations = () => {
         }
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        createToastify({ text: "An error ocurred", type: "error" });
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
@@ -224,9 +239,12 @@ export const useTranscations = () => {
         }
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-        createToastify({ text: "An error ocurred", type: "error" });
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
       }
     }
   };
