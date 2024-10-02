@@ -99,15 +99,21 @@ export const useTranscations = () => {
 
   const addTransaction = async (newItem: TransactionFormI) => {
     try {
-      const parsedItem = { ...newItem, amount: parseInt(newItem.amount) };
-      const response = await axios.post(`${port}/transactions/`, parsedItem);
-      if (response.status === 200) {
-        setTransactionsList([...transactionsList, response.data]);
-      } else {
-        createToastify({
-          text: "Add Transaction not successful",
-          type: "error",
+      if (user) {
+        const parsedItem = { ...newItem, amount: parseInt(newItem.amount) };
+        const response = await axios.post(`${port}/transactions/`, parsedItem, {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
         });
+        if (response.status === 200) {
+          setTransactionsList([...transactionsList, response.data]);
+        } else {
+          createToastify({
+            text: "Add Transaction not successful",
+            type: "error",
+          });
+        }
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -119,30 +125,37 @@ export const useTranscations = () => {
 
   const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
     try {
-      const parsedItem = {
-        ...updatedItem,
-        amount: parseInt(updatedItem.amount),
-      };
-      const response = await axios.put(
-        `${port}/transactions/${id}`,
-        parsedItem
-      );
-      if (response.status === 200) {
-        const i = transactionsList.findIndex((elem) => elem._id === id);
-        if (i !== -1) {
-          setTransactionsList([
-            ...transactionsList.slice(0, i),
-            response.data,
-            ...transactionsList.slice(i + 1),
-          ]);
+      if (user) {
+        const parsedItem = {
+          ...updatedItem,
+          amount: parseInt(updatedItem.amount),
+        };
+        const response = await axios.put(
+          `${port}/transactions/${id}`,
+          parsedItem,
+          {
+            headers: {
+              Authorization: "Bearer " + cookies.jwt,
+            },
+          }
+        );
+        if (response.status === 200) {
+          const i = transactionsList.findIndex((elem) => elem._id === id);
+          if (i !== -1) {
+            setTransactionsList([
+              ...transactionsList.slice(0, i),
+              response.data,
+              ...transactionsList.slice(i + 1),
+            ]);
+          } else {
+            throw new Error("ID not found updating transactions list");
+          }
         } else {
-          throw new Error("ID not found updating transactions list");
+          createToastify({
+            text: "Edit Transaction not successful",
+            type: "error",
+          });
         }
-      } else {
-        createToastify({
-          text: "Edit Transaction not successful",
-          type: "error",
-        });
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -154,22 +167,28 @@ export const useTranscations = () => {
 
   const deleteTransaction = async (id: string) => {
     try {
-      const response = await axios.delete(`${port}/transactions/${id}`);
-      if (response.status === 200) {
-        const i = transactionsList.findIndex((elem) => elem._id === id);
-        if (i !== -1) {
-          setTransactionsList([
-            ...transactionsList.slice(0, i),
-            ...transactionsList.slice(i + 1),
-          ]);
-        } else {
-          throw new Error("ID not found deleting transaction");
-        }
-      } else {
-        createToastify({
-          text: "Add Transaction not successful",
-          type: "error",
+      if (user) {
+        const response = await axios.delete(`${port}/transactions/${id}`, {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
         });
+        if (response.status === 200) {
+          const i = transactionsList.findIndex((elem) => elem._id === id);
+          if (i !== -1) {
+            setTransactionsList([
+              ...transactionsList.slice(0, i),
+              ...transactionsList.slice(i + 1),
+            ]);
+          } else {
+            throw new Error("ID not found deleting transaction");
+          }
+        } else {
+          createToastify({
+            text: "Add Transaction not successful",
+            type: "error",
+          });
+        }
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -190,7 +209,14 @@ export const useTranscations = () => {
             },
           }
         );
-        setBalance(response.data);
+        if (response.status === 200) {
+          setBalance(response.data);
+        } else {
+          createToastify({
+            text: "Could not calculate balance",
+            type: "error",
+          });
+        }
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
