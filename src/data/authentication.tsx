@@ -85,9 +85,9 @@ export const useAuth = () => {
         createToastify({ text: "Edit not successful", type: "error" });
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      if (err instanceof AxiosError) {
         createToastify({
-          text: "Something went wrong, please contact support",
+          text: err.response?.data.message || err.message,
           type: "error",
         });
         throw new Error(err.message);
@@ -104,9 +104,9 @@ export const useAuth = () => {
         createToastify({ text: "Delete not successful", type: "error" });
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      if (err instanceof AxiosError) {
         createToastify({
-          text: "Something went wrong, please contact support",
+          text: err.response?.data.message || err.message,
           type: "error",
         });
         throw new Error(err.message);
