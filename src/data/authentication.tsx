@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { atom, useRecoilState } from "recoil";
 import { useCookies } from "react-cookie";
 import { createToastify } from "../helpers/toastify";
@@ -55,15 +55,15 @@ export const useAuth = () => {
       });
       if (response.status === 200) {
         setUser(response.data.user);
-        setCookie("user", JSON.stringify(response.data.user), { path: "/", });
-        setCookie("jwt", response.data.token, )
+        setCookie("user", JSON.stringify(response.data.user), { path: "/" });
+        setCookie("jwt", response.data.token);
       } else {
         createToastify({ text: "Login not successful", type: "error" });
       }
     } catch (err: unknown) {
-      if (err instanceof Error) {
+      if (err instanceof AxiosError) {
         createToastify({
-          text: "Something went wrong, please contact support",
+          text: err.response?.data.message || err.message,
           type: "error",
         });
         throw new Error(err.message);
