@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { TransactionI } from "../../data/transactions";
+import { getCurrencyFormat } from "../../helpers/currency";
 
 interface TransactionProps {
   transaction: TransactionI;
@@ -21,11 +22,12 @@ export const Transaction = ({ transaction }: TransactionProps) => {
         <p className="px-2 rounded-md bg-yellow-category text-navy">
           {category.label}
         </p>
-        <p>{`${new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-          minimumFractionDigits: 0,
-        }).format(type === "income" ? amount : -amount)}`}</p>
+        <p>
+          {getCurrencyFormat({
+            currency: "USD",
+            amount: type === "income" ? amount : -amount,
+          })}
+        </p>
       </div>
     </div>
   );
