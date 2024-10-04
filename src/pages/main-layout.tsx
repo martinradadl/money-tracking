@@ -16,7 +16,7 @@ export const MainLayout = () => {
     } else {
       setUser(cookies.user);
     }
-  }, []);
+  }, [cookies.user]);
 
   return (
     <div className="flex flex-col h-dvh bg-navy">
