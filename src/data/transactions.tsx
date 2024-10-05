@@ -5,9 +5,6 @@ import { createToastify } from "../helpers/toastify";
 import { userState } from "./authentication";
 import { useCookies } from "react-cookie";
 
-
-export const currencies = ["USD", "EUR", "COP"];
-
 export interface TransactionI {
   _id?: string;
   type: string;

@@ -8,7 +8,7 @@ export interface UserI {
   name: string;
   email: string;
   password?: string;
-  currency?: string;
+  currency: CurrencyI;
 }
 
 export interface LoginI {
@@ -16,13 +16,24 @@ export interface LoginI {
   password: string;
 }
 
+export interface CurrencyI {
+  name: string;
+  code: string;
+}
+
 export const userState = atom<UserI | null>({
   key: "userState",
   default: null,
 });
 
+export const currenciesState = atom<CurrencyI[]>({
+  key: "currenciesState",
+  default: [],
+});
+
 export const useAuth = () => {
   const [user, setUser] = useRecoilState(userState);
+  const [currencies, setCurrencies] = useRecoilState(currenciesState);
   const [userCookie, setCookie] = useCookies(["user", "jwt"]);
   const port = "http://localhost:3000";
   const [cookies] = useCookies(["jwt"]);
@@ -73,15 +84,12 @@ export const useAuth = () => {
     }
   };
 
-  const changePassword = async (
-    userId: string,
-    passwords: { current: string; new: string }
-  ) => {
+  const changePassword = async (userId: string, newPassword: string) => {
     try {
       const response = await axios.put(
-        `${port}/auth/${userId}/change-password`,
+        `${port}/auth/${userId}/change-password/${newPassword}`,
+        {},
         {
-          passwords,
           headers: {
             Authorization: "Bearer " + cookies.jwt,
           },
@@ -134,8 +142,7 @@ export const useAuth = () => {
 
   const editUser = async (id: string, updatedItem: UserI) => {
     try {
-      const response = await axios.put(`${port}/auth/${id}`, {
-        updatedItem,
+      const response = await axios.put(`${port}/auth/${id}`, updatedItem, {
         headers: {
           Authorization: "Bearer " + cookies.jwt,
         },
@@ -158,7 +165,7 @@ export const useAuth = () => {
 
   const deleteUser = async (id: string) => {
     try {
-      const response = await axios.delete(`${port}/transactions/${id}`, {
+      const response = await axios.delete(`${port}/auth/${id}`, {
         headers: {
           Authorization: "Bearer " + cookies.jwt,
         },
@@ -167,6 +174,26 @@ export const useAuth = () => {
         setUser(null);
       } else {
         createToastify({ text: "Delete not successful", type: "error" });
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
+  const getCurrencies = async () => {
+    try {
+      const response = await axios.get(`${port}/auth/currencies`);
+      if (response.status === 200) {
+        setCurrencies(response.data);
+        return response.data;
+      } else {
+        createToastify({ text: "Could not get currencies", type: "error" });
       }
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
@@ -188,5 +215,7 @@ export const useAuth = () => {
     deleteUser,
     user,
     userCookie,
+    getCurrencies,
+    currencies,
   };
 };

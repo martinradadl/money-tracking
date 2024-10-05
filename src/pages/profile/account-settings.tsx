@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createToastify } from "../../helpers/toastify";
-import { userState } from "../../data/authentication";
+import { useAuth, userState } from "../../data/authentication";
 import {
   Button,
   Dialog,
@@ -9,7 +9,6 @@ import {
   Select,
 } from "@headlessui/react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { currencies } from "../../data/transactions";
 import { ConfirmPasswordModal } from "./confirm-password";
 import { useRecoilState } from "recoil";
 
@@ -21,7 +20,7 @@ export interface props {
 const accountFormInitialState = {
   name: "",
   email: "",
-  currency: "",
+  currency: { name: "", code: "" },
 };
 
 export default function AccountSettingsModal({ modalTrigger }: props) {
@@ -29,14 +28,16 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
   const [accountForm, setAccountForm] = useState(accountFormInitialState);
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const { getCurrencies, currencies } = useAuth();
 
   useEffect(() => {
     if (user) {
       setAccountForm({
         name: user.name,
-        email: "",
-        currency: "USD",
+        email: user.email,
+        currency: { name: user.currency.name, code: user.currency.code },
       });
+      getCurrencies();
     }
   }, [isOpen]);
 
@@ -58,11 +59,31 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
     });
   };
 
+  const handleChangeCurrency = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const currencySplitted = event.target.value.split(" - ");
+    setAccountForm({
+      ...accountForm,
+      currency: { name: currencySplitted[0], code: currencySplitted[1] },
+    });
+  };
+
   const hasEmptyFields = () => {
     return (
       accountForm.name === "" ||
       accountForm.email === "" ||
-      accountForm.currency === ""
+      accountForm.currency.name === "" ||
+      accountForm.currency.code === ""
+    );
+  };
+
+  const hasNoChanges = () => {
+    return (
+      accountForm.name === user?.name &&
+      accountForm.email === user?.email &&
+      accountForm.currency.name === user.currency.name &&
+      accountForm.currency.code === user.currency.code
     );
   };
 
@@ -126,15 +147,14 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
                     <Select
                       name="currency"
                       id="currency"
-                      value={accountForm.currency}
-                      onChange={handleChange}
+                      value={`${accountForm.currency.name} - ${accountForm.currency.code}`}
+                      onChange={handleChangeCurrency}
                       className="w-full h-9 border-navy rounded bg-green border-b-2"
                     >
-                      <option style={{ display: "none" }}></option>
                       {currencies.map((elem, i) => {
                         return (
-                          <option key={i} value={elem}>
-                            {elem}
+                          <option key={i} value={`${elem.name} - ${elem.code}`}>
+                            {`${elem.name} - ${elem.code}`}
                           </option>
                         );
                       })}
@@ -151,6 +171,11 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
                         text: "There are empty fields",
                         type: "warning",
                       });
+                    } else if (hasNoChanges()) {
+                      createToastify({
+                        text: "There are no changes",
+                        type: "warning",
+                      });
                     } else {
                       openConfirmModal();
                     }
@@ -164,6 +189,7 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
                     close: closeConfirmModal,
                     userId: user?._id,
                     accountForm,
+                    closeAccountSettings: close,
                   }}
                 />
               </div>

@@ -85,7 +85,9 @@ export const Transactions: React.FC = () => {
             "rounded px-2 py-0.5 font-semibold"
           )}
         >
-          {getCurrencyFormat({ amount: balance, currency: "USD" })}
+          {user
+            ? getCurrencyFormat({ amount: balance, currency: user.currency })
+            : null}
         </p>
       </div>
       <div className="flex flex-col gap-3">
@@ -119,7 +121,11 @@ export const Transactions: React.FC = () => {
                 }}
                 onTouchEnd={handleTouchEnd}
               >
-                <Transaction key={i} transaction={elem} />
+                <Transaction
+                  key={i}
+                  transaction={elem}
+                  currency={user?.currency}
+                />
               </div>
             </div>
           );
