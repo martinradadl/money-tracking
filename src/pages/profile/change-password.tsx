@@ -22,7 +22,7 @@ const passwordFormInitialState: passwordFormProps = {
 };
 
 export default function ChangePasswordModal({ userId, modalTrigger }: props) {
-  const { changePassword } = useAuth();
+  const { changePassword, checkPassword } = useAuth();
   const [passwordForm, setPasswordForm] = useState(passwordFormInitialState);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -43,7 +43,7 @@ export default function ChangePasswordModal({ userId, modalTrigger }: props) {
   };
 
   const newPasswordConfirmed = () => {
-    return passwordForm.new === passwordForm.current;
+    return passwordForm.new === passwordForm.confirm;
   };
 
   const hasEmptyFields = () => {
@@ -54,20 +54,31 @@ export default function ChangePasswordModal({ userId, modalTrigger }: props) {
     );
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (hasEmptyFields()) {
       createToastify({ text: "There are empty fields", type: "warning" });
     } else if (!newPasswordConfirmed()) {
       createToastify({
-        text: "Confirmed password does not match",
+        text: "Confirmed password does not match with new password",
         type: "warning",
       });
     } else {
-      const passwordsSubmitted = { ...passwordForm };
-      delete passwordsSubmitted["confirm"];
-      if (userId) changePassword(userId, passwordsSubmitted);
+      if (userId) {
+        const isCorrectPassword = await checkPassword(
+          userId,
+          passwordForm.current
+        );
+        if (isCorrectPassword) {
+          changePassword(userId, passwordForm.new);
+          close();
+        } else {
+          createToastify({
+            text: "The current password you typed is not valid",
+            type: "error",
+          });
+        }
+      }
     }
-    close();
   };
 
   return (
@@ -96,6 +107,7 @@ export default function ChangePasswordModal({ userId, modalTrigger }: props) {
                   <label>
                     <p className="text-2xl mb-2">Current password</p>
                     <input
+                      type="password"
                       className="w-full h-9 px-2 border-navy bg-green border-b-2"
                       id="current"
                       name="current"
@@ -108,6 +120,7 @@ export default function ChangePasswordModal({ userId, modalTrigger }: props) {
                   <label>
                     <p className="text-2xl mb-2">New password</p>
                     <input
+                      type="password"
                       className="w-full h-9 px-2 border-navy bg-green border-b-2"
                       id="new"
                       name="new"
@@ -120,6 +133,7 @@ export default function ChangePasswordModal({ userId, modalTrigger }: props) {
                   <label>
                     <p className="text-2xl mb-2">Confirm password</p>
                     <input
+                      type="password"
                       className="w-full h-9 px-2 border-navy bg-green border-b-2"
                       id="confirm"
                       name="confirm"

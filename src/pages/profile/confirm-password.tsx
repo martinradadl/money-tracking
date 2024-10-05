@@ -10,6 +10,7 @@ export interface props {
   userId?: string;
   accountForm?: UserI;
   isDelete?: boolean;
+  closeAccountSettings?: () => void;
 }
 
 export const ConfirmPasswordModal = ({
@@ -18,6 +19,7 @@ export const ConfirmPasswordModal = ({
   userId,
   accountForm,
   isDelete,
+  closeAccountSettings,
 }: props) => {
   const [password, setPassword] = useState("");
   const { checkPassword, editUser, deleteUser } = useAuth();
@@ -35,6 +37,13 @@ export const ConfirmPasswordModal = ({
         if (isCorrectPassword) {
           if (isDelete) deleteUser(userId);
           else if (accountForm) editUser(userId, accountForm);
+          close();
+          if (closeAccountSettings) closeAccountSettings();
+        } else {
+          createToastify({
+            text: "The password you typed is not valid",
+            type: "error",
+          });
         }
       }
     }
@@ -66,6 +75,7 @@ export const ConfirmPasswordModal = ({
                   <p>Confirm your password to proceed</p>
                 </div>
                 <input
+                  type="password"
                   className="w-full h-9 px-2 border-navy bg-beige border-b-2"
                   value={password}
                   onChange={handleChange}
