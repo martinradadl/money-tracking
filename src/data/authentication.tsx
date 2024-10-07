@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { atom, useRecoilState } from "recoil";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import { createToastify } from "../helpers/toastify";
 
 export interface UserI {
@@ -30,6 +30,35 @@ export const currenciesState = atom<CurrencyI[]>({
   key: "currenciesState",
   default: [],
 });
+
+export const checkPassword = async (id: string, password: string) => {
+  const port = "http://localhost:3000";
+  const cookies = new Cookies();
+
+  try {
+    const response = await axios.get(
+      `${port}/auth/${id}/check-password/${password}`,
+      {
+        headers: {
+          Authorization: "Bearer " + cookies.get("jwt"),
+        },
+      }
+    );
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      createToastify({ text: "Could not check password", type: "error" });
+    }
+  } catch (err: unknown) {
+    if (err instanceof AxiosError) {
+      createToastify({
+        text: err.response?.data.message || err.message,
+        type: "error",
+      });
+      throw new Error(err.message);
+    }
+  }
+};
 
 export const useAuth = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -114,32 +143,6 @@ export const useAuth = () => {
     }
   };
 
-  const checkPassword = async (id: string, password: string) => {
-    try {
-      const response = await axios.get(
-        `${port}/auth/${id}/check-password/${password}`,
-        {
-          headers: {
-            Authorization: "Bearer " + cookies.jwt,
-          },
-        }
-      );
-      if (response.status === 200) {
-        return response.data;
-      } else {
-        createToastify({ text: "Could not check password", type: "error" });
-      }
-    } catch (err: unknown) {
-      if (err instanceof AxiosError) {
-        createToastify({
-          text: err.response?.data.message || err.message,
-          type: "error",
-        });
-        throw new Error(err.message);
-      }
-    }
-  };
-
   const editUser = async (id: string, updatedItem: UserI) => {
     try {
       const response = await axios.put(`${port}/auth/${id}`, updatedItem, {
@@ -210,7 +213,6 @@ export const useAuth = () => {
     register,
     login,
     changePassword,
-    checkPassword,
     editUser,
     deleteUser,
     user,

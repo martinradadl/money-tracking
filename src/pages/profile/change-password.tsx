@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createToastify } from "../../helpers/toastify";
-import { useAuth } from "../../data/authentication";
+import { checkPassword, useAuth } from "../../data/authentication";
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
@@ -22,7 +22,7 @@ const passwordFormInitialState: passwordFormProps = {
 };
 
 export default function ChangePasswordModal({ userId, modalTrigger }: props) {
-  const { changePassword, checkPassword } = useAuth();
+  const { changePassword } = useAuth();
   const [passwordForm, setPasswordForm] = useState(passwordFormInitialState);
   const [isOpen, setIsOpen] = useState(false);
 
