@@ -28,7 +28,7 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
   const [accountForm, setAccountForm] = useState(accountFormInitialState);
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const { getCurrencies, currencies } = useAuth();
+  const { currencies } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -37,7 +37,6 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
         email: user.email,
         currency: { name: user.currency.name, code: user.currency.code },
       });
-      getCurrencies();
     }
   }, [isOpen]);
 
