@@ -19,7 +19,6 @@ export interface props {
 
 const accountFormInitialState = {
   name: "",
-  email: "",
   currency: { name: "", code: "" },
 };
 
@@ -34,7 +33,6 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
     if (user) {
       setAccountForm({
         name: user.name,
-        email: user.email,
         currency: { name: user.currency.name, code: user.currency.code },
       });
     }
@@ -71,7 +69,6 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
   const hasEmptyFields = () => {
     return (
       accountForm.name === "" ||
-      accountForm.email === "" ||
       accountForm.currency.name === "" ||
       accountForm.currency.code === ""
     );
@@ -80,7 +77,6 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
   const hasNoChanges = () => {
     return (
       accountForm.name === user?.name &&
-      accountForm.email === user?.email &&
       accountForm.currency.name === user.currency.name &&
       accountForm.currency.code === user.currency.code
     );
@@ -124,18 +120,6 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
                       id="name"
                       name="name"
                       value={accountForm.name}
-                      onChange={handleChange}
-                      maxLength={40}
-                    />
-                  </label>
-
-                  <label>
-                    <p className="text-2xl mb-2">Email</p>
-                    <input
-                      className="w-full h-9 px-2 border-navy bg-green border-b-2"
-                      id="email"
-                      name="email"
-                      value={accountForm.email}
                       onChange={handleChange}
                       maxLength={40}
                     />
