@@ -10,6 +10,8 @@ export default {
       "red-pastel": "#FF7272",
       "yellow-category": "#FABC60",
       red: "rgb(220,38,38)",
+      gray: "rgb(75 85 99)",
+      "light-gray": "rgb(209 213 219)",
     },
     extend: {},
   },

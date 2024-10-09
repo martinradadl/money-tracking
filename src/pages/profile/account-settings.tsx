@@ -131,7 +131,7 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
                   <label>
                     <p className="text-2xl mb-2">Email</p>
                     <input
-                      className="w-full h-9 px-2 border-navy bg-green border-b-2"
+                      className="w-full h-9 px-2 border-navy bg-light-gray text-gray border-b-2"
                       id="email"
                       name="email"
                       value={accountForm.email}
