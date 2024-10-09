@@ -36,7 +36,13 @@ export const ConfirmPasswordModal = ({
         const isCorrectPassword = await checkPassword(userId, password);
         if (isCorrectPassword) {
           if (isDelete) deleteUser(userId);
-          else if (accountForm) editUser(userId, accountForm);
+          else if (accountForm) {
+            editUser(userId, accountForm);
+            createToastify({
+              text: "Profile was successfully updated!",
+              type: "success",
+            });
+          }
           close();
           if (closeAccountSettings) closeAccountSettings();
         } else {
