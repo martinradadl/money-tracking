@@ -37,10 +37,11 @@ export const checkPassword = async (id: string, password: string) => {
 
   try {
     const response = await axios.get(
-      `${port}/auth/${id}/check-password/${password}`,
+      `${port}/auth/${id}/check-password`,
       {
         headers: {
           Authorization: "Bearer " + cookies.get("jwt"),
+          password,
         },
       }
     );
