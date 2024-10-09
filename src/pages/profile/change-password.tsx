@@ -3,6 +3,7 @@ import { createToastify } from "../../helpers/toastify";
 import { checkPassword, useAuth } from "../../data/authentication";
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
+import { SuccessModal } from "./success-modal";
 
 export interface props {
   userId?: string;
@@ -25,6 +26,7 @@ export default function ChangePasswordModal({ userId, modalTrigger }: props) {
   const { changePassword } = useAuth();
   const [passwordForm, setPasswordForm] = useState(passwordFormInitialState);
   const [isOpen, setIsOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const open = () => {
     setIsOpen(true);
@@ -70,7 +72,7 @@ export default function ChangePasswordModal({ userId, modalTrigger }: props) {
         );
         if (isCorrectPassword) {
           changePassword(userId, passwordForm.new);
-          close();
+          setIsSuccessModalOpen(true);
         } else {
           createToastify({
             text: "The current password you typed is not valid",
@@ -151,6 +153,7 @@ export default function ChangePasswordModal({ userId, modalTrigger }: props) {
                 >
                   Submit
                 </Button>
+                <SuccessModal isOpen={isSuccessModalOpen} />
               </div>
             </DialogPanel>
           </div>
