@@ -6,7 +6,7 @@ import { createToastify } from "../helpers/toastify";
 export interface UserI {
   _id?: string;
   name: string;
-  email?: string;
+  email: string;
   password?: string;
   currency: CurrencyI;
 }
