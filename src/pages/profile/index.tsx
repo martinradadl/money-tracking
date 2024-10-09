@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useRecoilState } from "recoil";
-import { userState } from "../../data/authentication";
+import { useAuth, userState } from "../../data/authentication";
 import {
   AiFillEdit,
   AiFillLock,
@@ -12,12 +12,11 @@ import ChangePasswordModal from "./change-password";
 import AccountSettingsModal from "./account-settings";
 import { ConfirmPasswordModal } from "./confirm-password";
 import { ContactSupportModal } from "./contact-support";
-import { Cookies } from "react-cookie";
 
 export const Profile: React.FC = () => {
-  const [user, setUser] = useRecoilState(userState);
+  const [user] = useRecoilState(userState);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const cookies = new Cookies();
+  const { logout } = useAuth();
 
   const openConfirmModal = () => {
     setIsConfirmModalOpen(true);
@@ -27,21 +26,16 @@ export const Profile: React.FC = () => {
     setIsConfirmModalOpen(false);
   };
 
-  const logout = () => {
-    cookies.remove("user", { path: "/" });
-    setUser(null);
-  };
-
   return (
     <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-10 overflow-y-auto text-beige entrance-anim">
       <h1 className="py-2 text-4xl font-semibold">Profile</h1>
 
       <div className="flex gap-4 items-center border-b-2 border-green pb-4">
-        <div className="bg-green rounded-full w-24 h-24" />
+        <div className="bg-green rounded-full h-24 w-24 max-h-24 max-w-24" />
 
-        <div className="flex flex-col flex-1 gap-1">
-          <p className="text-3xl text-ellipsis">{user?.name}</p>
-          <p className="text-xl text-ellipsis">{user?.email}</p>
+        <div className="flex flex-col flex-1 gap-1 whitespace-nowrap overflow-hidden">
+          <p className="text-3xl overflow-hidden text-ellipsis">{user?.name}</p>
+          <p className="text-xl overflow-hidden text-ellipsis">{user?.email}</p>
         </div>
 
         <AccountSettingsModal

@@ -63,9 +63,14 @@ export const checkPassword = async (id: string, password: string) => {
 export const useAuth = () => {
   const [user, setUser] = useRecoilState(userState);
   const [currencies, setCurrencies] = useRecoilState(currenciesState);
-  const [userCookie, setCookie] = useCookies(["user", "jwt"]);
+  const [userCookie, setCookie, removeCookie] = useCookies(["user", "jwt"]);
   const port = "http://localhost:3000";
-  const [cookies] = useCookies(["jwt"]);
+
+  const logout = () => {
+    setUser(null);
+    removeCookie("user", { path: "/" });
+    removeCookie("jwt");
+  };
 
   const register = async (newUser: UserI) => {
     try {
@@ -116,11 +121,12 @@ export const useAuth = () => {
   const changePassword = async (userId: string, newPassword: string) => {
     try {
       const response = await axios.put(
-        `${port}/auth/${userId}/change-password/${newPassword}`,
+        `${port}/auth/${userId}/change-password`,
         {},
         {
           headers: {
-            Authorization: "Bearer " + cookies.jwt,
+            Authorization: "Bearer " + userCookie.jwt,
+            newPassword,
           },
         }
       );
@@ -147,11 +153,12 @@ export const useAuth = () => {
     try {
       const response = await axios.put(`${port}/auth/${id}`, updatedItem, {
         headers: {
-          Authorization: "Bearer " + cookies.jwt,
+          Authorization: "Bearer " + userCookie.jwt,
         },
       });
       if (response.status === 200) {
         setUser(response.data);
+        setCookie("user", JSON.stringify(response.data), { path: "/" });
       } else {
         createToastify({ text: "Edit not successful", type: "error" });
       }
@@ -170,7 +177,7 @@ export const useAuth = () => {
     try {
       const response = await axios.delete(`${port}/auth/${id}`, {
         headers: {
-          Authorization: "Bearer " + cookies.jwt,
+          Authorization: "Bearer " + userCookie.jwt,
         },
       });
       if (response.status === 200) {
@@ -212,6 +219,7 @@ export const useAuth = () => {
   return {
     register,
     login,
+    logout,
     changePassword,
     editUser,
     deleteUser,
