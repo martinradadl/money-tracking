@@ -17,3 +17,9 @@
 .entrance-anim {
   animation: entranceAnim 1s ease 0s 1 normal forwards;
 }
+
+.profile-option {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}

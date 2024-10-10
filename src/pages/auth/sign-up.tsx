@@ -26,7 +26,11 @@ export const SignUp: React.FC = () => {
       if (hasEmptyFields()) {
         createToastify({ text: "Faltan campos por llenar", type: "warning" });
       } else {
-        await register(user);
+        const parsedUser = {
+          ...user,
+          currency: { name: "Colombian Peso", code: "COP" },
+        };
+        await register(parsedUser);
         navigate("/");
       }
     } catch (err: unknown) {

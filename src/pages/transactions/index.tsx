@@ -13,6 +13,7 @@ import {
 } from "../../data/transactions";
 import { DeleteTransactionModal } from "./delete-modal";
 import { userState } from "../../data/authentication";
+import { getCurrencyFormat } from "../../helpers/currency";
 
 export const Transactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
@@ -72,11 +73,9 @@ export const Transactions: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col flex-1 pb-14 px-4 gap-4 overflow-y-auto entrance-anim">
-      <h1 className="mx-auto py-2 text-4xl text-beige font-semibold">
-        Transactions
-      </h1>
-      <div className="flex w-full gap-3 pl-2 py-1 text-2xl font-semibold">
+    <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim">
+      <h1 className="py-2 text-4xl text-beige font-semibold">Transactions</h1>
+      <div className="flex w-full gap-3 py-1 text-2xl font-semibold">
         <p className="text-beige">My Balance:</p>
         <p
           className={classNames(
@@ -86,11 +85,9 @@ export const Transactions: React.FC = () => {
             "rounded px-2 py-0.5 font-semibold"
           )}
         >
-          {`${new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-            minimumFractionDigits: 0,
-          }).format(balance)}`}
+          {user
+            ? getCurrencyFormat({ amount: balance, currency: user.currency })
+            : null}
         </p>
       </div>
       <div className="flex flex-col gap-3">
@@ -124,7 +121,11 @@ export const Transactions: React.FC = () => {
                 }}
                 onTouchEnd={handleTouchEnd}
               >
-                <Transaction key={i} transaction={elem} />
+                <Transaction
+                  key={i}
+                  transaction={elem}
+                  currency={user?.currency}
+                />
               </div>
             </div>
           );

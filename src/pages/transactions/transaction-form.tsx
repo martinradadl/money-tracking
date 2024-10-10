@@ -9,7 +9,9 @@ export const TransactionForm = () => {
 
   const [categories] = useRecoilState(categoriesState);
 
-  const handleChangeConcept = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     if (newTransaction) {
       setNewTransaction({
         ...newTransaction,
@@ -39,15 +41,6 @@ export const TransactionForm = () => {
     }
   };
 
-  const handleChangeType = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    if (newTransaction) {
-      setNewTransaction({
-        ...newTransaction,
-        [event.target.name]: event.target.value,
-      });
-    }
-  };
-
   const handleChangeCategory = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -67,7 +60,7 @@ export const TransactionForm = () => {
           name="type"
           id="type"
           value={newTransaction?.type}
-          onChange={handleChangeType}
+          onChange={handleChange}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
           <option value="income">Income</option>
@@ -81,7 +74,7 @@ export const TransactionForm = () => {
           id="concept"
           name="concept"
           value={newTransaction?.concept}
-          onChange={handleChangeConcept}
+          onChange={handleChange}
           maxLength={40}
         />
       </label>

@@ -8,6 +8,7 @@ import {
   selectedTransactionState,
   useTranscations,
 } from "../../data/transactions";
+import { createToastify } from "../../helpers/toastify";
 
 export interface props {
   userId?: string;
@@ -56,11 +57,11 @@ export default function TransactionModal({ userId, close, isOpen }: props) {
   const onSubmit = () => {
     if (newTransaction) {
       if (hasEmptyFields()) {
-        alert("Faltan campos por llenar");
+        createToastify({ text: "There are empty fields", type: "warning" });
       } else {
         if (selectedTransaction?._id) {
           if (isSameTransaction()) {
-            alert("No hay cambios");
+            createToastify({ text: "There are no changes", type: "warning" });
             return;
           } else {
             editTransaction(selectedTransaction._id, newTransaction);
