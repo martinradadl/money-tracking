@@ -28,7 +28,7 @@ export const SignUp: React.FC = () => {
       } else {
         const parsedUser = {
           ...user,
-          currency: { name: "US Dollar", code: "USD" },
+          currency: { name: "Colombian Peso", code: "COP" },
         };
         await register(parsedUser);
         navigate("/");

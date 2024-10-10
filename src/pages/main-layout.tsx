@@ -12,11 +12,14 @@ export const MainLayout = () => {
   const { getCurrencies } = useAuth();
 
   useEffect(() => {
+    getCurrencies();
+  }, []);
+
+  useEffect(() => {
     if (!cookies.user) {
       navigate(`/login`);
     } else {
       setUser(cookies.user);
-      getCurrencies();
     }
   }, [cookies.user]);
 

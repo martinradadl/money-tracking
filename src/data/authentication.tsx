@@ -201,7 +201,6 @@ export const useAuth = () => {
       const response = await axios.get(`${port}/auth/currencies`);
       if (response.status === 200) {
         setCurrencies(response.data);
-        return response.data;
       } else {
         createToastify({ text: "Could not get currencies", type: "error" });
       }
