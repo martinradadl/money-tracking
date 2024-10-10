@@ -36,15 +36,12 @@ export const checkPassword = async (id: string, password: string) => {
   const cookies = new Cookies();
 
   try {
-    const response = await axios.get(
-      `${port}/auth/${id}/check-password`,
-      {
-        headers: {
-          Authorization: "Bearer " + cookies.get("jwt"),
-          password,
-        },
-      }
-    );
+    const response = await axios.get(`${port}/auth/${id}/check-password`, {
+      headers: {
+        Authorization: "Bearer " + cookies.get("jwt"),
+        password,
+      },
+    });
     if (response.status === 200) {
       return response.data;
     } else {
@@ -70,7 +67,7 @@ export const useAuth = () => {
   const logout = () => {
     setUser(null);
     removeCookie("user", { path: "/" });
-    removeCookie("jwt");
+    removeCookie("jwt", { path: "/" });
   };
 
   const register = async (newUser: UserI) => {
@@ -183,6 +180,8 @@ export const useAuth = () => {
       });
       if (response.status === 200) {
         setUser(null);
+        removeCookie("user", { path: "/" });
+        removeCookie("jwt", { path: "/" });
       } else {
         createToastify({ text: "Delete not successful", type: "error" });
       }
