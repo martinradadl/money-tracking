@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Transition } from "@headlessui/react";
 import { AiFillEdit } from "react-icons/ai";
-import { Transaction } from "./transaction";
-import TransactionModal from "./transaction-modal";
+import { Card } from "../../components/cards/card";
 import classNames from "classnames";
 import { useRecoilState } from "recoil";
 import {
@@ -10,23 +9,31 @@ import {
   selectedTransactionState,
   TransactionI,
   TransactionFormI,
+  newTransactionState,
 } from "../../data/transactions";
-import { DeleteTransactionModal } from "./delete-modal";
+import { DeleteCardModal } from "../../components/cards/delete-card";
 import { userState } from "../../data/authentication";
 import { getCurrencyFormat } from "../../helpers/currency";
+import { useCategories } from "../../data/categories";
+import CardModal from "../../components/cards/card-modal";
 
 export const Transactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
     selectedTransactionState
   );
+  const [newTransaction, setNewTransaction] =
+    useRecoilState(newTransactionState);
   const [user] = useRecoilState(userState);
   const {
     getTransactions,
-    getCategories,
     getBalance,
     transactionsList,
     balance,
+    deleteTransaction,
+    addTransaction,
+    editTransaction,
   } = useTranscations();
+  const { getCategories } = useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -111,7 +118,13 @@ export const Transactions: React.FC = () => {
                     <AiFillEdit />
                   </div>
                   <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
-                    <DeleteTransactionModal />
+                    <DeleteCardModal
+                      {...{
+                        selectedCard: selectedTransaction,
+                        setSelectedCard: setSelectedTransaction,
+                        deleteCard: deleteTransaction,
+                      }}
+                    />
                   </div>
                 </div>
               </Transition>
@@ -121,11 +134,7 @@ export const Transactions: React.FC = () => {
                 }}
                 onTouchEnd={handleTouchEnd}
               >
-                <Transaction
-                  key={i}
-                  transaction={elem}
-                  currency={user?.currency}
-                />
+                <Card key={i} content={elem} currency={user?.currency} />
               </div>
             </div>
           );
@@ -138,11 +147,16 @@ export const Transactions: React.FC = () => {
         >
           Add Transaction
         </button>
-        <TransactionModal
+        <CardModal
           {...{
             userId: user?._id,
             close: closeModal,
             isOpen: isModalOpen,
+            newCard: newTransaction,
+            setNewCard: setNewTransaction,
+            selectedCard: selectedTransaction,
+            addCard: addTransaction,
+            editCard: editTransaction,
           }}
         />
       </div>
