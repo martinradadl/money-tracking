@@ -1,20 +1,24 @@
 import React from "react";
-import { useRecoilState } from "recoil";
-import { categoriesState, newTransactionState } from "../../data/transactions";
+import { SetterOrUpdater, useRecoilState } from "recoil";
+import { TransactionFormI } from "../../data/transactions";
 import { Select } from "@headlessui/react";
+import { categoriesState } from "../../data/categories";
+import { DebtFormI } from "../../data/debts";
 
-export const TransactionForm = () => {
-  const [newTransaction, setNewTransaction] =
-    useRecoilState(newTransactionState);
+export interface props {
+  newCard: TransactionFormI | DebtFormI;
+  setNewCard: SetterOrUpdater<TransactionFormI | DebtFormI>;
+}
 
+export const CardForm = ({ newCard, setNewCard }: props) => {
   const [categories] = useRecoilState(categoriesState);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    if (newTransaction) {
-      setNewTransaction({
-        ...newTransaction,
+    if (newCard) {
+      setNewCard({
+        ...newCard,
         [event.target.name]: event.target.value,
       });
     }
@@ -29,13 +33,13 @@ export const TransactionForm = () => {
       .split("")
       .every((char) => allowedValues.test(char));
     if (
-      newTransaction &&
+      newCard &&
       inputValue.length <= 12 &&
       (!lastValue || hasAllowedValues) &&
       firstValue !== "0"
     ) {
-      setNewTransaction({
-        ...newTransaction,
+      setNewCard({
+        ...newCard,
         [event.target.name]: inputValue,
       });
     }
@@ -44,9 +48,9 @@ export const TransactionForm = () => {
   const handleChangeCategory = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    if (newTransaction) {
-      setNewTransaction({
-        ...newTransaction,
+    if (newCard) {
+      setNewCard({
+        ...newCard,
         category: { _id: event.target.value, label: "" },
       });
     }
@@ -59,7 +63,7 @@ export const TransactionForm = () => {
         <Select
           name="type"
           id="type"
-          value={newTransaction?.type}
+          value={newCard?.type}
           onChange={handleChange}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
@@ -73,7 +77,7 @@ export const TransactionForm = () => {
           className="w-full h-9 px-2 border-navy bg-green border-b-2"
           id="concept"
           name="concept"
-          value={newTransaction?.concept}
+          value={newCard?.concept}
           onChange={handleChange}
           maxLength={40}
         />
@@ -83,7 +87,7 @@ export const TransactionForm = () => {
         <Select
           name="category"
           id="category"
-          value={newTransaction?.category._id}
+          value={newCard?.category._id}
           onChange={handleChangeCategory}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
@@ -104,7 +108,7 @@ export const TransactionForm = () => {
           type="text"
           id="amount"
           name="amount"
-          value={newTransaction?.amount}
+          value={newCard?.amount}
           onChange={handleChangeAmount}
         />
       </label>

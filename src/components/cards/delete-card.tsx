@@ -1,17 +1,22 @@
 import { useState } from "react";
-import { useRecoilState } from "recoil";
-import {
-  selectedTransactionState,
-  useTranscations,
-} from "../../data/transactions";
+import { SetterOrUpdater } from "recoil";
+import { TransactionFormI } from "../../data/transactions";
 import { AiFillDelete, AiOutlineWarning } from "react-icons/ai";
 import { Dialog, DialogPanel } from "@headlessui/react";
+import { DebtFormI } from "../../data/debts";
 
-export const DeleteTransactionModal = () => {
-  const [selectedTransaction, setSelectedTransaction] = useRecoilState(
-    selectedTransactionState
-  );
-  const { deleteTransaction } = useTranscations();
+export interface props<Type> {
+  selectedCard: Type | null;
+  setSelectedCard: SetterOrUpdater<Type | null>;
+  deleteCard: (id: string) => Promise<void>;
+}
+
+export const DeleteCardModal = ({
+  selectedCard,
+  setSelectedCard,
+  deleteCard,
+}: props<TransactionFormI | DebtFormI>) => {
+  const isDebt = selectedCard && "beneficiary" in selectedCard;
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
@@ -41,9 +46,13 @@ export const DeleteTransactionModal = () => {
                 <AiOutlineWarning className="text-4xl text-red" />
                 <div className="flex flex-col gap-1 items-center justify-center text-center">
                   <h3>
-                    <b>Delete Transaction</b>
+                    <b>Delete {isDebt ? "Debt" : "Transaction"}</b>
                   </h3>
-                  <p> Are you sure you want to delete this transaction?</p>
+                  <p>
+                    {" "}
+                    Are you sure you want to delete this{" "}
+                    {isDebt ? "debt" : "transaction"}?
+                  </p>
                 </div>
                 <div className="flex gap-4">
                   <button
@@ -54,9 +63,9 @@ export const DeleteTransactionModal = () => {
                   </button>
                   <button
                     onClick={() => {
-                      if (selectedTransaction?._id) {
-                        deleteTransaction(selectedTransaction._id);
-                        setSelectedTransaction(null);
+                      if (selectedCard?._id) {
+                        deleteCard(selectedCard._id);
+                        setSelectedCard(null);
                       }
                     }}
                     className="bg-red text-beige font-bold w-28 rounded-full py-2 px-4 text-sm focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"

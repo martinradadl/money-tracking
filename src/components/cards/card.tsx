@@ -2,27 +2,30 @@ import classNames from "classnames";
 import { TransactionI } from "../../data/transactions";
 import { getCurrencyFormat } from "../../helpers/currency";
 import { CurrencyI } from "../../data/authentication";
+import { DebtI } from "../../data/debts";
 
 interface TransactionProps {
-  transaction: TransactionI;
+  content: TransactionI | DebtI;
   currency?: CurrencyI;
 }
 
-export const Transaction = ({ transaction, currency }: TransactionProps) => {
-  const { type, concept, category, amount } = transaction;
+export const Card = ({ content, currency }: TransactionProps) => {
+  const { type, concept, category, amount } = content;
+
   return (
     <div
       className={classNames(
         "px-2 pt-2 pb-3 flex flex-col text-[1.5rem] rounded-md gap-3 font-semibold",
-        type === "income"
+        type === "income" || type === "loan"
           ? "bg-green-pastel text-navy	ml-4"
           : "bg-red-pastel text-beige mr-4"
       )}
     >
-      <p>{concept}</p>
+      <p>{"beneficiary" in content ? content.beneficiary : concept}</p>
+      <p className="text-sm">{"beneficiary" in content ? concept : null}</p>
       <div className="flex place-content-between">
         <p className="px-2 rounded-md bg-yellow-category text-navy">
-          {category.label}
+          {category.label !== "N/A" ? category.label : null}
         </p>
         {currency ? (
           <p>
