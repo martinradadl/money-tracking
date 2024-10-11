@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from "vitest";
 import { useTranscations } from "../data/transactions.js";
 import axios from "axios";
 import {
-  categories,
   createWrapper,
   newTransaction,
   updatedTransaction,
@@ -154,35 +153,6 @@ describe("useTransactions", () => {
         result.current.deleteTransaction("01");
       });
       expect(result.current.transactionsList).toEqual([]);
-    });
-  });
-
-  describe("getCategories", () => {
-    it("should return empty categories list when status is not 200", async () => {
-      vi.mocked(axios, true).get.mockResolvedValueOnce({
-        status: 500,
-      });
-
-      const { result } = renderHook(() => useTranscations(), { wrapper });
-
-      await act(async () => {
-        result.current.getCategories();
-      });
-      expect(result.current.categories).toEqual([]);
-    });
-
-    it("should return categories list and statusCode 200", async () => {
-      vi.mocked(axios, true).get.mockResolvedValueOnce({
-        data: categories,
-        status: 200,
-      });
-
-      const { result } = renderHook(() => useTranscations(), { wrapper });
-
-      await act(async () => {
-        result.current.getCategories();
-      });
-      expect(result.current.categories).toEqual(categories);
     });
   });
 

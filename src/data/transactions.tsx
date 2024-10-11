@@ -4,10 +4,11 @@ import "toastify-js/src/toastify.css";
 import { createToastify } from "../helpers/toastify";
 import { userState } from "./authentication";
 import { useCookies } from "react-cookie";
+import { CategoryI, port } from "./categories";
 
 export interface TransactionI {
   _id?: string;
-  type: string;
+  type: "income" | "outcome";
   concept: string;
   category: CategoryI;
   amount: number;
@@ -16,11 +17,6 @@ export interface TransactionI {
 
 export interface TransactionFormI extends Omit<TransactionI, "amount"> {
   amount: string;
-}
-
-export interface CategoryI {
-  _id: string;
-  label: string;
 }
 
 export const newTransactionState = atom<TransactionFormI | null>({
@@ -38,11 +34,6 @@ export const selectedTransactionState = atom<TransactionFormI | null>({
   default: null,
 });
 
-export const categoriesState = atom<CategoryI[]>({
-  key: "categoriesState",
-  default: [],
-});
-
 export const balanceState = atom<number>({
   key: "balanceState",
   default: 0,
@@ -53,11 +44,8 @@ export const useTranscations = () => {
     transactionsListState
   );
   const [user] = useRecoilState(userState);
-  const [categories, setCategories] = useRecoilState(categoriesState);
   const [balance, setBalance] = useRecoilState(balanceState);
   const [cookies] = useCookies(["jwt"]);
-
-  const port = "http://localhost:3000";
 
   const getTransactions = async () => {
     try {
@@ -72,25 +60,6 @@ export const useTranscations = () => {
         } else {
           createToastify({ text: "Transactions not found", type: "error" });
         }
-      }
-    } catch (err: unknown) {
-      if (err instanceof AxiosError) {
-        createToastify({
-          text: err.response?.data.message || err.message,
-          type: "error",
-        });
-        throw new Error(err.message);
-      }
-    }
-  };
-
-  const getCategories = async () => {
-    try {
-      const response = await axios.get(`${port}/transactions/categories`);
-      if (response.status === 200) {
-        setCategories(response.data);
-      } else {
-        createToastify({ text: "Categories not found", type: "error" });
       }
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
@@ -255,8 +224,6 @@ export const useTranscations = () => {
     editTransaction,
     deleteTransaction,
     transactionsList,
-    getCategories,
-    categories,
     getBalance,
     balance,
   };
