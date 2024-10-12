@@ -4,24 +4,25 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import { CardForm } from "./card-form";
 import { SetterOrUpdater } from "recoil";
 import { createToastify } from "../../helpers/toastify";
-import { DebtFormI } from "../../data/debts";
+import { DebtFormI, DebtType } from "../../data/debts";
 import { TransactionFormI } from "../../data/transactions";
 
-export interface props {
+function isDebt(item: TransactionFormI| DebtFormI):item is DebtFormI {
+  return (item as DebtFormI).beneficiary !== undefined && (item as DebtFormI).type ==="debt"
+}
+
+export interface props<T extends DebtFormI | TransactionFormI> {
   userId?: string;
   close: () => void;
   isOpen: boolean;
-  newCard: TransactionFormI | DebtFormI;
-  setNewCard: SetterOrUpdater<TransactionFormI | DebtFormI>;
-  selectedCard: TransactionFormI | DebtFormI;
-  addCard: (newItem: TransactionFormI | DebtFormI) => Promise<void>;
-  editCard: (
-    id: string,
-    updatedItem: TransactionFormI | DebtFormI
-  ) => Promise<void>;
+  newCard: T;
+  setNewCard: (item:T)=>void;
+  selectedCard: T;
+  addCard: (newItem: T) => Promise<void>;
+  editCard: (id: string, updatedItem: T) => Promise<void>;
 }
 
-export default function CardModal({
+export const CardModal = <T extends  DebtFormI | TransactionFormI>({
   userId,
   close,
   isOpen,
@@ -30,15 +31,13 @@ export default function CardModal({
   selectedCard,
   addCard,
   editCard,
-}: props) {
-  const [isDebt, setIsDebt] = useState(false);
+}: props<T>) => {
 
   useEffect(() => {
     if (selectedCard) {
       setNewCard({ ...selectedCard });
     } else {
-      if ("beneficiary" in newCard) {
-        setIsDebt(true);
+      if (isDebt(newCard)) {
         setNewCard({
           type: "debt",
           beneficiary: "",
@@ -49,7 +48,7 @@ export default function CardModal({
         });
       } else {
         setNewCard({
-          type: "income",
+          type: "",
           concept: "",
           category: { _id: "670877bf07255749b8882674", label: "N/A" },
           amount: "",
@@ -124,7 +123,7 @@ export default function CardModal({
                 <AiOutlineArrowLeft className="text-3xl my-2" onClick={close} />
 
                 <DialogTitle className="text-3xl py-2">
-                  {isDebt
+                  {isDebt(selectedCard)
                     ? `${selectedCard ? "Add" : "Edit"} Debt`
                     : `${selectedCard ? "Add" : "Edit"} Transaction`}
                 </DialogTitle>
@@ -145,4 +144,4 @@ export default function CardModal({
       </Dialog>
     </>
   );
-}
+};

@@ -5,14 +5,16 @@ import axios, { AxiosError } from "axios";
 import { createToastify } from "../helpers/toastify";
 import { useCookies } from "react-cookie";
 
+export type DebtType = 'debt' | 'loan'
+
 export interface DebtI {
   _id?: string;
-  type: "debt" | "loan";
+  userId?: string;
+  type: DebtType;
   beneficiary: string;
   concept: string;
   category: CategoryI;
   amount: number;
-  userId?: string;
 }
 
 export interface DebtFormI extends Omit<DebtI, "amount"> {

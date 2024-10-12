@@ -15,7 +15,7 @@ import { DeleteCardModal } from "../../components/cards/delete-card";
 import { userState } from "../../data/authentication";
 import { getCurrencyFormat } from "../../helpers/currency";
 import { useCategories } from "../../data/categories";
-import CardModal from "../../components/cards/card-modal";
+import { CardModal } from "../../components/cards/card-modal";
 
 export const Transactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
@@ -118,7 +118,7 @@ export const Transactions: React.FC = () => {
                     <AiFillEdit />
                   </div>
                   <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
-                    <DeleteCardModal
+                    <DeleteCardModal<TransactionFormI>
                       {...{
                         selectedCard: selectedTransaction,
                         setSelectedCard: setSelectedTransaction,

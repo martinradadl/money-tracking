@@ -6,9 +6,11 @@ import { userState } from "./authentication";
 import { useCookies } from "react-cookie";
 import { CategoryI, port } from "./categories";
 
+type TranscationType = "income" | "outcome"
+
 export interface TransactionI {
   _id?: string;
-  type: "income" | "outcome";
+  type: TranscationType;
   concept: string;
   category: CategoryI;
   amount: number;

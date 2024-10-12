@@ -14,7 +14,7 @@ import classNames from "classnames";
 import { AiFillEdit } from "react-icons/ai";
 import { Card } from "../../components/cards/card";
 import { DeleteCardModal } from "../../components/cards/delete-card";
-import CardModal from "../../components/cards/card-modal";
+import { CardModal } from "../../components/cards/card-modal";
 
 export const Debts: React.FC = () => {
   const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
@@ -88,9 +88,9 @@ export const Debts: React.FC = () => {
                     <AiFillEdit />
                   </div>
                   <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
-                    <DeleteCardModal
+                    <DeleteCardModal<DebtFormI>
+                      selectedCard={selectedDebt}
                       {...{
-                        selectedCard: selectedDebt,
                         setSelectedCard: setSelectedDebt,
                         deleteCard: deleteDebt,
                       }}
@@ -117,14 +117,15 @@ export const Debts: React.FC = () => {
         >
           Add Transaction
         </button>
-        <CardModal
+        <CardModal<DebtFormI>
+          selectedCard={selectedDebt}
           {...{
             userId: user?._id,
             close: closeModal,
             isOpen: isModalOpen,
             newCard: newDebt,
             setNewCard: setNewDebt,
-            selectedCard: selectedDebt,
+            
             addCard: addDebt,
             editCard: editDebt,
           }}

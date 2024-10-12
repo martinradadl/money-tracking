@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { SetterOrUpdater } from "recoil";
-import { TransactionFormI } from "../../data/transactions";
 import { AiFillDelete, AiOutlineWarning } from "react-icons/ai";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { DebtFormI } from "../../data/debts";
+import { TransactionFormI } from "../../data/transactions";
 
-export interface props<Type> {
-  selectedCard: Type | null;
-  setSelectedCard: SetterOrUpdater<Type | null>;
+export interface props<T extends DebtFormI | TransactionFormI> {
+  selectedCard: T | null;
+  setSelectedCard: SetterOrUpdater<T | null>;
   deleteCard: (id: string) => Promise<void>;
 }
 
-export const DeleteCardModal = ({
+export const DeleteCardModal = <T extends DebtFormI | TransactionFormI>({
   selectedCard,
   setSelectedCard,
   deleteCard,
-}: props<TransactionFormI | DebtFormI>) => {
+}: props<T>) => {
   const isDebt = selectedCard && "beneficiary" in selectedCard;
   const [isOpen, setIsOpen] = useState(false);
 
