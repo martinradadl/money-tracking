@@ -1,14 +1,16 @@
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { CardForm } from "./card-form";
-import { SetterOrUpdater } from "recoil";
 import { createToastify } from "../../helpers/toastify";
-import { DebtFormI, DebtType } from "../../data/debts";
+import { DebtFormI } from "../../data/debts";
 import { TransactionFormI } from "../../data/transactions";
 
-function isDebt(item: TransactionFormI| DebtFormI):item is DebtFormI {
-  return (item as DebtFormI).beneficiary !== undefined && (item as DebtFormI).type ==="debt"
+function isDebt(item: TransactionFormI | DebtFormI): item is DebtFormI {
+  return (
+    (item as DebtFormI).beneficiary !== undefined &&
+    (item as DebtFormI).type === "debt"
+  );
 }
 
 export interface props<T extends DebtFormI | TransactionFormI> {
@@ -16,13 +18,13 @@ export interface props<T extends DebtFormI | TransactionFormI> {
   close: () => void;
   isOpen: boolean;
   newCard: T;
-  setNewCard: (item:T)=>void;
+  setNewCard: (item: T) => void;
   selectedCard: T;
   addCard: (newItem: T) => Promise<void>;
   editCard: (id: string, updatedItem: T) => Promise<void>;
 }
 
-export const CardModal = <T extends  DebtFormI | TransactionFormI>({
+export const CardModal = <T extends DebtFormI | TransactionFormI>({
   userId,
   close,
   isOpen,
@@ -32,7 +34,6 @@ export const CardModal = <T extends  DebtFormI | TransactionFormI>({
   addCard,
   editCard,
 }: props<T>) => {
-
   useEffect(() => {
     if (selectedCard) {
       setNewCard({ ...selectedCard });
