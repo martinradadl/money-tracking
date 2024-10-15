@@ -21,12 +21,23 @@ export const Card = ({ content, currency }: TransactionProps) => {
           : "bg-red-pastel text-beige mr-4"
       )}
     >
-      <p>{"beneficiary" in content ? content.beneficiary : concept}</p>
-      <p className="text-sm">{"beneficiary" in content ? concept : null}</p>
-      <div className="flex place-content-between">
-        <p className="px-2 rounded-md bg-yellow-category text-navy">
-          {category.label !== "N/A" ? category.label : null}
-        </p>
+      <div className="flex flex-col gap-1">
+        <p>{"beneficiary" in content ? content.beneficiary : concept}</p>
+        <p className="text-xl">{"beneficiary" in content ? concept : null}</p>
+      </div>
+
+      <div
+        className={classNames(
+          "flex ",
+          category.label !== "N/A" ? "place-content-between" : "justify-end"
+        )}
+      >
+        {category.label !== "N/A" ? (
+          <p className="px-2 rounded-md bg-yellow-category text-navy">
+            {category.label}{" "}
+          </p>
+        ) : null}
+
         {currency ? (
           <p>
             {getCurrencyFormat({
