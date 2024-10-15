@@ -2,6 +2,26 @@ import { RecoilRoot } from "recoil";
 import { LoginI, UserI, userState } from "../data/authentication";
 import { TransactionFormI } from "../data/transactions";
 import React from "react";
+import { DebtFormI } from "../data/debts";
+
+export const createWrapper = (withUser: boolean) => {
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <RecoilRoot
+      initializeState={
+        withUser
+          ? ({ set }) => {
+              set(userState, newUser);
+            }
+          : undefined
+      }
+    >
+      {children}
+    </RecoilRoot>
+  );
+  return wrapper;
+};
+
+// USERS
 
 export const currencies = [{ name: "fakeCurrency", code: "FAKE" }];
 
@@ -26,39 +46,46 @@ export const loggedUser: LoginI = {
   password: "fakePassword",
 };
 
+// TRANSACTIONS
+
 export const newTransaction: TransactionFormI = {
-  _id: "01",
+  _id: "fakeId",
   type: "income",
-  concept: "August Salary",
-  category: { _id: "66da1b9328ba43a7f62749d2", label: "Salary" },
-  amount: "999",
-  userId: "1234",
+  concept: "fakeConcept",
+  category: { _id: "fakeId", label: "fakeLabel" },
+  amount: "fakeAmount",
+  userId: "fakeUserId",
 };
 
 export const updatedTransaction: TransactionFormI = {
-  _id: "01",
+  _id: "fakeUpdatedId",
   type: "income",
-  concept: "September Salary",
-  category: { _id: "66da1b9328ba43a7f62749d2", label: "Salary" },
-  amount: "888",
-  userId: "1234",
+  concept: "fakeUpdatedConcept",
+  category: { _id: "fakeId", label: "fakeLabel" },
+  amount: "fakeUpdatedAmount",
+  userId: "fakeUpdatedUserId",
 };
 
-export const categories = [{ _id: "01", label: "Salary" }];
+export const categories = [{ _id: "fakeId", label: "fakeLabel" }];
 
-export const createWrapper = (withUser: boolean) => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <RecoilRoot
-      initializeState={
-        withUser
-          ? ({ set }) => {
-              set(userState, newUser);
-            }
-          : undefined
-      }
-    >
-      {children}
-    </RecoilRoot>
-  );
-  return wrapper;
+// DEBTS
+
+export const newDebt: DebtFormI = {
+  _id: "fakeId",
+  type: "debt",
+  beneficiary: "fakeBeneficiary",
+  concept: "fakeConcept",
+  category: { _id: "fakeId", label: "fakeLabel" },
+  amount: "fakeAmount",
+  userId: "fakeUserId",
+};
+
+export const updatedDebt: DebtFormI = {
+  _id: "fakeId",
+  type: "debt",
+  beneficiary: "fakeBeneficiary",
+  concept: "fakeConcept",
+  category: { _id: "fakeId", label: "fakeLabel" },
+  amount: "fakeAmount",
+  userId: "fakeUserId",
 };
