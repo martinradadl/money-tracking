@@ -1,16 +1,23 @@
 import React from "react";
-import { SetterOrUpdater, useRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { TransactionFormI } from "../../data/transactions";
 import { Select } from "@headlessui/react";
 import { categoriesState } from "../../data/categories";
 import { DebtFormI } from "../../data/debts";
 
-export interface props {
-  newCard: TransactionFormI | DebtFormI;
-  setNewCard: SetterOrUpdater<TransactionFormI | DebtFormI>;
+function isDebt(item: TransactionFormI | DebtFormI | null) {
+  return item && "beneficiary" in item;
 }
 
-export const CardForm = ({ newCard, setNewCard }: props) => {
+export interface props<T extends DebtFormI | TransactionFormI | null> {
+  newCard: T;
+  setNewCard: (item: T) => void;
+}
+
+export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
+  newCard,
+  setNewCard,
+}: props<T>) => {
   const [categories] = useRecoilState(categoriesState);
 
   const handleChange = (
@@ -55,7 +62,6 @@ export const CardForm = ({ newCard, setNewCard }: props) => {
       });
     }
   };
-
   return (
     <div className="flex flex-col gap-4 mt-2">
       <label>
@@ -67,10 +73,36 @@ export const CardForm = ({ newCard, setNewCard }: props) => {
           onChange={handleChange}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
-          <option value="income">Income</option>
-          <option value="expenses">Expenses</option>
+          {isDebt(newCard) ? (
+            <>
+              <option value="debt">Debt</option>
+              <option value="loan">Loan</option>
+            </>
+          ) : (
+            <>
+              <option value="income">Income</option>
+              <option value="expenses">Expenses</option>
+            </>
+          )}
         </Select>
       </label>
+
+      {isDebt(newCard) ? (
+        <label>
+          <p className="capitalize text-2xl mb-2">beneficiary</p>
+          <input
+            className="w-full h-9 px-2 border-navy bg-green border-b-2"
+            id="beneficiary"
+            name="beneficiary"
+            value={
+              newCard && "beneficiary" in newCard ? newCard?.beneficiary : ""
+            }
+            onChange={handleChange}
+            maxLength={40}
+          />
+        </label>
+      ) : null}
+
       <label>
         <p className="capitalize text-2xl mb-2">concept</p>
         <input
@@ -82,6 +114,7 @@ export const CardForm = ({ newCard, setNewCard }: props) => {
           maxLength={40}
         />
       </label>
+
       <label>
         <p className="capitalize text-2xl mb-2">category</p>
         <Select
@@ -101,6 +134,7 @@ export const CardForm = ({ newCard, setNewCard }: props) => {
           })}
         </Select>
       </label>
+
       <label>
         <p className="capitalize text-2xl mb-2">amount</p>
         <input

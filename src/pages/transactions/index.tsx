@@ -5,24 +5,22 @@ import { Card } from "../../components/cards/card";
 import classNames from "classnames";
 import { useRecoilState } from "recoil";
 import {
-  useTranscations,
+  useTransactions,
   selectedTransactionState,
   TransactionI,
   TransactionFormI,
-  newTransactionState,
 } from "../../data/transactions";
 import { DeleteCardModal } from "../../components/cards/delete-card";
 import { userState } from "../../data/authentication";
 import { getCurrencyFormat } from "../../helpers/currency";
 import { useCategories } from "../../data/categories";
-import { CardModal } from "../../components/cards/card-modal";
+import { TransactionModal } from "./transaction-modal";
 
 export const Transactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
     selectedTransactionState
   );
-  const [newTransaction, setNewTransaction] =
-    useRecoilState(newTransactionState);
+
   const [user] = useRecoilState(userState);
   const {
     getTransactions,
@@ -30,9 +28,7 @@ export const Transactions: React.FC = () => {
     transactionsList,
     balance,
     deleteTransaction,
-    addTransaction,
-    editTransaction,
-  } = useTranscations();
+  } = useTransactions();
   const { getCategories } = useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
@@ -147,16 +143,12 @@ export const Transactions: React.FC = () => {
         >
           Add Transaction
         </button>
-        <CardModal
+        <TransactionModal
           {...{
             userId: user?._id,
             close: closeModal,
             isOpen: isModalOpen,
-            newCard: newTransaction,
-            setNewCard: setNewTransaction,
             selectedCard: selectedTransaction,
-            addCard: addTransaction,
-            editCard: editTransaction,
           }}
         />
       </div>

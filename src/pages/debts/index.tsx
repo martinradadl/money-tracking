@@ -3,7 +3,6 @@ import { useRecoilState } from "recoil";
 import {
   DebtFormI,
   DebtI,
-  newDebtState,
   selectedDebtState,
   useDebts,
 } from "../../data/debts";
@@ -14,13 +13,12 @@ import classNames from "classnames";
 import { AiFillEdit } from "react-icons/ai";
 import { Card } from "../../components/cards/card";
 import { DeleteCardModal } from "../../components/cards/delete-card";
-import { CardModal } from "../../components/cards/card-modal";
+import { DebtModal } from "./debts-modal";
 
 export const Debts: React.FC = () => {
   const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
-  const [newDebt, setNewDebt] = useRecoilState(newDebtState);
   const [user] = useRecoilState(userState);
-  const { getDebts, debtsList, deleteDebt, addDebt, editDebt } = useDebts();
+  const { getDebts, debtsList, deleteDebt } = useDebts();
   const { getCategories } = useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
@@ -117,17 +115,11 @@ export const Debts: React.FC = () => {
         >
           Add Transaction
         </button>
-        <CardModal<DebtFormI>
-          selectedCard={selectedDebt}
+        <DebtModal
           {...{
             userId: user?._id,
             close: closeModal,
             isOpen: isModalOpen,
-            newCard: newDebt,
-            setNewCard: setNewDebt,
-            
-            addCard: addDebt,
-            editCard: editDebt,
           }}
         />
       </div>
