@@ -1,12 +1,8 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { useTranscations } from "../data/transactions.js";
+import { useTransactions } from "../data/transactions.js";
 import axios from "axios";
-import {
-  createWrapper,
-  newTransaction,
-  updatedTransaction,
-} from "./utils.js";
+import { createWrapper, newTransaction, updatedTransaction } from "./utils.js";
 
 vi.mock("axios");
 
@@ -19,7 +15,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
@@ -32,7 +28,7 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
@@ -46,7 +42,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.getTransactions();
       });
@@ -59,7 +55,7 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.getTransactions();
@@ -79,7 +75,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
@@ -100,14 +96,14 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
 
       await act(async () => {
-        result.current.editTransaction("01", updatedTransaction);
+        result.current.editTransaction("fakeId", updatedTransaction);
       });
       expect(result.current.transactionsList).toEqual([updatedTransaction]);
     });
@@ -123,7 +119,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
@@ -143,14 +139,14 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
 
       await act(async () => {
-        result.current.deleteTransaction("01");
+        result.current.deleteTransaction("fakeId");
       });
       expect(result.current.transactionsList).toEqual([]);
     });
@@ -162,7 +158,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.getBalance();
@@ -176,7 +172,7 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.getBalance();

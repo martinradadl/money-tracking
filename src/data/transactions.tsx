@@ -6,7 +6,7 @@ import { userState } from "./authentication";
 import { useCookies } from "react-cookie";
 import { CategoryI, port } from "./categories";
 
-type TranscationType = "income" | "outcome"
+type TranscationType = "income" | "outcome";
 
 export interface TransactionI {
   _id?: string;
@@ -41,7 +41,7 @@ export const balanceState = atom<number>({
   default: 0,
 });
 
-export const useTranscations = () => {
+export const useTransactions = () => {
   const [transactionsList, setTransactionsList] = useRecoilState(
     transactionsListState
   );
