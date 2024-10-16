@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useEffect } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { CardForm } from "../../components/cards/card-form";
+import { ItemForm } from "../../components/cards/item-form";
 import { createToastify } from "../../helpers/toastify";
 import { newDebtState, selectedDebtState, useDebts } from "../../data/debts";
 import { useRecoilState } from "recoil";
@@ -93,10 +93,10 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
                   {`${selectedDebt ? "Edit" : "Add"} Debt`}
                 </DialogTitle>
 
-                <CardForm
+                <ItemForm
                   {...{
-                    newCard: newDebt,
-                    setNewCard: setNewDebt,
+                    newItem: newDebt,
+                    setNewItem: setNewDebt,
                   }}
                 />
               </div>

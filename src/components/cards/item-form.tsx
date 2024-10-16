@@ -10,22 +10,22 @@ function isDebt(item: TransactionFormI | DebtFormI | null) {
 }
 
 export interface props<T extends DebtFormI | TransactionFormI | null> {
-  newCard: T;
-  setNewCard: (item: T) => void;
+  newItem: T;
+  setNewItem: (item: T) => void;
 }
 
-export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
-  newCard,
-  setNewCard,
+export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
+  newItem,
+  setNewItem,
 }: props<T>) => {
   const [categories] = useRecoilState(categoriesState);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    if (newCard) {
-      setNewCard({
-        ...newCard,
+    if (newItem) {
+      setNewItem({
+        ...newItem,
         [event.target.name]: event.target.value,
       });
     }
@@ -40,13 +40,13 @@ export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
       .split("")
       .every((char) => allowedValues.test(char));
     if (
-      newCard &&
+      newItem &&
       inputValue.length <= 12 &&
       (!lastValue || hasAllowedValues) &&
       firstValue !== "0"
     ) {
-      setNewCard({
-        ...newCard,
+      setNewItem({
+        ...newItem,
         [event.target.name]: inputValue,
       });
     }
@@ -55,9 +55,9 @@ export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
   const handleChangeCategory = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    if (newCard) {
-      setNewCard({
-        ...newCard,
+    if (newItem) {
+      setNewItem({
+        ...newItem,
         category: { _id: event.target.value, label: "" },
       });
     }
@@ -69,11 +69,11 @@ export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
         <Select
           name="type"
           id="type"
-          value={newCard?.type}
+          value={newItem?.type}
           onChange={handleChange}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
-          {isDebt(newCard) ? (
+          {isDebt(newItem) ? (
             <>
               <option value="debt">Debt</option>
               <option value="loan">Loan</option>
@@ -87,7 +87,7 @@ export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
         </Select>
       </label>
 
-      {isDebt(newCard) ? (
+      {isDebt(newItem) ? (
         <label>
           <p className="capitalize text-2xl mb-2">beneficiary</p>
           <input
@@ -95,7 +95,7 @@ export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
             id="beneficiary"
             name="beneficiary"
             value={
-              newCard && "beneficiary" in newCard ? newCard?.beneficiary : ""
+              newItem && "beneficiary" in newItem ? newItem?.beneficiary : ""
             }
             onChange={handleChange}
             maxLength={40}
@@ -109,7 +109,7 @@ export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
           className="w-full h-9 px-2 border-navy bg-green border-b-2"
           id="concept"
           name="concept"
-          value={newCard?.concept}
+          value={newItem?.concept}
           onChange={handleChange}
           maxLength={40}
         />
@@ -120,7 +120,7 @@ export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
         <Select
           name="category"
           id="category"
-          value={newCard?.category._id}
+          value={newItem?.category._id}
           onChange={handleChangeCategory}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
@@ -142,7 +142,7 @@ export const CardForm = <T extends DebtFormI | TransactionFormI | null>({
           type="text"
           id="amount"
           name="amount"
-          value={newCard?.amount}
+          value={newItem?.amount}
           onChange={handleChangeAmount}
         />
       </label>

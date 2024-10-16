@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useEffect } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { CardForm } from "../../components/cards/card-form";
+import { ItemForm } from "../../components/cards/item-form";
 import { createToastify } from "../../helpers/toastify";
 import {
   newTransactionState,
@@ -95,10 +95,10 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
                   {`${selectedTransaction ? "Edit" : "Add"} Transaction`}
                 </DialogTitle>
 
-                <CardForm
+                <ItemForm
                   {...{
-                    newCard: newTransaction,
-                    setNewCard: setNewTransaction,
+                    newItem: newTransaction,
+                    setNewItem: setNewTransaction,
                   }}
                 />
               </div>
