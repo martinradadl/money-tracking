@@ -5,7 +5,7 @@ import axios, { AxiosError } from "axios";
 import { createToastify } from "../helpers/toastify";
 import { useCookies } from "react-cookie";
 
-export type DebtType = 'debt' | 'loan'
+export type DebtType = "debt" | "loan";
 
 export interface DebtI {
   _id?: string;
@@ -43,17 +43,15 @@ export const useDebts = () => {
 
   const getDebts = async () => {
     try {
-      if (user) {
-        const response = await axios.get(`${port}/debts/${user?._id}`, {
-          headers: {
-            Authorization: "Bearer " + cookies.jwt,
-          },
-        });
-        if (response.status === 200) {
-          setDebtsList(response.data);
-        } else {
-          createToastify({ text: "Debt or Loan not found", type: "error" });
-        }
+      const response = await axios.get(`${port}/debts/${user?._id}`, {
+        headers: {
+          Authorization: "Bearer " + cookies.jwt,
+        },
+      });
+      if (response.status === 200) {
+        setDebtsList(response.data);
+      } else {
+        createToastify({ text: "Debt or Loan not found", type: "error" });
       }
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
@@ -68,25 +66,23 @@ export const useDebts = () => {
 
   const addDebt = async (newItem: DebtFormI) => {
     try {
-      if (user) {
-        const parsedItem = {
-          ...newItem,
-          amount: parseInt(newItem.amount),
-          userId: user._id,
-        };
-        const response = await axios.post(`${port}/debts/`, parsedItem, {
-          headers: {
-            Authorization: "Bearer " + cookies.jwt,
-          },
+      const parsedItem = {
+        ...newItem,
+        amount: parseInt(newItem.amount),
+        userId: user?._id,
+      };
+      const response = await axios.post(`${port}/debts/`, parsedItem, {
+        headers: {
+          Authorization: "Bearer " + cookies.jwt,
+        },
+      });
+      if (response.status === 200) {
+        setDebtsList([...debtsList, response.data]);
+      } else {
+        createToastify({
+          text: "Add Debt not successful",
+          type: "error",
         });
-        if (response.status === 200) {
-          setDebtsList([...debtsList, response.data]);
-        } else {
-          createToastify({
-            text: "Add Debt not successful",
-            type: "error",
-          });
-        }
       }
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
@@ -101,34 +97,32 @@ export const useDebts = () => {
 
   const editDebt = async (id: string, updatedItem: DebtFormI) => {
     try {
-      if (user) {
-        const parsedItem = {
-          ...updatedItem,
-          amount: parseInt(updatedItem.amount),
-          userId: user._id,
-        };
-        const response = await axios.put(`${port}/debts/${id}`, parsedItem, {
-          headers: {
-            Authorization: "Bearer " + cookies.jwt,
-          },
-        });
-        if (response.status === 200) {
-          const i = debtsList.findIndex((elem) => elem._id === id);
-          if (i !== -1) {
-            setDebtsList([
-              ...debtsList.slice(0, i),
-              response.data,
-              ...debtsList.slice(i + 1),
-            ]);
-          } else {
-            throw new Error("ID not found updating debts list");
-          }
+      const parsedItem = {
+        ...updatedItem,
+        amount: parseInt(updatedItem.amount),
+        userId: user?._id,
+      };
+      const response = await axios.put(`${port}/debts/${id}`, parsedItem, {
+        headers: {
+          Authorization: "Bearer " + cookies.jwt,
+        },
+      });
+      if (response.status === 200) {
+        const i = debtsList.findIndex((elem) => elem._id === id);
+        if (i !== -1) {
+          setDebtsList([
+            ...debtsList.slice(0, i),
+            response.data,
+            ...debtsList.slice(i + 1),
+          ]);
         } else {
-          createToastify({
-            text: "Edit Debt not successful",
-            type: "error",
-          });
+          throw new Error("ID not found updating debts list");
         }
+      } else {
+        createToastify({
+          text: "Edit Debt not successful",
+          type: "error",
+        });
       }
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
@@ -143,25 +137,23 @@ export const useDebts = () => {
 
   const deleteDebt = async (id: string) => {
     try {
-      if (user) {
-        const response = await axios.delete(`${port}/debts/${id}`, {
-          headers: {
-            Authorization: "Bearer " + cookies.jwt,
-          },
-        });
-        if (response.status === 200) {
-          const i = debtsList.findIndex((elem) => elem._id === id);
-          if (i !== -1) {
-            setDebtsList([...debtsList.slice(0, i), ...debtsList.slice(i + 1)]);
-          } else {
-            throw new Error("ID not found deleting debt");
-          }
+      const response = await axios.delete(`${port}/debts/${id}`, {
+        headers: {
+          Authorization: "Bearer " + cookies.jwt,
+        },
+      });
+      if (response.status === 200) {
+        const i = debtsList.findIndex((elem) => elem._id === id);
+        if (i !== -1) {
+          setDebtsList([...debtsList.slice(0, i), ...debtsList.slice(i + 1)]);
         } else {
-          createToastify({
-            text: "Add Debt not successful",
-            type: "error",
-          });
+          throw new Error("ID not found deleting debt");
         }
+      } else {
+        createToastify({
+          text: "Add Debt not successful",
+          type: "error",
+        });
       }
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
