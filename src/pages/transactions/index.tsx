@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Transition } from "@headlessui/react";
 import { AiFillEdit } from "react-icons/ai";
-import { Card } from "../../components/cards/card";
+import { Card } from "../../components/movements/card";
 import classNames from "classnames";
 import { useRecoilState } from "recoil";
 import {
@@ -10,7 +10,7 @@ import {
   TransactionI,
   TransactionFormI,
 } from "../../data/transactions";
-import { DeleteCardModal } from "../../components/cards/delete-card";
+import { DeleteMovementModal } from "../../components/movements/delete-movement";
 import { userState } from "../../data/authentication";
 import { getCurrencyFormat } from "../../helpers/currency";
 import { TransactionModal } from "./transaction-modal";
@@ -43,11 +43,11 @@ export const Transactions: React.FC = () => {
 
   useEffect(() => {
     getTransactions();
-  }, [user]);
+  }, [user?._id]);
 
   useEffect(() => {
     if (user) getBalance();
-  }, [user, transactionsList]);
+  }, [user?._id, transactionsList]);
 
   const handleClickedOutside = (event: Event) => {
     if (
@@ -111,11 +111,11 @@ export const Transactions: React.FC = () => {
                     <AiFillEdit />
                   </div>
                   <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
-                    <DeleteCardModal<TransactionFormI>
+                    <DeleteMovementModal<TransactionFormI>
                       {...{
-                        selectedCard: selectedTransaction,
-                        setSelectedCard: setSelectedTransaction,
-                        deleteCard: deleteTransaction,
+                        selectedMovement: selectedTransaction,
+                        setSelectedMovement: setSelectedTransaction,
+                        deleteMovement: deleteTransaction,
                       }}
                     />
                   </div>
@@ -145,7 +145,6 @@ export const Transactions: React.FC = () => {
             userId: user?._id,
             close: closeModal,
             isOpen: isModalOpen,
-            selectedCard: selectedTransaction,
           }}
         />
       </div>

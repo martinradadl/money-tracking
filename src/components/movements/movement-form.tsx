@@ -5,27 +5,27 @@ import { Select } from "@headlessui/react";
 import { categoriesState } from "../../data/categories";
 import { DebtFormI } from "../../data/debts";
 
-function isDebt(item: TransactionFormI | DebtFormI | null) {
-  return item && "beneficiary" in item;
+function isDebt(movement: TransactionFormI | DebtFormI | null) {
+  return movement && "beneficiary" in movement;
 }
 
 export interface props<T extends DebtFormI | TransactionFormI | null> {
-  newItem: T;
-  setNewItem: (item: T) => void;
+  newMovement: T;
+  setNewMovement: (movement: T) => void;
 }
 
-export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
-  newItem,
-  setNewItem,
+export const MovementForm = <T extends DebtFormI | TransactionFormI | null>({
+  newMovement,
+  setNewMovement,
 }: props<T>) => {
   const [categories] = useRecoilState(categoriesState);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    if (newItem) {
-      setNewItem({
-        ...newItem,
+    if (newMovement) {
+      setNewMovement({
+        ...newMovement,
         [event.target.name]: event.target.value,
       });
     }
@@ -40,13 +40,13 @@ export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
       .split("")
       .every((char) => allowedValues.test(char));
     if (
-      newItem &&
+      newMovement &&
       inputValue.length <= 12 &&
       (!lastValue || hasAllowedValues) &&
       firstValue !== "0"
     ) {
-      setNewItem({
-        ...newItem,
+      setNewMovement({
+        ...newMovement,
         [event.target.name]: inputValue,
       });
     }
@@ -55,9 +55,9 @@ export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
   const handleChangeCategory = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    if (newItem) {
-      setNewItem({
-        ...newItem,
+    if (newMovement) {
+      setNewMovement({
+        ...newMovement,
         category: { _id: event.target.value, label: "" },
       });
     }
@@ -69,11 +69,11 @@ export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
         <Select
           name="type"
           id="type"
-          value={newItem?.type}
+          value={newMovement?.type}
           onChange={handleChange}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
-          {isDebt(newItem) ? (
+          {isDebt(newMovement) ? (
             <>
               <option value="debt">Debt</option>
               <option value="loan">Loan</option>
@@ -87,7 +87,7 @@ export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
         </Select>
       </label>
 
-      {isDebt(newItem) ? (
+      {isDebt(newMovement) ? (
         <label>
           <p className="capitalize text-2xl mb-2">beneficiary</p>
           <input
@@ -95,7 +95,7 @@ export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
             id="beneficiary"
             name="beneficiary"
             value={
-              newItem && "beneficiary" in newItem ? newItem?.beneficiary : ""
+              newMovement && "beneficiary" in newMovement ? newMovement?.beneficiary : ""
             }
             onChange={handleChange}
             maxLength={40}
@@ -109,7 +109,7 @@ export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
           className="w-full h-9 px-2 border-navy bg-green border-b-2"
           id="concept"
           name="concept"
-          value={newItem?.concept}
+          value={newMovement?.concept}
           onChange={handleChange}
           maxLength={40}
         />
@@ -120,7 +120,7 @@ export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
         <Select
           name="category"
           id="category"
-          value={newItem?.category._id}
+          value={newMovement?.category._id}
           onChange={handleChangeCategory}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
@@ -142,7 +142,7 @@ export const ItemForm = <T extends DebtFormI | TransactionFormI | null>({
           type="text"
           id="amount"
           name="amount"
-          value={newItem?.amount}
+          value={newMovement?.amount}
           onChange={handleChangeAmount}
         />
       </label>

@@ -10,9 +10,9 @@ import { userState } from "../../data/authentication";
 import { Transition } from "@headlessui/react";
 import classNames from "classnames";
 import { AiFillEdit } from "react-icons/ai";
-import { Card } from "../../components/cards/card";
-import { DeleteCardModal } from "../../components/cards/delete-card";
-import { DebtModal } from "./debts-modal";
+import { Card } from "../../components/movements/card";
+import { DeleteMovementModal } from "../../components/movements/delete-movement";
+import { DebtModal } from "./debt-modal";
 
 export const Debts: React.FC = () => {
   const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
@@ -83,11 +83,11 @@ export const Debts: React.FC = () => {
                     <AiFillEdit />
                   </div>
                   <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
-                    <DeleteCardModal<DebtFormI>
-                      selectedCard={selectedDebt}
+                    <DeleteMovementModal<DebtFormI>
+                      selectedMovement={selectedDebt}
                       {...{
-                        setSelectedCard: setSelectedDebt,
-                        deleteCard: deleteDebt,
+                        setSelectedMovement: setSelectedDebt,
+                        deleteMovement: deleteDebt,
                       }}
                     />
                   </div>

@@ -1,10 +1,11 @@
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useEffect } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { ItemForm } from "../../components/cards/item-form";
+import { MovementForm } from "../../components/movements/movement-form";
 import { createToastify } from "../../helpers/toastify";
 import { newDebtState, selectedDebtState, useDebts } from "../../data/debts";
 import { useRecoilState } from "recoil";
+import { noCategory } from "../../helpers/categories";
 
 export interface props {
   userId?: string;
@@ -25,7 +26,7 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
         type: "loan",
         beneficiary: "",
         concept: "",
-        category: { _id: "670877bf07255749b8882674", label: "N/A" },
+        category: noCategory,
         amount: "",
         userId,
       });
@@ -93,10 +94,10 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
                   {`${selectedDebt ? "Edit" : "Add"} Debt`}
                 </DialogTitle>
 
-                <ItemForm
+                <MovementForm
                   {...{
-                    newItem: newDebt,
-                    setNewItem: setNewDebt,
+                    newMovement: newDebt,
+                    setNewMovement: setNewDebt,
                   }}
                 />
               </div>
