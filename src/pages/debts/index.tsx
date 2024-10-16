@@ -6,7 +6,6 @@ import {
   selectedDebtState,
   useDebts,
 } from "../../data/debts";
-import { useCategories } from "../../data/categories";
 import { userState } from "../../data/authentication";
 import { Transition } from "@headlessui/react";
 import classNames from "classnames";
@@ -19,7 +18,6 @@ export const Debts: React.FC = () => {
   const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
   const [user] = useRecoilState(userState);
   const { getDebts, debtsList, deleteDebt } = useDebts();
-  const { getCategories } = useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -34,9 +32,8 @@ export const Debts: React.FC = () => {
   }
 
   useEffect(() => {
-    getCategories();
-    getDebts();
-  }, [user]);
+    if (user?._id) getDebts();
+  }, [user?._id]);
 
   const handleClickedOutside = (event: Event) => {
     if (

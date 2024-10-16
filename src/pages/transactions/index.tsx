@@ -13,7 +13,6 @@ import {
 import { DeleteCardModal } from "../../components/cards/delete-card";
 import { userState } from "../../data/authentication";
 import { getCurrencyFormat } from "../../helpers/currency";
-import { useCategories } from "../../data/categories";
 import { TransactionModal } from "./transaction-modal";
 
 export const Transactions: React.FC = () => {
@@ -29,7 +28,6 @@ export const Transactions: React.FC = () => {
     balance,
     deleteTransaction,
   } = useTransactions();
-  const { getCategories } = useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -44,7 +42,6 @@ export const Transactions: React.FC = () => {
   }
 
   useEffect(() => {
-    getCategories();
     getTransactions();
   }, [user]);
 
