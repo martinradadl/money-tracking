@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useEffect } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { ItemForm } from "../../components/cards/item-form";
+import { MovementForm } from "../../components/movements/movement-form";
 import { createToastify } from "../../helpers/toastify";
 import {
   newTransactionState,
@@ -9,6 +9,7 @@ import {
   useTransactions,
 } from "../../data/transactions";
 import { useRecoilState } from "recoil";
+import { noCategory } from "../../helpers/categories";
 
 export interface props {
   userId?: string;
@@ -29,7 +30,7 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
       setNewTransaction({
         type: "income",
         concept: "",
-        category: { _id: "670877bf07255749b8882674", label: "N/A" },
+        category: noCategory,
         amount: "",
         userId,
       });
@@ -95,10 +96,10 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
                   {`${selectedTransaction ? "Edit" : "Add"} Transaction`}
                 </DialogTitle>
 
-                <ItemForm
+                <MovementForm
                   {...{
-                    newItem: newTransaction,
-                    setNewItem: setNewTransaction,
+                    newMovement: newTransaction,
+                    setNewMovement: setNewTransaction,
                   }}
                 />
               </div>
