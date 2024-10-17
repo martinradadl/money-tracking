@@ -11,7 +11,7 @@ export interface DebtI {
   _id?: string;
   userId?: string;
   type: DebtType;
-  beneficiary: string;
+  entity: string;
   concept: string;
   category: CategoryI;
   amount: number;

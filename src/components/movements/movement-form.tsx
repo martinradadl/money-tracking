@@ -6,7 +6,7 @@ import { categoriesState } from "../../data/categories";
 import { DebtFormI } from "../../data/debts";
 
 function isDebt(movement: TransactionFormI | DebtFormI | null) {
-  return movement && "beneficiary" in movement;
+  return movement && "entity" in movement;
 }
 
 export interface props<T extends DebtFormI | TransactionFormI | null> {
@@ -89,13 +89,15 @@ export const MovementForm = <T extends DebtFormI | TransactionFormI | null>({
 
       {isDebt(newMovement) ? (
         <label>
-          <p className="capitalize text-2xl mb-2">beneficiary</p>
+          <p className="capitalize text-2xl mb-2">entity</p>
           <input
             className="w-full h-9 px-2 border-navy bg-green border-b-2"
-            id="beneficiary"
-            name="beneficiary"
+            id="entity"
+            name="entity"
             value={
-              newMovement && "beneficiary" in newMovement ? newMovement?.beneficiary : ""
+              newMovement && "entity" in newMovement
+                ? newMovement?.entity
+                : ""
             }
             onChange={handleChange}
             maxLength={40}
@@ -104,7 +106,9 @@ export const MovementForm = <T extends DebtFormI | TransactionFormI | null>({
       ) : null}
 
       <label>
-        <p className="capitalize text-2xl mb-2">concept</p>
+        <p className="capitalize text-2xl mb-2">
+          concept {isDebt(newMovement) ? "(optional)" : ""}
+        </p>
         <input
           className="w-full h-9 px-2 border-navy bg-green border-b-2"
           id="concept"

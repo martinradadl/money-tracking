@@ -22,8 +22,8 @@ export const Card = ({ content, currency }: TransactionProps) => {
       )}
     >
       <div className="flex flex-col gap-1">
-        <p>{"beneficiary" in content ? content.beneficiary : concept}</p>
-        <p className="text-xl">{"beneficiary" in content ? concept : null}</p>
+        <p>{"entity" in content ? content.entity : concept}</p>
+        <p className="text-xl">{"entity" in content ? concept : null}</p>
       </div>
 
       <div
@@ -42,7 +42,7 @@ export const Card = ({ content, currency }: TransactionProps) => {
           <p>
             {getCurrencyFormat({
               currency,
-              amount: type === "income" ? amount : -amount,
+              amount: type === "income" || type === "loan" ? amount : -amount,
             })}
           </p>
         ) : null}

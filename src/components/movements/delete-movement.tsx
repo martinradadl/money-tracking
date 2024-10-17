@@ -16,7 +16,7 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
   setSelectedMovement,
   deleteMovement,
 }: props<T>) => {
-  const isDebt = selectedMovement && "beneficiary" in selectedMovement;
+  const isDebt = selectedMovement && "entity" in selectedMovement;
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
@@ -36,15 +36,15 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
         className="relative z-10 focus:outline-none"
         onClose={close}
       >
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto flex movements-center justify-center">
-          <div className="flex movements-center justify-center w-full text-navy">
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto flex items-center justify-center">
+          <div className="flex items-center justify-center w-full text-navy">
             <DialogPanel
               transition
               className="w-[90%] rounded-md shadow-[0_0_60px_4px_rgba(0,0,0,0.3)] flex flex-col place-content-between h-fit overflow-y-scroll bg-beige p-4 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
             >
-              <div className="flex flex-col gap-4 movements-center justify-center">
+              <div className="flex flex-col gap-4 items-center justify-center">
                 <AiOutlineWarning className="text-4xl text-red" />
-                <div className="flex flex-col gap-1 movements-center justify-center text-center">
+                <div className="flex flex-col gap-1 items-center justify-center text-center">
                   <h3>
                     <b>Delete {isDebt ? "Debt" : "Transaction"}</b>
                   </h3>

@@ -136,7 +136,7 @@ export const Transactions: React.FC = () => {
       <div className="fixed bottom-[4.5rem] right-3">
         <button
           onClick={openModal}
-          className="bg-green text-beige font-bold w-40 rounded-full py-2 px-4 text-base focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"
+          className="bg-green text-beige font-bold w-fit rounded-full py-2 px-4 text-base focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"
         >
           Add Transaction
         </button>

@@ -73,7 +73,7 @@ export const categories = [{ _id: "fakeId", label: "fakeLabel" }];
 export const newDebt: DebtFormI = {
   _id: "fakeId",
   type: "debt",
-  beneficiary: "fakeBeneficiary",
+  entity: "fakeEntity",
   concept: "fakeConcept",
   category: { _id: "fakeId", label: "fakeLabel" },
   amount: "fakeAmount",
@@ -83,7 +83,7 @@ export const newDebt: DebtFormI = {
 export const updatedDebt: DebtFormI = {
   _id: "fakeId",
   type: "debt",
-  beneficiary: "fakeBeneficiary",
+  entity: "fakeEntity",
   concept: "fakeConcept",
   category: { _id: "fakeId", label: "fakeLabel" },
   amount: "fakeAmount",

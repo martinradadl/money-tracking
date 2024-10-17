@@ -24,7 +24,7 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
     } else {
       setNewDebt({
         type: "loan",
-        beneficiary: "",
+        entity: "",
         concept: "",
         category: noCategory,
         amount: "",
@@ -36,7 +36,7 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
   const isSameDebt = () => {
     return (
       newDebt?.type === selectedDebt?.type &&
-      newDebt?.beneficiary === selectedDebt?.beneficiary &&
+      newDebt?.entity === selectedDebt?.entity &&
       newDebt?.concept === selectedDebt?.concept &&
       newDebt?.amount === selectedDebt?.amount &&
       newDebt?.category._id === selectedDebt?.category._id
@@ -45,8 +45,7 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
 
   const hasEmptyFields = () => {
     return (
-      newDebt?.beneficiary === "" ||
-      newDebt?.concept === "" ||
+      newDebt?.entity === "" ||
       newDebt?.amount === "" ||
       newDebt?.amount === "0" ||
       newDebt?.category._id === ""
