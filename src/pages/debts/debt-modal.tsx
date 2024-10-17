@@ -4,11 +4,11 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import { MovementForm } from "../../components/movements/movement-form";
 import { createToastify } from "../../helpers/toastify";
 import {
-  newTransactionState,
-  selectedTransactionState,
-  TransactionFormI,
-  useTransactions,
-} from "../../data/transactions";
+  DebtFormI,
+  newDebtState,
+  selectedDebtState,
+  useDebts,
+} from "../../data/debts";
 import { useRecoilState } from "recoil";
 import { noCategory } from "../../helpers/categories";
 
@@ -18,59 +18,60 @@ export interface props {
   isOpen: boolean;
 }
 
-export const newTransactionInitialState: TransactionFormI = {
-  type: "income",
+export const newDebtInitialState: DebtFormI = {
+  type: "loan",
+  entity: "",
   concept: "",
   category: noCategory,
   amount: "",
 };
 
-export const TransactionModal = ({ userId, close, isOpen }: props) => {
-  const [newTransaction, setNewTransaction] =
-    useRecoilState(newTransactionState);
-  const [selectedTransaction] = useRecoilState(selectedTransactionState);
-  const { addTransaction, editTransaction } = useTransactions();
+export const DebtModal = ({ userId, close, isOpen }: props) => {
+  const [newDebt, setNewDebt] = useRecoilState(newDebtState);
+  const [selectedDebt] = useRecoilState(selectedDebtState);
+  const { addDebt, editDebt } = useDebts();
 
   useEffect(() => {
-    if (selectedTransaction) {
-      setNewTransaction({ ...selectedTransaction });
+    if (selectedDebt) {
+      setNewDebt({ ...selectedDebt });
     } else {
-      setNewTransaction({ ...newTransactionInitialState, userId });
+      setNewDebt({ ...newDebtInitialState, userId });
     }
-  }, [selectedTransaction]);
+  }, [selectedDebt]);
 
-  const isSameTransaction = () => {
+  const isSameDebt = () => {
     return (
-      newTransaction?.type === selectedTransaction?.type &&
-      newTransaction?.concept === selectedTransaction?.concept &&
-      newTransaction?.amount === selectedTransaction?.amount &&
-      newTransaction?.category._id === selectedTransaction?.category._id
+      newDebt?.type === selectedDebt?.type &&
+      newDebt?.entity === selectedDebt?.entity &&
+      newDebt?.concept === selectedDebt?.concept &&
+      newDebt?.amount === selectedDebt?.amount &&
+      newDebt?.category._id === selectedDebt?.category._id
     );
   };
 
   const hasEmptyFields = () => {
     return (
-      newTransaction?.concept === "" ||
-      newTransaction?.amount === "" ||
-      newTransaction?.amount === "0" ||
-      newTransaction?.category._id === ""
+      newDebt?.entity === "" ||
+      newDebt?.amount === "" ||
+      newDebt?.amount === "0" ||
+      newDebt?.category._id === ""
     );
   };
 
   const onSubmit = () => {
-    if (newTransaction) {
+    if (newDebt) {
       if (hasEmptyFields()) {
         createToastify({ text: "There are empty fields", type: "warning" });
       } else {
-        if (selectedTransaction?._id) {
-          if (isSameTransaction()) {
+        if (selectedDebt?._id) {
+          if (isSameDebt()) {
             createToastify({ text: "There are no changes", type: "warning" });
             return;
           } else {
-            editTransaction(selectedTransaction._id, newTransaction);
+            editDebt(selectedDebt._id, newDebt);
           }
         } else {
-          addTransaction(newTransaction);
+          addDebt(newDebt);
         }
         close();
       }
@@ -95,13 +96,13 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
                 <AiOutlineArrowLeft className="text-3xl my-2" onClick={close} />
 
                 <DialogTitle className="text-3xl py-2">
-                  {`${selectedTransaction ? "Edit" : "Add"} Transaction`}
+                  {`${selectedDebt ? "Edit" : "Add"} Debt`}
                 </DialogTitle>
 
                 <MovementForm
                   {...{
-                    newMovement: newTransaction,
-                    setNewMovement: setNewTransaction,
+                    newMovement: newDebt,
+                    setNewMovement: setNewDebt,
                   }}
                 />
               </div>

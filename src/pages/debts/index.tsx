@@ -1,38 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Transition } from "@headlessui/react";
-import { AiFillEdit } from "react-icons/ai";
-import { Card } from "../../components/movements/card";
-import classNames from "classnames";
 import { useRecoilState } from "recoil";
 import {
-  useTransactions,
-  selectedTransactionState,
-  TransactionI,
-  TransactionFormI,
-  newTransactionState,
-} from "../../data/transactions";
-import { DeleteMovementModal } from "../../components/movements/delete-movement";
+  DebtFormI,
+  DebtI,
+  newDebtState,
+  selectedDebtState,
+  useDebts,
+} from "../../data/debts";
 import { userState } from "../../data/authentication";
-import { getCurrencyFormat } from "../../helpers/currency";
-import {
-  newTransactionInitialState,
-  TransactionModal,
-} from "./transaction-modal";
+import { Transition } from "@headlessui/react";
+import classNames from "classnames";
+import { AiFillEdit } from "react-icons/ai";
+import { Card } from "../../components/movements/card";
+import { DeleteMovementModal } from "../../components/movements/delete-movement";
+import { DebtModal, newDebtInitialState } from "./debt-modal";
 
-export const Transactions: React.FC = () => {
-  const [selectedTransaction, setSelectedTransaction] = useRecoilState(
-    selectedTransactionState
-  );
-  const [, setNewTransaction] = useRecoilState(newTransactionState);
-
+export const Debts: React.FC = () => {
+  const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
+  const [, setNewDebt] = useRecoilState(newDebtState);
   const [user] = useRecoilState(userState);
-  const {
-    getTransactions,
-    getBalance,
-    transactionsList,
-    balance,
-    deleteTransaction,
-  } = useTransactions();
+  const { getDebts, debtsList, deleteDebt } = useDebts();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -43,17 +30,13 @@ export const Transactions: React.FC = () => {
 
   function closeModal() {
     setIsModalOpen(false);
-    setSelectedTransaction(null);
-    setNewTransaction(newTransactionInitialState);
+    setSelectedDebt(null);
+    setNewDebt(newDebtInitialState);
   }
 
   useEffect(() => {
-    getTransactions();
+    if (user?._id) getDebts();
   }, [user?._id]);
-
-  useEffect(() => {
-    if (user) getBalance();
-  }, [user?._id, transactionsList]);
 
   const handleClickedOutside = (event: Event) => {
     if (
@@ -61,16 +44,16 @@ export const Transactions: React.FC = () => {
       !selectedContainer.current.contains(event.target as Node) &&
       !isModalOpen
     ) {
-      setSelectedTransaction(null);
+      setSelectedDebt(null);
     }
   };
 
-  const handleTouchStart = (transaction: TransactionI) => {
+  const handleTouchStart = (debt: DebtI) => {
     timer.current = setTimeout(() => {
       document.addEventListener("touchstart", handleClickedOutside, {
         once: true,
       });
-      setSelectedTransaction(transaction as unknown as TransactionFormI);
+      setSelectedDebt(debt as unknown as DebtFormI);
     }, 500);
   };
 
@@ -80,32 +63,18 @@ export const Transactions: React.FC = () => {
 
   return (
     <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim">
-      <h1 className="py-2 text-4xl text-beige font-semibold">Transactions</h1>
-      <div className="flex w-full gap-3 py-1 text-2xl font-semibold">
-        <p className="text-beige">My Balance:</p>
-        <p
-          className={classNames(
-            balance >= 0
-              ? "bg-green-pastel text-navy"
-              : "bg-red-pastel text-beige",
-            "rounded px-2 py-0.5 font-semibold"
-          )}
-        >
-          {user
-            ? getCurrencyFormat({ amount: balance, currency: user.currency })
-            : null}
-        </p>
-      </div>
+      <h1 className="py-2 text-4xl text-beige font-semibold">Debts</h1>
+
       <div className="flex flex-col gap-3">
-        {transactionsList.map((elem, i) => {
+        {debtsList.map((elem, i) => {
           return (
             <div key={i} className="relative">
-              <Transition show={selectedTransaction?._id === elem._id}>
+              <Transition show={selectedDebt?._id === elem._id}>
                 <div
                   ref={selectedContainer}
                   className={classNames(
                     "absolute -top-4 flex gap-3 transition duration-300 ease-in data-[closed]:opacity-0",
-                    elem.type === "income" ? "right-1" : "right-5"
+                    elem.type === "loan" ? "right-1" : "right-5"
                   )}
                 >
                   <div
@@ -117,11 +86,11 @@ export const Transactions: React.FC = () => {
                     <AiFillEdit />
                   </div>
                   <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
-                    <DeleteMovementModal<TransactionFormI>
+                    <DeleteMovementModal<DebtFormI>
+                      selectedMovement={selectedDebt}
                       {...{
-                        selectedMovement: selectedTransaction,
-                        setSelectedMovement: setSelectedTransaction,
-                        deleteMovement: deleteTransaction,
+                        setSelectedMovement: setSelectedDebt,
+                        deleteMovement: deleteDebt,
                       }}
                     />
                   </div>
@@ -144,9 +113,9 @@ export const Transactions: React.FC = () => {
           onClick={openModal}
           className="bg-green text-beige font-bold w-fit rounded-full py-2 px-4 text-base focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"
         >
-          Add Transaction
+          Add Debt
         </button>
-        <TransactionModal
+        <DebtModal
           {...{
             userId: user?._id,
             close: closeModal,

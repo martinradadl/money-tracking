@@ -1,20 +1,31 @@
 import React from "react";
 import { useRecoilState } from "recoil";
-import { categoriesState, newTransactionState } from "../../data/transactions";
+import { TransactionFormI } from "../../data/transactions";
 import { Select } from "@headlessui/react";
+import { categoriesState } from "../../data/categories";
+import { DebtFormI } from "../../data/debts";
 
-export const TransactionForm = () => {
-  const [newTransaction, setNewTransaction] =
-    useRecoilState(newTransactionState);
+function isDebt(movement: TransactionFormI | DebtFormI | null) {
+  return movement && "entity" in movement;
+}
 
+export interface props<T extends DebtFormI | TransactionFormI | null> {
+  newMovement: T;
+  setNewMovement: (movement: T) => void;
+}
+
+export const MovementForm = <T extends DebtFormI | TransactionFormI | null>({
+  newMovement,
+  setNewMovement,
+}: props<T>) => {
   const [categories] = useRecoilState(categoriesState);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    if (newTransaction) {
-      setNewTransaction({
-        ...newTransaction,
+    if (newMovement) {
+      setNewMovement({
+        ...newMovement,
         [event.target.name]: event.target.value,
       });
     }
@@ -29,13 +40,13 @@ export const TransactionForm = () => {
       .split("")
       .every((char) => allowedValues.test(char));
     if (
-      newTransaction &&
+      newMovement &&
       inputValue.length <= 12 &&
       (!lastValue || hasAllowedValues) &&
       firstValue !== "0"
     ) {
-      setNewTransaction({
-        ...newTransaction,
+      setNewMovement({
+        ...newMovement,
         [event.target.name]: inputValue,
       });
     }
@@ -44,14 +55,13 @@ export const TransactionForm = () => {
   const handleChangeCategory = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    if (newTransaction) {
-      setNewTransaction({
-        ...newTransaction,
+    if (newMovement) {
+      setNewMovement({
+        ...newMovement,
         category: { _id: event.target.value, label: "" },
       });
     }
   };
-
   return (
     <div className="flex flex-col gap-4 mt-2">
       <label>
@@ -59,31 +69,62 @@ export const TransactionForm = () => {
         <Select
           name="type"
           id="type"
-          value={newTransaction?.type}
+          value={newMovement?.type}
           onChange={handleChange}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
-          <option value="income">Income</option>
-          <option value="expenses">Expenses</option>
+          {isDebt(newMovement) ? (
+            <>
+              <option value="debt">Debt</option>
+              <option value="loan">Loan</option>
+            </>
+          ) : (
+            <>
+              <option value="income">Income</option>
+              <option value="expenses">Expenses</option>
+            </>
+          )}
         </Select>
       </label>
+
+      {isDebt(newMovement) ? (
+        <label>
+          <p className="capitalize text-2xl mb-2">
+            {newMovement?.type === "loan" ? "Owes you" : "You owe to"}
+          </p>
+          <input
+            className="w-full h-9 px-2 border-navy bg-green border-b-2"
+            id="entity"
+            name="entity"
+            value={
+              newMovement && "entity" in newMovement ? newMovement?.entity : ""
+            }
+            onChange={handleChange}
+            maxLength={40}
+          />
+        </label>
+      ) : null}
+
       <label>
-        <p className="capitalize text-2xl mb-2">concept</p>
+        <p className="capitalize text-2xl mb-2">
+          concept {isDebt(newMovement) ? "(optional)" : ""}
+        </p>
         <input
           className="w-full h-9 px-2 border-navy bg-green border-b-2"
           id="concept"
           name="concept"
-          value={newTransaction?.concept}
+          value={newMovement?.concept}
           onChange={handleChange}
           maxLength={40}
         />
       </label>
+
       <label>
         <p className="capitalize text-2xl mb-2">category</p>
         <Select
           name="category"
           id="category"
-          value={newTransaction?.category._id}
+          value={newMovement?.category._id}
           onChange={handleChangeCategory}
           className="w-full h-9 border-navy rounded bg-green border-b-2"
         >
@@ -97,6 +138,7 @@ export const TransactionForm = () => {
           })}
         </Select>
       </label>
+
       <label>
         <p className="capitalize text-2xl mb-2">amount</p>
         <input
@@ -104,7 +146,7 @@ export const TransactionForm = () => {
           type="text"
           id="amount"
           name="amount"
-          value={newTransaction?.amount}
+          value={newMovement?.amount}
           onChange={handleChangeAmount}
         />
       </label>

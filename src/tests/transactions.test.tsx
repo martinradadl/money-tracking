@@ -1,13 +1,8 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { useTranscations } from "../data/transactions.js";
+import { useTransactions } from "../data/transactions.js";
 import axios from "axios";
-import {
-  categories,
-  createWrapper,
-  newTransaction,
-  updatedTransaction,
-} from "./utils.js";
+import { createWrapper, newTransaction, updatedTransaction } from "./utils.js";
 
 vi.mock("axios");
 
@@ -20,7 +15,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
@@ -33,7 +28,7 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
@@ -47,7 +42,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.getTransactions();
       });
@@ -60,7 +55,7 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.getTransactions();
@@ -80,7 +75,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
@@ -101,14 +96,14 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
 
       await act(async () => {
-        result.current.editTransaction("01", updatedTransaction);
+        result.current.editTransaction("fakeId", updatedTransaction);
       });
       expect(result.current.transactionsList).toEqual([updatedTransaction]);
     });
@@ -124,7 +119,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
@@ -144,45 +139,16 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.addTransaction(newTransaction);
       });
 
       await act(async () => {
-        result.current.deleteTransaction("01");
+        result.current.deleteTransaction("fakeId");
       });
       expect(result.current.transactionsList).toEqual([]);
-    });
-  });
-
-  describe("getCategories", () => {
-    it("should return empty categories list when status is not 200", async () => {
-      vi.mocked(axios, true).get.mockResolvedValueOnce({
-        status: 500,
-      });
-
-      const { result } = renderHook(() => useTranscations(), { wrapper });
-
-      await act(async () => {
-        result.current.getCategories();
-      });
-      expect(result.current.categories).toEqual([]);
-    });
-
-    it("should return categories list and statusCode 200", async () => {
-      vi.mocked(axios, true).get.mockResolvedValueOnce({
-        data: categories,
-        status: 200,
-      });
-
-      const { result } = renderHook(() => useTranscations(), { wrapper });
-
-      await act(async () => {
-        result.current.getCategories();
-      });
-      expect(result.current.categories).toEqual(categories);
     });
   });
 
@@ -192,7 +158,7 @@ describe("useTransactions", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.getBalance();
@@ -206,7 +172,7 @@ describe("useTransactions", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useTranscations(), { wrapper });
+      const { result } = renderHook(() => useTransactions(), { wrapper });
 
       await act(async () => {
         result.current.getBalance();
