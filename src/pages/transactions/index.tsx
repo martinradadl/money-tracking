@@ -9,16 +9,21 @@ import {
   selectedTransactionState,
   TransactionI,
   TransactionFormI,
+  newTransactionState,
 } from "../../data/transactions";
 import { DeleteMovementModal } from "../../components/movements/delete-movement";
 import { userState } from "../../data/authentication";
 import { getCurrencyFormat } from "../../helpers/currency";
-import { TransactionModal } from "./transaction-modal";
+import {
+  newTransactionInitialState,
+  TransactionModal,
+} from "./transaction-modal";
 
 export const Transactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
     selectedTransactionState
   );
+  const [, setNewTransaction] = useRecoilState(newTransactionState);
 
   const [user] = useRecoilState(userState);
   const {
@@ -39,6 +44,7 @@ export const Transactions: React.FC = () => {
   function closeModal() {
     setIsModalOpen(false);
     setSelectedTransaction(null);
+    setNewTransaction(newTransactionInitialState);
   }
 
   useEffect(() => {

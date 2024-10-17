@@ -6,6 +6,7 @@ import { createToastify } from "../../helpers/toastify";
 import {
   newTransactionState,
   selectedTransactionState,
+  TransactionFormI,
   useTransactions,
 } from "../../data/transactions";
 import { useRecoilState } from "recoil";
@@ -17,6 +18,13 @@ export interface props {
   isOpen: boolean;
 }
 
+export const newTransactionInitialState: TransactionFormI = {
+  type: "income",
+  concept: "",
+  category: noCategory,
+  amount: "",
+};
+
 export const TransactionModal = ({ userId, close, isOpen }: props) => {
   const [newTransaction, setNewTransaction] =
     useRecoilState(newTransactionState);
@@ -27,13 +35,7 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
     if (selectedTransaction) {
       setNewTransaction({ ...selectedTransaction });
     } else {
-      setNewTransaction({
-        type: "income",
-        concept: "",
-        category: noCategory,
-        amount: "",
-        userId,
-      });
+      setNewTransaction({ ...newTransactionInitialState, userId });
     }
   }, [selectedTransaction]);
 

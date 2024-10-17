@@ -3,6 +3,7 @@ import { useRecoilState } from "recoil";
 import {
   DebtFormI,
   DebtI,
+  newDebtState,
   selectedDebtState,
   useDebts,
 } from "../../data/debts";
@@ -12,10 +13,11 @@ import classNames from "classnames";
 import { AiFillEdit } from "react-icons/ai";
 import { Card } from "../../components/movements/card";
 import { DeleteMovementModal } from "../../components/movements/delete-movement";
-import { DebtModal } from "./debt-modal";
+import { DebtModal, newDebtInitialState } from "./debt-modal";
 
 export const Debts: React.FC = () => {
   const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
+  const [, setNewDebt] = useRecoilState(newDebtState);
   const [user] = useRecoilState(userState);
   const { getDebts, debtsList, deleteDebt } = useDebts();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,6 +31,7 @@ export const Debts: React.FC = () => {
   function closeModal() {
     setIsModalOpen(false);
     setSelectedDebt(null);
+    setNewDebt(newDebtInitialState);
   }
 
   useEffect(() => {

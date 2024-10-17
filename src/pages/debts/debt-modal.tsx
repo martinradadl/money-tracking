@@ -3,7 +3,12 @@ import { useEffect } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { MovementForm } from "../../components/movements/movement-form";
 import { createToastify } from "../../helpers/toastify";
-import { newDebtState, selectedDebtState, useDebts } from "../../data/debts";
+import {
+  DebtFormI,
+  newDebtState,
+  selectedDebtState,
+  useDebts,
+} from "../../data/debts";
 import { useRecoilState } from "recoil";
 import { noCategory } from "../../helpers/categories";
 
@@ -12,6 +17,14 @@ export interface props {
   close: () => void;
   isOpen: boolean;
 }
+
+export const newDebtInitialState: DebtFormI = {
+  type: "loan",
+  entity: "",
+  concept: "",
+  category: noCategory,
+  amount: "",
+};
 
 export const DebtModal = ({ userId, close, isOpen }: props) => {
   const [newDebt, setNewDebt] = useRecoilState(newDebtState);
@@ -22,14 +35,7 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
     if (selectedDebt) {
       setNewDebt({ ...selectedDebt });
     } else {
-      setNewDebt({
-        type: "loan",
-        entity: "",
-        concept: "",
-        category: noCategory,
-        amount: "",
-        userId,
-      });
+      setNewDebt({ ...newDebtInitialState, userId });
     }
   }, [selectedDebt]);
 
