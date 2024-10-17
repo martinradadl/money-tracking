@@ -89,15 +89,15 @@ export const MovementForm = <T extends DebtFormI | TransactionFormI | null>({
 
       {isDebt(newMovement) ? (
         <label>
-          <p className="capitalize text-2xl mb-2">entity</p>
+          <p className="capitalize text-2xl mb-2">
+            {newMovement?.type === "loan" ? "Owes you" : "You owe to"}
+          </p>
           <input
             className="w-full h-9 px-2 border-navy bg-green border-b-2"
             id="entity"
             name="entity"
             value={
-              newMovement && "entity" in newMovement
-                ? newMovement?.entity
-                : ""
+              newMovement && "entity" in newMovement ? newMovement?.entity : ""
             }
             onChange={handleChange}
             maxLength={40}
