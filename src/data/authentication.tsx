@@ -119,7 +119,7 @@ export const useAuth = () => {
   const changePassword = async (userId: string, newPassword: string) => {
     try {
       const response = await axios.put(
-        `${port}/auth/${userId}/change-password`,
+        `${port}/auth/change-password/${userId}`,
         {},
         {
           headers: {
@@ -130,6 +130,73 @@ export const useAuth = () => {
       );
       if (response.status === 200) {
         setUser(response.data);
+      } else {
+        createToastify({
+          text: "Password change not successful",
+          type: "error",
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
+  const forgotPassword = async (email: string) => {
+    try {
+      const response = await axios.patch(
+        `${port}/auth/forgot-password/${email}`,
+        {}
+      );
+      if (response.status === 200) {
+        createToastify({
+          text: response.data.message,
+          type: "success",
+        });
+      } else {
+        createToastify({
+          text: "Email not send",
+          type: "error",
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
+  const resetPassword = async (
+    id: string,
+    newPassword: string,
+    token: string
+  ) => {
+    try {
+      const response = await axios.put(
+        `${port}/auth/reset-password/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+            newPassword,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setUser(response.data);
+        createToastify({
+          text: "Password successfully reset",
+          type: "success",
+        });
       } else {
         createToastify({
           text: "Password change not successful",
@@ -220,6 +287,8 @@ export const useAuth = () => {
     login,
     logout,
     changePassword,
+    forgotPassword,
+    resetPassword,
     editUser,
     deleteUser,
     user,
