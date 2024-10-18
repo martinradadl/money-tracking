@@ -67,7 +67,14 @@ export const Login: React.FC = () => {
         >
           Log in
         </button>
-        <p className="text-lg">Forgot your password?</p>
+        <p
+          className="text-lg"
+          onClick={() => {
+            navigate(`/forgot-password`);
+          }}
+        >
+          Forgot your password?
+        </p>
         <p
           className="text-lg"
           onClick={() => {

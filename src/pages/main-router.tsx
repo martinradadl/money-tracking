@@ -9,6 +9,8 @@ import { MainLayout } from "./main-layout";
 import { Login } from "./auth/login";
 import { SignUp } from "./auth/sign-up";
 import { NonAuthLayout } from "./non-auth-layout";
+import { ResetPassword } from "./auth/reset-password";
+import { ForgotPassword } from "./auth/forgot-password";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +43,11 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      { path: "/forgot-password", element: <ForgotPassword /> },
+      {
+        path: "/reset-password/:id/:token",
+        element: <ResetPassword />,
       },
     ],
   },
