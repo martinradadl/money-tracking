@@ -148,7 +148,7 @@ describe("useAuthentication", () => {
     });
 
     it("Should return updated User and statusCode 200", async () => {
-      vi.mocked(axios, true).put.mockResolvedValueOnce({
+      vi.mocked(axios, true).mockResolvedValueOnce({
         data: { ...newUser, password: updatedUser.password },
         status: 200,
       });
@@ -168,7 +168,7 @@ describe("useAuthentication", () => {
 
   describe("reset password", async () => {
     it("Should return error", async () => {
-      vi.mocked(axios, true).put.mockResolvedValueOnce({
+      vi.mocked(axios, true).mockResolvedValueOnce({
         status: 500,
       });
 
