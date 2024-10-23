@@ -134,7 +134,7 @@ describe("useAuthentication", () => {
 
   describe("change password", async () => {
     it("Should not change password", async () => {
-      vi.mocked(axios, true).put.mockResolvedValueOnce({
+      vi.mocked(axios, true).mockResolvedValueOnce({
         status: 500,
       });
 
@@ -186,20 +186,19 @@ describe("useAuthentication", () => {
     });
 
     it("Should return updated User and statusCode 200", async () => {
-      vi.mocked(axios, true).put.mockResolvedValueOnce({
+      vi.mocked(axios, true).mockResolvedValueOnce({
         data: { ...newUser, password: updatedUser.password },
         status: 200,
       });
 
       const { result } = renderHook(() => useAuth(), { wrapper });
       await act(async () => {
-        if (newUser._id && updatedUser.password) {
           result.current.resetPassword(
-            newUser._id,
-            updatedUser.password,
+            newUser?._id || "",
+            updatedUser?.password || "",
             fakeToken
           );
-        }
+        
       });
       expect(result.current.user).toEqual({
         ...newUser,
