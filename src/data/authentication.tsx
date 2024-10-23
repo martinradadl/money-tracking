@@ -53,7 +53,6 @@ export const checkPassword = async (id: string, password: string) => {
         text: err.response?.data.message || err.message,
         type: "error",
       });
-      throw new Error(err.message);
     }
   }
 };
@@ -87,7 +86,6 @@ export const useAuth = () => {
           text: "Something went wrong, please contact support",
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -110,7 +108,6 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -141,35 +138,23 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
 
   const forgotPassword = async (email: string) => {
     try {
-      const response = await axios.patch(
-        `${port}/auth/forgot-password/${email}`,
-        {}
-      );
-      if (response.status === 200) {
-        createToastify({
-          text: response.data.message,
-          type: "success",
-        });
-      } else {
-        createToastify({
-          text: "Email not send",
-          type: "error",
-        });
-      }
+      const response = await axios.get(`${port}/auth/forgot-password/${email}`);
+      createToastify({
+        text: response.data.message,
+        type: "success",
+      });
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
         createToastify({
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -180,16 +165,15 @@ export const useAuth = () => {
     token: string
   ) => {
     try {
-      const response = await axios.put(
-        `${port}/auth/reset-password/${id}`,
-        {},
-        {
-          headers: {
-            Authorization: "Bearer " + token,
-            newPassword,
-          },
-        }
-      );
+      const response = await axios({
+        method: "put",
+        url: `${port}/auth/reset-password/${id}`,
+        headers: {
+          Authorization: "Bearer " + token,
+          newPassword,
+        },
+      });
+
       if (response.status === 200) {
         setUser(response.data);
         createToastify({
@@ -208,7 +192,6 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -232,7 +215,6 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -257,7 +239,6 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -276,7 +257,6 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };

@@ -1,14 +1,16 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, vi, describe, it } from "vitest";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { checkPassword, useAuth } from "../data/authentication";
 import {
   createWrapper,
   currencies,
+  fakeToken,
   loggedUser,
   newUser,
   updatedUser,
 } from "./utils";
+import * as createToastify from "../helpers/toastify";
 
 vi.mock("axios");
 
@@ -160,6 +162,83 @@ describe("useAuthentication", () => {
       expect(result.current.user).toEqual({
         ...newUser,
         password: updatedUser.password,
+      });
+    });
+  });
+
+  describe("reset password", async () => {
+    it("Should return error", async () => {
+      vi.mocked(axios, true).put.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        if (newUser._id && updatedUser.password) {
+          result.current.resetPassword(
+            newUser._id,
+            updatedUser.password,
+            fakeToken
+          );
+        }
+      });
+      expect(result.current.user).toEqual(null);
+    });
+
+    it("Should return updated User and statusCode 200", async () => {
+      vi.mocked(axios, true).put.mockResolvedValueOnce({
+        data: { ...newUser, password: updatedUser.password },
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        if (newUser._id && updatedUser.password) {
+          result.current.resetPassword(
+            newUser._id,
+            updatedUser.password,
+            fakeToken
+          );
+        }
+      });
+      expect(result.current.user).toEqual({
+        ...newUser,
+        password: updatedUser.password,
+      });
+    });
+  });
+
+  describe("forgot password", async () => {
+    it("Should return error", async () => {
+      const err = new AxiosError("error");
+      vi.mocked(axios, true).get.mockImplementation(() => {
+        throw err;
+      });
+      const spy = vi.spyOn(createToastify, "createToastify");
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        result.current.forgotPassword(newUser.email);
+      });
+      expect(spy).toHaveBeenCalledWith({
+        text: err.message,
+        type: "error",
+      });
+    });
+
+    it("Should return message that email was sent and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 200,
+        data: { message: "fakeMessage" },
+      });
+      const spy = vi.spyOn(createToastify, "createToastify");
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await act(async () => {
+        result.current.forgotPassword(newUser.email);
+      });
+      expect(spy).toHaveBeenCalledWith({
+        text: "fakeMessage",
+        type: "success",
       });
     });
   });

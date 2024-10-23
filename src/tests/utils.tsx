@@ -46,6 +46,10 @@ export const loggedUser: LoginI = {
   password: "fakePassword",
 };
 
+// TOKENS
+
+export const fakeToken = "fakeToken";
+
 // TRANSACTIONS
 
 export const newTransaction: TransactionFormI = {
