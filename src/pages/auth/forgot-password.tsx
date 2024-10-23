@@ -43,7 +43,7 @@ export const ForgotPassword = () => {
           className="bg-green w-fit text-xl font-semibold py-2 px-4 rounded"
           onClick={handleSubmit}
         >
-          Send Link
+          Submit
         </button>
         <p
           className="text-lg"

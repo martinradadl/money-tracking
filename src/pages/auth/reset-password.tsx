@@ -1,13 +1,21 @@
-import React, { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../data/authentication";
 import { createToastify } from "../../helpers/toastify";
 
 export const ResetPassword = () => {
-  const params = useParams();
+  const [params] = useSearchParams();
   const [password, setPassword] = useState({ new: "", confirm: "" });
   const navigate = useNavigate();
   const { resetPassword } = useAuth();
+  const userId = params.get("userId");
+  const token = params.get("token");
+
+  useEffect(() => {
+    if (!userId || !token) {
+      navigate("/login");
+    }
+  }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword({
@@ -31,8 +39,8 @@ export const ResetPassword = () => {
           type: "warning",
         });
       } else {
-        if (params.id && params.token) {
-          await resetPassword(params.id, password.confirm, params.token);
+        if (userId && token) {
+          await resetPassword(userId, password.confirm, token);
           navigate("/login");
         }
       }
