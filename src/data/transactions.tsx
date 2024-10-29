@@ -4,7 +4,8 @@ import "toastify-js/src/toastify.css";
 import { createToastify } from "../helpers/toastify";
 import { userState } from "./authentication";
 import { useCookies } from "react-cookie";
-import { CategoryI, port } from "./categories";
+import { CategoryI } from "./categories";
+import { API_URL } from "../helpers/env";
 
 type TranscationType = "income" | "outcome";
 
@@ -51,7 +52,7 @@ export const useTransactions = () => {
 
   const getTransactions = async () => {
     try {
-      const response = await axios.get(`${port}/transactions/${user?._id}`, {
+      const response = await axios.get(`${API_URL}/transactions/${user?._id}`, {
         headers: {
           Authorization: "Bearer " + cookies.jwt,
         },
@@ -79,7 +80,7 @@ export const useTransactions = () => {
         amount: parseInt(newItem.amount),
         userId: user?._id,
       };
-      const response = await axios.post(`${port}/transactions/`, parsedItem, {
+      const response = await axios.post(`${API_URL}/transactions/`, parsedItem, {
         headers: {
           Authorization: "Bearer " + cookies.jwt,
         },
@@ -111,7 +112,7 @@ export const useTransactions = () => {
         userId: user?._id,
       };
       const response = await axios.put(
-        `${port}/transactions/${id}`,
+        `${API_URL}/transactions/${id}`,
         parsedItem,
         {
           headers: {
@@ -149,7 +150,7 @@ export const useTransactions = () => {
 
   const deleteTransaction = async (id: string) => {
     try {
-      const response = await axios.delete(`${port}/transactions/${id}`, {
+      const response = await axios.delete(`${API_URL}/transactions/${id}`, {
         headers: {
           Authorization: "Bearer " + cookies.jwt,
         },
@@ -184,7 +185,7 @@ export const useTransactions = () => {
   const getBalance = async () => {
     try {
       const response = await axios.get(
-        `${port}/transactions/balance/${user?._id}`,
+        `${API_URL}/transactions/balance/${user?._id}`,
         {
           headers: {
             Authorization: "Bearer " + cookies.jwt,
