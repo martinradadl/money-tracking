@@ -1,9 +1,10 @@
 import { atom, useRecoilState } from "recoil";
-import { CategoryI, port } from "./categories";
+import { CategoryI } from "./categories";
 import { userState } from "./authentication";
 import axios, { AxiosError } from "axios";
 import { createToastify } from "../helpers/toastify";
 import { useCookies } from "react-cookie";
+import { API_URL } from "../helpers/env";
 
 export type DebtType = "debt" | "loan";
 
@@ -43,7 +44,7 @@ export const useDebts = () => {
 
   const getDebts = async () => {
     try {
-      const response = await axios.get(`${port}/debts/${user?._id}`, {
+      const response = await axios.get(`${API_URL}/debts/${user?._id}`, {
         headers: {
           Authorization: "Bearer " + cookies.jwt,
         },
@@ -71,7 +72,7 @@ export const useDebts = () => {
         amount: parseInt(newItem.amount),
         userId: user?._id,
       };
-      const response = await axios.post(`${port}/debts/`, parsedItem, {
+      const response = await axios.post(`${API_URL}/debts/`, parsedItem, {
         headers: {
           Authorization: "Bearer " + cookies.jwt,
         },
@@ -102,7 +103,7 @@ export const useDebts = () => {
         amount: parseInt(updatedItem.amount),
         userId: user?._id,
       };
-      const response = await axios.put(`${port}/debts/${id}`, parsedItem, {
+      const response = await axios.put(`${API_URL}/debts/${id}`, parsedItem, {
         headers: {
           Authorization: "Bearer " + cookies.jwt,
         },
@@ -137,7 +138,7 @@ export const useDebts = () => {
 
   const deleteDebt = async (id: string) => {
     try {
-      const response = await axios.delete(`${port}/debts/${id}`, {
+      const response = await axios.delete(`${API_URL}/debts/${id}`, {
         headers: {
           Authorization: "Bearer " + cookies.jwt,
         },

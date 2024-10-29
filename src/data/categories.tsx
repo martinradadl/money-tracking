@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { atom, useRecoilState } from "recoil";
 import { createToastify } from "../helpers/toastify";
+import { API_URL } from "../helpers/env";
 
 export interface CategoryI {
   _id: string;
@@ -12,14 +13,12 @@ export const categoriesState = atom<CategoryI[]>({
   default: [],
 });
 
-export const port = "http://localhost:3000";
-
 export const useCategories = () => {
   const [categories, setCategories] = useRecoilState(categoriesState);
 
   const getCategories = async () => {
     try {
-      const response = await axios.get(`${port}/categories/`);
+      const response = await axios.get(`${API_URL}/categories/`);
       if (response.status === 200) {
         setCategories(response.data);
       } else {
