@@ -4,7 +4,6 @@ import { StrictMode } from "react";
 import { RecoilRoot } from "recoil";
 import "./index.css";
 import "toastify-js/src/toastify.css";
-import "dotenv/config";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
