@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { expect, vi, describe, it } from "vitest";
+import { expect, vi, describe, it, afterAll } from "vitest";
 import axios, { AxiosError } from "axios";
 import { checkPassword, useAuth } from "../data/authentication";
 import {
@@ -17,7 +17,15 @@ vi.mock("axios");
 const wrapper = createWrapper(false);
 
 describe("useAuthentication", () => {
+  afterAll(() => {
+    vi.resetAllMocks();
+  });
+
   describe("register", async () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
     it("should return user as null when status is not 200", async () => {
       vi.mocked(axios, true).post.mockResolvedValueOnce({
         status: 500,
@@ -45,6 +53,10 @@ describe("useAuthentication", () => {
   });
 
   describe("login", async () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
     it("should return user as null when status is not 200", async () => {
       vi.mocked(axios, true).post.mockResolvedValueOnce({
         status: 500,
@@ -72,6 +84,10 @@ describe("useAuthentication", () => {
   });
 
   describe("edit user", async () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
     it("Should not update User", async () => {
       vi.mocked(axios, true).put.mockResolvedValueOnce({
         status: 500,
@@ -103,6 +119,10 @@ describe("useAuthentication", () => {
   });
 
   describe("delete user", async () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
     it("Should not delete User", async () => {
       vi.mocked(axios, true).delete.mockResolvedValueOnce({
         status: 500,
@@ -133,6 +153,10 @@ describe("useAuthentication", () => {
   });
 
   describe("change password", async () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
     it("Should not change password", async () => {
       vi.mocked(axios, true).mockResolvedValueOnce({
         status: 500,
@@ -168,6 +192,10 @@ describe("useAuthentication", () => {
   });
 
   describe("reset password", async () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
     it("Should return error", async () => {
       vi.mocked(axios, true).mockResolvedValueOnce({
         status: 500,
@@ -186,7 +214,7 @@ describe("useAuthentication", () => {
       expect(result.current.user).toEqual(null);
     });
 
-    it.skip("Should return updated User and statusCode 200", async () => {
+    it("Should return updated User and statusCode 200", async () => {
       vi.mocked(axios, true).mockResolvedValueOnce({
         data: { ...newUser, password: updatedUser.password },
         status: 200,
@@ -208,6 +236,10 @@ describe("useAuthentication", () => {
   });
 
   describe("forgot password", async () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
     it("Should return error", async () => {
       const err = new AxiosError("error");
       vi.mocked(axios, true).get.mockImplementation(() => {
@@ -243,6 +275,10 @@ describe("useAuthentication", () => {
   });
 
   describe("get currencies", () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
     it("should not return currencies when status is not 200", async () => {
       vi.mocked(axios, true).get.mockResolvedValueOnce({
         status: 500,
@@ -272,6 +308,10 @@ describe("useAuthentication", () => {
   });
 
   describe("check password", () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
     it("should not return password check when status is not 200", async () => {
       vi.mocked(axios, true).get.mockResolvedValueOnce({
         status: 500,
