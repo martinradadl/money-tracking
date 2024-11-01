@@ -86,7 +86,7 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
         className="relative z-10 focus:outline-none"
         onClose={close}
       >
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto h-dvh">
           <div className="flex min-h-full items-center justify-center text-navy">
             <DialogPanel
               transition

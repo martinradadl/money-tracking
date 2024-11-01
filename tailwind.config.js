@@ -6,6 +6,7 @@ export default {
       navy: "#141E46",
       green: "#41B06E",
       "green-pastel": "#8DECB4",
+      "dark-green": "#17594A",
       beige: "#FFF5E0",
       "red-pastel": "#FF7272",
       "yellow-category": "#FABC60",
