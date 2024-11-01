@@ -53,7 +53,6 @@ export const checkPassword = async (id: string, password: string) => {
         text: err.response?.data.message || err.message,
         type: "error",
       });
-      throw new Error(err.message);
     }
   }
 };
@@ -87,7 +86,6 @@ export const useAuth = () => {
           text: "Something went wrong, please contact support",
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -110,7 +108,6 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -141,7 +138,61 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
+      }
+    }
+  };
+
+  const forgotPassword = async (email: string) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/auth/forgot-password/${email}`
+      );
+      createToastify({
+        text: response.data.message,
+        type: "success",
+      });
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+      }
+    }
+  };
+
+  const resetPassword = async (
+    id: string,
+    newPassword: string,
+    token: string
+  ) => {
+    try {
+      const response = await axios({
+        method: "put",
+        url: `${API_URL}/auth/reset-password/${id}`,
+        headers: {
+          Authorization: "Bearer " + token,
+          newPassword,
+        },
+      });
+      if (response.status === 200) {
+        setUser(response.data);
+        createToastify({
+          text: "Password successfully reset",
+          type: "success",
+        });
+      } else {
+        createToastify({
+          text: "Password change not successful",
+          type: "error",
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
       }
     }
   };
@@ -165,7 +216,6 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -190,7 +240,6 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -209,7 +258,6 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
-        throw new Error(err.message);
       }
     }
   };
@@ -219,6 +267,8 @@ export const useAuth = () => {
     login,
     logout,
     changePassword,
+    forgotPassword,
+    resetPassword,
     editUser,
     deleteUser,
     user,
