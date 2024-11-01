@@ -144,7 +144,9 @@ export const useAuth = () => {
 
   const forgotPassword = async (email: string) => {
     try {
-      const response = await axios.get(`${port}/auth/forgot-password/${email}`);
+      const response = await axios.get(
+        `${API_URL}/auth/forgot-password/${email}`
+      );
       createToastify({
         text: response.data.message,
         type: "success",
@@ -167,13 +169,12 @@ export const useAuth = () => {
     try {
       const response = await axios({
         method: "put",
-        url: `${port}/auth/reset-password/${id}`,
+        url: `${API_URL}/auth/reset-password/${id}`,
         headers: {
           Authorization: "Bearer " + token,
           newPassword,
         },
       });
-
       if (response.status === 200) {
         setUser(response.data);
         createToastify({
