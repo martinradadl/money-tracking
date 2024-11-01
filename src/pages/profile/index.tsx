@@ -28,25 +28,25 @@ export const Profile: React.FC = () => {
 
   return (
     <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-10 overflow-y-auto text-beige entrance-anim">
-      <h1 className="py-2 text-4xl font-semibold">Profile</h1>
+      <h1 className="page-title">Profile</h1>
 
       <div className="flex gap-4 items-center border-b-2 border-green pb-4">
-        <div className="bg-green rounded-full h-24 w-24 max-h-24 max-w-24" />
+        <div className="bg-green rounded-full h-20 w-20 max-h-20 max-w-20" />
 
         <div className="flex flex-col flex-1 gap-1 whitespace-nowrap overflow-hidden">
-          <p className="text-3xl overflow-hidden text-ellipsis">{user?.name}</p>
-          <p className="text-xl overflow-hidden text-ellipsis">{user?.email}</p>
+          <p className="text-2xl overflow-hidden text-ellipsis">{user?.name}</p>
+          <p className="text-base overflow-hidden text-ellipsis">{user?.email}</p>
         </div>
 
         <AccountSettingsModal
           {...{
             userId: user?._id,
-            modalTrigger: <AiFillEdit className="text-5xl" />,
+            modalTrigger: <AiFillEdit className="text-4xl" />,
           }}
         />
       </div>
 
-      <div className="flex flex-col gap-6 text-3xl">
+      <div className="flex flex-col gap-6 text-2xl">
         <ChangePasswordModal
           {...{
             userId: user?._id,

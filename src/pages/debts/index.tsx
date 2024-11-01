@@ -63,7 +63,7 @@ export const Debts: React.FC = () => {
 
   return (
     <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim">
-      <h1 className="py-2 text-4xl text-beige font-semibold">Debts</h1>
+      <h1 className="page-title text-beige">Debts</h1>
 
       <div className="flex flex-col gap-3">
         {debtsList.map((elem, i) => {
