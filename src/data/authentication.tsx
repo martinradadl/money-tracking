@@ -108,6 +108,7 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
+        throw err;
       }
     }
   };

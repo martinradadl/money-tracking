@@ -26,9 +26,8 @@ export const Login: React.FC = () => {
       if (hasEmptyFields()) {
         createToastify({ text: "Faltan campos por llenar", type: "warning" });
       } else {
-        login(user).then(() => {
-          navigate("/");
-        });
+        await login(user);
+        navigate("/");
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
