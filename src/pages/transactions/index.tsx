@@ -80,8 +80,8 @@ export const Transactions: React.FC = () => {
 
   return (
     <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim">
-      <h1 className="py-2 text-4xl text-beige font-semibold">Transactions</h1>
-      <div className="flex w-full gap-3 py-1 text-2xl font-semibold">
+      <h1 className="page-title text-beige">Transactions</h1>
+      <div className="flex w-full gap-3 py-1 text-xl font-semibold">
         <p className="text-beige">My Balance:</p>
         <p
           className={classNames(

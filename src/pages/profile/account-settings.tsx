@@ -102,7 +102,7 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
         className="relative z-10 focus:outline-none"
         onClose={close}
       >
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto h-dvh">
           <div className="flex min-h-full items-center justify-center text-navy">
             <DialogPanel
               transition
@@ -131,7 +131,7 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
                   <label>
                     <p className="text-2xl mb-2">Email</p>
                     <input
-                      className="w-full h-9 px-2 border-navy bg-light-gray text-gray border-b-2"
+                      className="w-full h-9 px-2 border-navy bg-dark-green text-light-gray border-b-2"
                       id="email"
                       name="email"
                       value={accountForm.email}

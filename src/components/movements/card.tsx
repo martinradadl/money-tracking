@@ -15,7 +15,7 @@ export const Card = ({ content, currency }: TransactionProps) => {
   return (
     <div
       className={classNames(
-        "px-2 pt-2 pb-3 flex flex-col text-[1.5rem] rounded-md gap-3 font-semibold",
+        "px-2 pt-2 pb-3 flex flex-col text-xl rounded-md gap-3 font-semibold",
         type === "income" || type === "loan"
           ? "bg-green-pastel text-navy	ml-4"
           : "bg-red-pastel text-beige mr-4"
@@ -29,7 +29,7 @@ export const Card = ({ content, currency }: TransactionProps) => {
               : `You owe to ${content.entity}`
             : concept}
         </p>
-        <p className="text-xl">{"entity" in content ? concept : null}</p>
+        <p className="text-base">{"entity" in content ? concept : null}</p>
       </div>
 
       <div

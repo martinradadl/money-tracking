@@ -40,7 +40,7 @@ export const ContactSupportModal = ({ modalTrigger }: props) => {
                   </h3>
                   <p>
                     You can contact us by sending an email to
-                    <b> support@moneytracking.com</b>
+                    <b> martinrprojects@gmail.com</b>
                   </p>
                 </div>
 

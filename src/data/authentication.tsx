@@ -70,9 +70,7 @@ export const useAuth = () => {
 
   const register = async (newUser: UserI) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, newUser, {
-        withCredentials: true,
-      });
+      const response = await axios.post(`${API_URL}/auth/register`, newUser);
       if (response.status === 200) {
         setUser(response.data.user);
         setCookie("user", JSON.stringify(response.data.user), { path: "/" });
@@ -92,9 +90,7 @@ export const useAuth = () => {
 
   const login = async (loggedUser: LoginI) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, loggedUser, {
-        withCredentials: true,
-      });
+      const response = await axios.post(`${API_URL}/auth/login`, loggedUser);
       if (response.status === 200) {
         setUser(response.data.user);
         setCookie("user", JSON.stringify(response.data.user), { path: "/" });
@@ -108,6 +104,7 @@ export const useAuth = () => {
           text: err.response?.data.message || err.message,
           type: "error",
         });
+        throw err;
       }
     }
   };
