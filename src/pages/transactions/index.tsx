@@ -142,6 +142,7 @@ export const Transactions: React.FC = () => {
                 </div>
               </Transition>
               <div
+                className="cursor-pointer"
                 onTouchStart={
                   isMobile()
                     ? () => {
