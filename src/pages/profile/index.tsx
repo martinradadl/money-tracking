@@ -31,7 +31,7 @@ export const Profile: React.FC = () => {
       <h1 className="page-title">Profile</h1>
 
       <div className="flex gap-4 items-center border-b-2 border-green pb-4">
-        <div className="bg-green rounded-full h-20 w-20 max-h-20 max-w-20" />
+        <div className="bg-green rounded-full h-20 w-20 max-h-20 max-w-20 cursor-pointer" />
 
         <div className="flex flex-col flex-1 gap-1 whitespace-nowrap overflow-hidden">
           <p className="text-2xl overflow-hidden text-ellipsis">{user?.name}</p>
@@ -41,7 +41,7 @@ export const Profile: React.FC = () => {
         <AccountSettingsModal
           {...{
             userId: user?._id,
-            modalTrigger: <AiFillEdit className="text-4xl" />,
+            modalTrigger: <AiFillEdit className="text-4xl cursor-pointer" />,
           }}
         />
       </div>

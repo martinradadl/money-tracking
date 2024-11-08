@@ -68,7 +68,7 @@ export const Login: React.FC = () => {
           Log in
         </button>
         <p
-          className="text-lg"
+          className="text-lg cursor-pointer"
           onClick={() => {
             navigate(`/forgot-password`);
           }}
@@ -76,7 +76,7 @@ export const Login: React.FC = () => {
           Forgot your password?
         </p>
         <p
-          className="text-lg"
+          className="text-lg cursor-pointer"
           onClick={() => {
             navigate(`/sign-up`);
           }}

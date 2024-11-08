@@ -46,7 +46,7 @@ export const ForgotPassword = () => {
           Submit
         </button>
         <p
-          className="text-lg"
+          className="text-lg cursor-pointer"
           onClick={() => {
             navigate(`/login`);
           }}
