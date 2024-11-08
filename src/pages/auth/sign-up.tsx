@@ -82,7 +82,7 @@ export const SignUp: React.FC = () => {
           Sign Up
         </button>
         <p
-          className="text-lg"
+          className="text-lg cursor-pointer"
           onClick={() => {
             navigate(`/login`);
           }}
