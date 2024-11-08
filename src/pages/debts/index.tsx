@@ -15,12 +15,13 @@ import { Card } from "../../components/movements/card";
 import { DeleteMovementModal } from "../../components/movements/delete-movement";
 import { DebtModal, newDebtInitialState } from "./debt-modal";
 import { isMobile } from "../../helpers/utils";
+import { getCurrencyFormat } from "../../helpers/currency";
 
 export const Debts: React.FC = () => {
   const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
   const [, setNewDebt] = useRecoilState(newDebtState);
   const [user] = useRecoilState(userState);
-  const { getDebts, debtsList, deleteDebt } = useDebts();
+  const { getDebts, debtsList, deleteDebt, balance, getBalance } = useDebts();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -38,6 +39,10 @@ export const Debts: React.FC = () => {
   useEffect(() => {
     if (user?._id) getDebts();
   }, [user?._id]);
+
+  useEffect(() => {
+    if (user) getBalance();
+  }, [user?._id, debtsList]);
 
   useEffect(() => {
     if (!isMobile() && !selectedDebt) {
@@ -78,7 +83,21 @@ export const Debts: React.FC = () => {
   return (
     <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim">
       <h1 className="page-title text-beige">Debts</h1>
-
+      <div className="flex w-full gap-3 py-1 text-xl font-semibold">
+        <p className="text-beige">My Balance:</p>
+        <p
+          className={classNames(
+            balance >= 0
+              ? "bg-green-pastel text-navy"
+              : "bg-red-pastel text-beige",
+            "rounded px-2 py-0.5 font-semibold"
+          )}
+        >
+          {user
+            ? getCurrencyFormat({ amount: balance, currency: user.currency })
+            : null}
+        </p>
+      </div>
       <div className="flex flex-col gap-3">
         {debtsList.map((elem, i) => {
           return (
