@@ -37,9 +37,15 @@ export const selectedDebtState = atom<DebtFormI | null>({
   default: null,
 });
 
+export const debtsBalanceState = atom<number>({
+  key: "debtsBalanceState",
+  default: 0,
+});
+
 export const useDebts = () => {
   const [debtsList, setDebtsList] = useRecoilState(debtsListState);
   const [user] = useRecoilState(userState);
+  const [balance, setBalance] = useRecoilState(debtsBalanceState);
   const [cookies] = useCookies(["jwt"]);
 
   const getDebts = async () => {
@@ -167,5 +173,42 @@ export const useDebts = () => {
     }
   };
 
-  return { getDebts, addDebt, editDebt, deleteDebt, debtsList };
+  const getBalance = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/debts/balance/${user?._id}`,
+        {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setBalance(response.data);
+      } else {
+        createToastify({
+          text: "Could not calculate balance",
+          type: "error",
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
+  return {
+    getDebts,
+    addDebt,
+    editDebt,
+    deleteDebt,
+    getBalance,
+    balance,
+    debtsList,
+  };
 };

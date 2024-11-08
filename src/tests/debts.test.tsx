@@ -151,4 +151,33 @@ describe("useDebts", () => {
       expect(result.current.debtsList).toEqual([]);
     });
   });
+
+  describe("getBalance", () => {
+    it("should not return balance when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useDebts(), { wrapper });
+
+      await act(async () => {
+        result.current.getBalance();
+      });
+      expect(result.current.balance).toEqual(0);
+    });
+
+    it("should return balance and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useDebts(), { wrapper });
+
+      await act(async () => {
+        result.current.getBalance();
+      });
+      expect(result.current.balance).toEqual(100);
+    });
+  });
 });
