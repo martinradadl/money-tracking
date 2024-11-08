@@ -14,6 +14,7 @@ import { AiFillEdit } from "react-icons/ai";
 import { Card } from "../../components/movements/card";
 import { DeleteMovementModal } from "../../components/movements/delete-movement";
 import { DebtModal, newDebtInitialState } from "./debt-modal";
+import { isMobile } from "../../helpers/utils";
 
 export const Debts: React.FC = () => {
   const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
@@ -38,6 +39,15 @@ export const Debts: React.FC = () => {
     if (user?._id) getDebts();
   }, [user?._id]);
 
+  useEffect(() => {
+    if (!isMobile() && !selectedDebt) {
+      document.addEventListener("mousedown", handleClickedOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickedOutside, true);
+      };
+    }
+  }, [selectedDebt?._id]);
+
   const handleClickedOutside = (event: Event) => {
     if (
       selectedContainer.current &&
@@ -61,6 +71,10 @@ export const Debts: React.FC = () => {
     clearTimeout(timer.current);
   };
 
+  const handleClick = (debt: DebtI) => {
+    setSelectedDebt(debt as unknown as DebtFormI);
+  };
+
   return (
     <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim">
       <h1 className="page-title text-beige">Debts</h1>
@@ -81,11 +95,11 @@ export const Debts: React.FC = () => {
                     onClick={() => {
                       openModal();
                     }}
-                    className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl"
+                    className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl cursor-pointer"
                   >
                     <AiFillEdit />
                   </div>
-                  <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
+                  <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl cursor-pointer">
                     <DeleteMovementModal<DebtFormI>
                       selectedMovement={selectedDebt}
                       {...{
@@ -97,10 +111,27 @@ export const Debts: React.FC = () => {
                 </div>
               </Transition>
               <div
-                onTouchStart={() => {
-                  handleTouchStart(elem);
-                }}
-                onTouchEnd={handleTouchEnd}
+                onTouchStart={
+                  isMobile()
+                    ? () => {
+                        handleTouchStart(elem);
+                      }
+                    : undefined
+                }
+                onTouchEnd={
+                  isMobile()
+                    ? () => {
+                        handleTouchEnd();
+                      }
+                    : undefined
+                }
+                onClick={
+                  !isMobile()
+                    ? () => {
+                        handleClick(elem);
+                      }
+                    : undefined
+                }
               >
                 <Card key={i} content={elem} currency={user?.currency} />
               </div>

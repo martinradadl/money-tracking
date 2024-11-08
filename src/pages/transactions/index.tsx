@@ -18,6 +18,7 @@ import {
   newTransactionInitialState,
   TransactionModal,
 } from "./transaction-modal";
+import { isMobile } from "../../helpers/utils";
 
 export const Transactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
@@ -48,12 +49,21 @@ export const Transactions: React.FC = () => {
   }
 
   useEffect(() => {
-    getTransactions();
+    if (user?._id) getTransactions();
   }, [user?._id]);
 
   useEffect(() => {
     if (user) getBalance();
   }, [user?._id, transactionsList]);
+
+  useEffect(() => {
+    if (!isMobile() && !selectedTransaction) {
+      document.addEventListener("mousedown", handleClickedOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickedOutside, true);
+      };
+    }
+  }, [selectedTransaction?._id]);
 
   const handleClickedOutside = (event: Event) => {
     if (
@@ -76,6 +86,10 @@ export const Transactions: React.FC = () => {
 
   const handleTouchEnd = () => {
     clearTimeout(timer.current);
+  };
+
+  const handleClick = (transaction: TransactionI) => {
+    setSelectedTransaction(transaction as unknown as TransactionFormI);
   };
 
   return (
@@ -112,11 +126,11 @@ export const Transactions: React.FC = () => {
                     onClick={() => {
                       openModal();
                     }}
-                    className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl"
+                    className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl cursor-pointer"
                   >
                     <AiFillEdit />
                   </div>
-                  <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl">
+                  <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl cursor-pointer">
                     <DeleteMovementModal<TransactionFormI>
                       {...{
                         selectedMovement: selectedTransaction,
@@ -128,10 +142,27 @@ export const Transactions: React.FC = () => {
                 </div>
               </Transition>
               <div
-                onTouchStart={() => {
-                  handleTouchStart(elem);
-                }}
-                onTouchEnd={handleTouchEnd}
+                onTouchStart={
+                  isMobile()
+                    ? () => {
+                        handleTouchStart(elem);
+                      }
+                    : undefined
+                }
+                onTouchEnd={
+                  isMobile()
+                    ? () => {
+                        handleTouchEnd();
+                      }
+                    : undefined
+                }
+                onClick={
+                  !isMobile()
+                    ? () => {
+                        handleClick(elem);
+                      }
+                    : undefined
+                }
               >
                 <Card key={i} content={elem} currency={user?.currency} />
               </div>
