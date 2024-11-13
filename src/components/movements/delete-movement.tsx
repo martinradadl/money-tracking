@@ -25,6 +25,7 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
 
   function close() {
     setIsOpen(false);
+    setSelectedMovement(null);
   }
 
   return (

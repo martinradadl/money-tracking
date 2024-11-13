@@ -44,15 +44,6 @@ export const Debts: React.FC = () => {
     if (user) getBalance();
   }, [user?._id, debtsList]);
 
-  useEffect(() => {
-    if (!isMobile() && !selectedDebt) {
-      document.addEventListener("mousedown", handleClickedOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickedOutside, true);
-      };
-    }
-  }, [selectedDebt?._id]);
-
   const handleClickedOutside = (event: Event) => {
     if (
       selectedContainer.current &&
@@ -61,6 +52,22 @@ export const Debts: React.FC = () => {
     ) {
       setSelectedDebt(null);
     }
+  };
+
+  const handleClickedOutsideWeb = (event: Event) => {
+    if (
+      selectedContainer.current &&
+      !selectedContainer.current.contains(event.target as Node) &&
+      !isModalOpen
+    ) {
+      setSelectedDebt(null);
+    }
+    document.removeEventListener("mousedown", handleClickedOutsideWeb, true);
+  };
+
+  const handleClick = (debt: DebtI) => {
+    document.addEventListener("mousedown", handleClickedOutsideWeb, true);
+    setSelectedDebt(debt as unknown as DebtFormI);
   };
 
   const handleTouchStart = (debt: DebtI) => {
@@ -74,10 +81,6 @@ export const Debts: React.FC = () => {
 
   const handleTouchEnd = () => {
     clearTimeout(timer.current);
-  };
-
-  const handleClick = (debt: DebtI) => {
-    setSelectedDebt(debt as unknown as DebtFormI);
   };
 
   return (

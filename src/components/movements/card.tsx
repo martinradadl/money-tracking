@@ -23,11 +23,20 @@ export const Card = ({ content, currency }: TransactionProps) => {
     >
       <div className="flex flex-col gap-1">
         <p>
-          {"entity" in content
-            ? type === "loan"
-              ? `${content.entity} owes you`
-              : `You owe to ${content.entity}`
-            : concept}
+          {"entity" in content ? (
+            type === "loan" ? (
+              <p>
+                {content.entity} <span className="text-base">owes you</span>
+              </p>
+            ) : (
+              <p>
+                {" "}
+                <span className="text-base">You owe to</span> {content.entity}
+              </p>
+            )
+          ) : (
+            concept
+          )}
         </p>
         <p className="text-base">{"entity" in content ? concept : null}</p>
       </div>
