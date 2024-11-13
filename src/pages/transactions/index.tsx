@@ -56,15 +56,6 @@ export const Transactions: React.FC = () => {
     if (user) getBalance();
   }, [user?._id, transactionsList]);
 
-  useEffect(() => {
-    if (!isMobile() && !selectedTransaction) {
-      document.addEventListener("mousedown", handleClickedOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickedOutside, true);
-      };
-    }
-  }, [selectedTransaction?._id]);
-
   const handleClickedOutside = (event: Event) => {
     if (
       selectedContainer.current &&
@@ -73,6 +64,22 @@ export const Transactions: React.FC = () => {
     ) {
       setSelectedTransaction(null);
     }
+  };
+
+  const handleClickedOutsideWeb = (event: Event) => {
+    if (
+      selectedContainer.current &&
+      !selectedContainer.current.contains(event.target as Node) &&
+      !isModalOpen
+    ) {
+      setSelectedTransaction(null);
+    }
+    document.removeEventListener("mousedown", handleClickedOutsideWeb, true);
+  };
+
+  const handleClick = (transaction: TransactionI) => {
+    document.addEventListener("mousedown", handleClickedOutsideWeb, true);
+    setSelectedTransaction(transaction as unknown as TransactionFormI);
   };
 
   const handleTouchStart = (transaction: TransactionI) => {
@@ -86,10 +93,6 @@ export const Transactions: React.FC = () => {
 
   const handleTouchEnd = () => {
     clearTimeout(timer.current);
-  };
-
-  const handleClick = (transaction: TransactionI) => {
-    setSelectedTransaction(transaction as unknown as TransactionFormI);
   };
 
   return (
