@@ -52,7 +52,10 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
                 </div>
                 <div className="flex gap-4">
                   <button
-                    onClick={close}
+                    onClick={() => {
+                      setSelectedMovement(null);
+                      close();
+                    }}
                     className="bg-navy text-beige font-bold w-24 rounded-full py-1 px-2 text-sm focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"
                   >
                     No, Keep It
