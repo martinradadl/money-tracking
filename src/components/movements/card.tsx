@@ -22,34 +22,32 @@ export const Card = ({ content, currency }: TransactionProps) => {
       )}
     >
       <div className="flex flex-col gap-1">
-        <p>
-          {"entity" in content ? (
-            type === "loan" ? (
-              <p>
-                {content.entity} <span className="text-base">owes you</span>
-              </p>
-            ) : (
-              <p>
-                {" "}
-                <span className="text-base">You owe to</span> {content.entity}
-              </p>
-            )
+        {"entity" in content ? (
+          type === "loan" ? (
+            <p>
+              {content.entity} <span className="text-base">owes you</span>
+            </p>
           ) : (
-            concept
-          )}
-        </p>
+            <p>
+              {" "}
+              <span className="text-base">You owe to</span> {content.entity}
+            </p>
+          )
+        ) : (
+          <p>{concept}</p>
+        )}
         <p className="text-base">{"entity" in content ? concept : null}</p>
       </div>
 
       <div
         className={classNames(
           "flex ",
-          category.label !== "N/A" ? "place-content-between" : "justify-end"
+          category?.label !== "N/A" ? "place-content-between" : "justify-end"
         )}
       >
-        {category.label !== "N/A" ? (
+        {category?.label !== "N/A" ? (
           <p className="px-2 rounded-md bg-yellow-category text-navy">
-            {category.label}{" "}
+            {category?.label}{" "}
           </p>
         ) : null}
 
