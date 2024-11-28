@@ -3,7 +3,7 @@ import { SetterOrUpdater } from "recoil";
 import { AiFillDelete, AiOutlineWarning } from "react-icons/ai";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { DebtFormI } from "../../data/debts";
-import { TransactionFormI } from "../../data/transactions";
+import { TransactionFormI, useTransactions } from "../../data/transactions";
 
 export interface props<T extends DebtFormI | TransactionFormI> {
   selectedMovement: T | null;
@@ -18,6 +18,7 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
 }: props<T>) => {
   const isDebt = selectedMovement && "entity" in selectedMovement;
   const [isOpen, setIsOpen] = useState(false);
+  const { getBalance } = useTransactions();
 
   function open() {
     setIsOpen(true);
@@ -63,6 +64,7 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
                       if (selectedMovement?._id) {
                         deleteMovement(selectedMovement._id);
                         setSelectedMovement(null);
+                        getBalance();
                       }
                     }}
                     className="bg-red text-beige font-bold w-28 rounded-full py-2 px-4 text-sm focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"

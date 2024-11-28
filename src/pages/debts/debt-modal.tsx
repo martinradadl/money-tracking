@@ -29,7 +29,7 @@ export const newDebtInitialState: DebtFormI = {
 export const DebtModal = ({ userId, close, isOpen }: props) => {
   const [newDebt, setNewDebt] = useRecoilState(newDebtState);
   const [selectedDebt] = useRecoilState(selectedDebtState);
-  const { addDebt, editDebt } = useDebts();
+  const { addDebt, editDebt, getBalance } = useDebts();
 
   useEffect(() => {
     if (selectedDebt) {
@@ -73,6 +73,7 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
         } else {
           addDebt(newDebt);
         }
+        getBalance();
         close();
       }
     }

@@ -29,7 +29,7 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
   const [newTransaction, setNewTransaction] =
     useRecoilState(newTransactionState);
   const [selectedTransaction] = useRecoilState(selectedTransactionState);
-  const { addTransaction, editTransaction } = useTransactions();
+  const { addTransaction, editTransaction, getBalance } = useTransactions();
 
   useEffect(() => {
     if (selectedTransaction) {
@@ -72,6 +72,7 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
         } else {
           addTransaction(newTransaction);
         }
+        getBalance();
         close();
       }
     }
