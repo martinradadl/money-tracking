@@ -19,13 +19,17 @@ import {
   TransactionModal,
 } from "./transaction-modal";
 import { isMobile } from "../../helpers/utils";
+import { CardSkeleton } from "../../components/movements/card-skeleton";
+import { LoadingIcon } from "../../components/loading-icon";
 
 export const Transactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useRecoilState(
     selectedTransactionState
   );
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
   const [, setNewTransaction] = useRecoilState(newTransactionState);
-
   const [user] = useRecoilState(userState);
   const {
     getTransactions,
@@ -48,13 +52,41 @@ export const Transactions: React.FC = () => {
     setNewTransaction(newTransactionInitialState);
   }
 
-  useEffect(() => {
-    if (user?._id) getTransactions();
-  }, [user?._id]);
+  const container = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (user) getBalance();
-  }, [user?._id, transactionsList]);
+  }, [user?._id]);
+
+  const fetchTransactions = async () => {
+    if (user?._id) {
+      if (firstLoad) {
+        setFirstLoad(false);
+      }
+      getTransactions(page, 3);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [page, user?._id]);
+
+  useEffect(() => {
+    if (loading == true) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  }, [loading]);
+
+  const handleScroll = () => {
+    const subtraction =
+      (container.current?.scrollHeight || 0) -
+      (container.current?.offsetHeight || 0);
+
+    if (subtraction - (container.current?.scrollTop || 0) === 0) {
+      setLoading(true);
+    }
+  };
 
   const handleClickedOutside = (event: Event) => {
     if (
@@ -96,7 +128,11 @@ export const Transactions: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim">
+    <div
+      className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim"
+      onScroll={handleScroll}
+      ref={container}
+    >
       <h1 className="page-title text-beige">Transactions</h1>
       <div className="flex w-full gap-3 py-1 text-xl font-semibold">
         <p className="text-beige">My Balance:</p>
@@ -114,6 +150,14 @@ export const Transactions: React.FC = () => {
         </p>
       </div>
       <div className="flex flex-col gap-3">
+        {firstLoad ? (
+          <>
+            <CardSkeleton />
+            <CardSkeleton isIncomeOrLoan={true} />
+            <CardSkeleton />
+          </>
+        ) : null}
+
         {transactionsList.map((elem, i) => {
           return (
             <div key={i} className="relative">
@@ -173,6 +217,7 @@ export const Transactions: React.FC = () => {
             </div>
           );
         })}
+        {loading ? <LoadingIcon /> : null}
       </div>
       <div className="fixed bottom-[4.5rem] right-3">
         <button

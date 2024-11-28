@@ -16,9 +16,14 @@ import { DeleteMovementModal } from "../../components/movements/delete-movement"
 import { DebtModal, newDebtInitialState } from "./debt-modal";
 import { isMobile } from "../../helpers/utils";
 import { getCurrencyFormat } from "../../helpers/currency";
+import { CardSkeleton } from "../../components/movements/card-skeleton";
+import { LoadingIcon } from "../../components/loading-icon";
 
 export const Debts: React.FC = () => {
   const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
   const [, setNewDebt] = useRecoilState(newDebtState);
   const [user] = useRecoilState(userState);
   const { getDebts, debtsList, deleteDebt, balance, getBalance } = useDebts();
@@ -36,13 +41,41 @@ export const Debts: React.FC = () => {
     setNewDebt(newDebtInitialState);
   }
 
-  useEffect(() => {
-    if (user?._id) getDebts();
-  }, [user?._id]);
+  const container = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (user) getBalance();
   }, [user?._id, debtsList]);
+
+  const fetchDebts = async () => {
+    if (user?._id) {
+      if (firstLoad) {
+        setFirstLoad(false);
+      }
+      getDebts(page, 3);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchDebts();
+  }, [page, user?._id]);
+
+  useEffect(() => {
+    if (loading == true) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  }, [loading]);
+
+  const handleScroll = () => {
+    const subtraction =
+      (container.current?.scrollHeight || 0) -
+      (container.current?.offsetHeight || 0);
+
+    if (subtraction - (container.current?.scrollTop || 0) === 0) {
+      setLoading(true);
+    }
+  };
 
   const handleClickedOutside = (event: Event) => {
     if (
@@ -84,7 +117,11 @@ export const Debts: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim">
+    <div
+      className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim"
+      onScroll={handleScroll}
+      ref={container}
+    >
       <h1 className="page-title text-beige">Debts</h1>
       <div className="flex w-full gap-3 py-1 text-xl font-semibold">
         <p className="text-beige">My Balance:</p>
@@ -102,6 +139,14 @@ export const Debts: React.FC = () => {
         </p>
       </div>
       <div className="flex flex-col gap-3">
+        {firstLoad ? (
+          <>
+            <CardSkeleton />
+            <CardSkeleton isIncomeOrLoan={true} />
+            <CardSkeleton />
+          </>
+        ) : null}
+
         {debtsList.map((elem, i) => {
           return (
             <div key={i} className="relative">
@@ -161,6 +206,7 @@ export const Debts: React.FC = () => {
             </div>
           );
         })}
+        {loading ? <LoadingIcon /> : null}
       </div>
       <div className="fixed bottom-[4.5rem] right-3">
         <button
