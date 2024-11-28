@@ -50,15 +50,20 @@ export const useTransactions = () => {
   const [balance, setBalance] = useRecoilState(balanceState);
   const [cookies] = useCookies(["jwt"]);
 
-  const getTransactions = async () => {
+  const getTransactions = async (page?: number, limit?: number) => {
     try {
-      const response = await axios.get(`${API_URL}/transactions/${user?._id}`, {
-        headers: {
-          Authorization: "Bearer " + cookies.jwt,
-        },
-      });
+      const response = await axios.get(
+        `${API_URL}/transactions/${user?._id}?page=${page || 1}&limit=${
+          limit || 10
+        }`,
+        {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        }
+      );
       if (response.status === 200) {
-        setTransactionsList(response.data);
+        setTransactionsList([...transactionsList, ...response.data]);
       } else {
         createToastify({ text: "Transactions not found", type: "error" });
       }
@@ -80,11 +85,15 @@ export const useTransactions = () => {
         amount: parseInt(newItem.amount),
         userId: user?._id,
       };
-      const response = await axios.post(`${API_URL}/transactions/`, parsedItem, {
-        headers: {
-          Authorization: "Bearer " + cookies.jwt,
-        },
-      });
+      const response = await axios.post(
+        `${API_URL}/transactions/`,
+        parsedItem,
+        {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        }
+      );
       if (response.status === 200) {
         setTransactionsList([...transactionsList, response.data]);
       } else {

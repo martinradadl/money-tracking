@@ -48,15 +48,18 @@ export const useDebts = () => {
   const [balance, setBalance] = useRecoilState(debtsBalanceState);
   const [cookies] = useCookies(["jwt"]);
 
-  const getDebts = async () => {
+  const getDebts = async (page?: number, limit?: number) => {
     try {
-      const response = await axios.get(`${API_URL}/debts/${user?._id}`, {
-        headers: {
-          Authorization: "Bearer " + cookies.jwt,
-        },
-      });
+      const response = await axios.get(
+        `${API_URL}/debts/${user?._id}?page=${page || 1}&limit=${limit || 10}`,
+        {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        }
+      );
       if (response.status === 200) {
-        setDebtsList(response.data);
+        setDebtsList([...debtsList, ...response.data]);
       } else {
         createToastify({ text: "Debt or Loan not found", type: "error" });
       }
