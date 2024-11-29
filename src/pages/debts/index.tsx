@@ -52,7 +52,7 @@ export const Debts: React.FC = () => {
       if (firstLoad) {
         setFirstLoad(false);
       }
-      getDebts(page, 3);
+      getDebts(page, 10);
     }
     setLoading(false);
   };

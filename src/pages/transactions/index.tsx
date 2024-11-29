@@ -63,7 +63,7 @@ export const Transactions: React.FC = () => {
       if (firstLoad) {
         setFirstLoad(false);
       }
-      getTransactions(page, 3);
+      getTransactions(page, 10);
     }
     setLoading(false);
   };
