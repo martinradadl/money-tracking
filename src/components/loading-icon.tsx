@@ -8,12 +8,11 @@ export const LoadingIcon = () => {
         viewBox="0 0 24 24"
       >
         <circle
-          className="opacity-25"
+          className="opacity-25 stroke-[4px]"
           cx="12"
           cy="12"
           r="10"
           stroke="#FFF5E0"
-          stroke-width="4"
         ></circle>
         <path
           className="opacity-75"
