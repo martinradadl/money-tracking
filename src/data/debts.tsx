@@ -42,10 +42,16 @@ export const debtsBalanceState = atom<number>({
   default: 0,
 });
 
+export const isLastPageDebtsState = atom<boolean>({
+  key: "isLastPageDebtsState",
+  default: false,
+});
+
 export const useDebts = () => {
   const [debtsList, setDebtsList] = useRecoilState(debtsListState);
   const [user] = useRecoilState(userState);
   const [balance, setBalance] = useRecoilState(debtsBalanceState);
+  const [isLastPage, setIsLastPage] = useRecoilState(isLastPageDebtsState);
   const [cookies] = useCookies(["jwt"]);
 
   const getDebts = async (page?: number, limit?: number) => {
@@ -60,6 +66,9 @@ export const useDebts = () => {
       );
       if (response.status === 200) {
         setDebtsList([...debtsList, ...response.data]);
+        if (limit && response.data.length < limit) {
+          setIsLastPage(true);
+        }
       } else {
         createToastify({ text: "Debt or Loan not found", type: "error" });
       }
@@ -213,5 +222,6 @@ export const useDebts = () => {
     getBalance,
     balance,
     debtsList,
+    isLastPage,
   };
 };

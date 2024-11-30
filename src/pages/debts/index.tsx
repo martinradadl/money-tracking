@@ -26,7 +26,8 @@ export const Debts: React.FC = () => {
   const [firstLoad, setFirstLoad] = useState(true);
   const [, setNewDebt] = useRecoilState(newDebtState);
   const [user] = useRecoilState(userState);
-  const { getDebts, debtsList, deleteDebt, balance, getBalance } = useDebts();
+  const { getDebts, debtsList, deleteDebt, balance, getBalance, isLastPage } =
+    useDebts();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -49,10 +50,10 @@ export const Debts: React.FC = () => {
 
   const fetchDebts = async () => {
     if (user?._id) {
+      await getDebts(page, 10);
       if (firstLoad) {
         setFirstLoad(false);
       }
-      getDebts(page, 10);
     }
     setLoading(false);
   };
@@ -62,7 +63,10 @@ export const Debts: React.FC = () => {
   }, [page, user?._id]);
 
   useEffect(() => {
-    if (loading == true) {
+    if (isLastPage) {
+      setLoading(false);
+    }
+    if (loading === true && !isLastPage) {
       setPage((prevPage) => prevPage + 1);
     }
   }, [loading]);
@@ -72,7 +76,7 @@ export const Debts: React.FC = () => {
       (container.current?.scrollHeight || 0) -
       (container.current?.offsetHeight || 0);
 
-    if (subtraction - (container.current?.scrollTop || 0) === 0) {
+    if (subtraction - (container.current?.scrollTop || 0) === 0 && !loading) {
       setLoading(true);
     }
   };
@@ -145,67 +149,68 @@ export const Debts: React.FC = () => {
             <CardSkeleton isIncomeOrLoan={true} />
             <CardSkeleton />
           </>
-        ) : null}
-
-        {debtsList.map((elem, i) => {
-          return (
-            <div key={i} className="relative">
-              <Transition show={selectedDebt?._id === elem._id}>
-                <div
-                  ref={selectedContainer}
-                  className={classNames(
-                    "absolute -top-4 flex gap-3 transition duration-300 ease-in data-[closed]:opacity-0",
-                    elem.type === "loan" ? "right-1" : "right-5"
-                  )}
-                >
+        ) : (
+          debtsList.map((elem, i) => {
+            return (
+              <div key={i} className="relative">
+                <Transition show={selectedDebt?._id === elem._id}>
                   <div
-                    onClick={() => {
-                      openModal();
-                    }}
-                    className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl cursor-pointer"
+                    ref={selectedContainer}
+                    className={classNames(
+                      "absolute -top-4 flex gap-3 transition duration-300 ease-in data-[closed]:opacity-0",
+                      elem.type === "loan" ? "right-1" : "right-5"
+                    )}
                   >
-                    <AiFillEdit />
-                  </div>
-                  <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl cursor-pointer">
-                    <DeleteMovementModal<DebtFormI>
-                      selectedMovement={selectedDebt}
-                      {...{
-                        setSelectedMovement: setSelectedDebt,
-                        deleteMovement: deleteDebt,
+                    <div
+                      onClick={() => {
+                        openModal();
                       }}
-                    />
+                      className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl cursor-pointer"
+                    >
+                      <AiFillEdit />
+                    </div>
+                    <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl cursor-pointer">
+                      <DeleteMovementModal<DebtFormI>
+                        selectedMovement={selectedDebt}
+                        {...{
+                          setSelectedMovement: setSelectedDebt,
+                          deleteMovement: deleteDebt,
+                        }}
+                      />
+                    </div>
                   </div>
+                </Transition>
+                <div
+                  className="cursor-pointer"
+                  onTouchStart={
+                    isMobile()
+                      ? () => {
+                          handleTouchStart(elem);
+                        }
+                      : undefined
+                  }
+                  onTouchEnd={
+                    isMobile()
+                      ? () => {
+                          handleTouchEnd();
+                        }
+                      : undefined
+                  }
+                  onClick={
+                    !isMobile()
+                      ? () => {
+                          handleClick(elem);
+                        }
+                      : undefined
+                  }
+                >
+                  <Card key={i} content={elem} currency={user?.currency} />
                 </div>
-              </Transition>
-              <div
-                className="cursor-pointer"
-                onTouchStart={
-                  isMobile()
-                    ? () => {
-                        handleTouchStart(elem);
-                      }
-                    : undefined
-                }
-                onTouchEnd={
-                  isMobile()
-                    ? () => {
-                        handleTouchEnd();
-                      }
-                    : undefined
-                }
-                onClick={
-                  !isMobile()
-                    ? () => {
-                        handleClick(elem);
-                      }
-                    : undefined
-                }
-              >
-                <Card key={i} content={elem} currency={user?.currency} />
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
+
         {loading ? <LoadingIcon /> : null}
       </div>
       <div className="fixed bottom-[4.5rem] right-3">

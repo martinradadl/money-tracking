@@ -37,6 +37,7 @@ export const Transactions: React.FC = () => {
     transactionsList,
     balance,
     deleteTransaction,
+    isLastPage,
   } = useTransactions();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
@@ -60,10 +61,10 @@ export const Transactions: React.FC = () => {
 
   const fetchTransactions = async () => {
     if (user?._id) {
+      await getTransactions(page, 10);
       if (firstLoad) {
         setFirstLoad(false);
       }
-      getTransactions(page, 10);
     }
     setLoading(false);
   };
@@ -73,7 +74,10 @@ export const Transactions: React.FC = () => {
   }, [page, user?._id]);
 
   useEffect(() => {
-    if (loading == true) {
+    if (isLastPage) {
+      setLoading(false);
+    }
+    if (loading === true && !isLastPage) {
       setPage((prevPage) => prevPage + 1);
     }
   }, [loading]);
@@ -83,7 +87,7 @@ export const Transactions: React.FC = () => {
       (container.current?.scrollHeight || 0) -
       (container.current?.offsetHeight || 0);
 
-    if (subtraction - (container.current?.scrollTop || 0) === 0) {
+    if (subtraction - (container.current?.scrollTop || 0) === 0 && !loading) {
       setLoading(true);
     }
   };
@@ -156,67 +160,68 @@ export const Transactions: React.FC = () => {
             <CardSkeleton isIncomeOrLoan={true} />
             <CardSkeleton />
           </>
-        ) : null}
-
-        {transactionsList.map((elem, i) => {
-          return (
-            <div key={i} className="relative">
-              <Transition show={selectedTransaction?._id === elem._id}>
-                <div
-                  ref={selectedContainer}
-                  className={classNames(
-                    "absolute -top-4 flex gap-3 transition duration-300 ease-in data-[closed]:opacity-0",
-                    elem.type === "income" ? "right-1" : "right-5"
-                  )}
-                >
+        ) : (
+          transactionsList.map((elem, i) => {
+            return (
+              <div key={i} className="relative">
+                <Transition show={selectedTransaction?._id === elem._id}>
                   <div
-                    onClick={() => {
-                      openModal();
-                    }}
-                    className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl cursor-pointer"
+                    ref={selectedContainer}
+                    className={classNames(
+                      "absolute -top-4 flex gap-3 transition duration-300 ease-in data-[closed]:opacity-0",
+                      elem.type === "income" ? "right-1" : "right-5"
+                    )}
                   >
-                    <AiFillEdit />
-                  </div>
-                  <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl cursor-pointer">
-                    <DeleteMovementModal<TransactionFormI>
-                      {...{
-                        selectedMovement: selectedTransaction,
-                        setSelectedMovement: setSelectedTransaction,
-                        deleteMovement: deleteTransaction,
+                    <div
+                      onClick={() => {
+                        openModal();
                       }}
-                    />
+                      className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl cursor-pointer"
+                    >
+                      <AiFillEdit />
+                    </div>
+                    <div className="bg-beige text-red rounded-full p-[0.4rem] text-2xl cursor-pointer">
+                      <DeleteMovementModal<TransactionFormI>
+                        {...{
+                          selectedMovement: selectedTransaction,
+                          setSelectedMovement: setSelectedTransaction,
+                          deleteMovement: deleteTransaction,
+                        }}
+                      />
+                    </div>
                   </div>
+                </Transition>
+                <div
+                  className="cursor-pointer"
+                  onTouchStart={
+                    isMobile()
+                      ? () => {
+                          handleTouchStart(elem);
+                        }
+                      : undefined
+                  }
+                  onTouchEnd={
+                    isMobile()
+                      ? () => {
+                          handleTouchEnd();
+                        }
+                      : undefined
+                  }
+                  onClick={
+                    !isMobile()
+                      ? () => {
+                          handleClick(elem);
+                        }
+                      : undefined
+                  }
+                >
+                  <Card key={i} content={elem} currency={user?.currency} />
                 </div>
-              </Transition>
-              <div
-                className="cursor-pointer"
-                onTouchStart={
-                  isMobile()
-                    ? () => {
-                        handleTouchStart(elem);
-                      }
-                    : undefined
-                }
-                onTouchEnd={
-                  isMobile()
-                    ? () => {
-                        handleTouchEnd();
-                      }
-                    : undefined
-                }
-                onClick={
-                  !isMobile()
-                    ? () => {
-                        handleClick(elem);
-                      }
-                    : undefined
-                }
-              >
-                <Card key={i} content={elem} currency={user?.currency} />
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
+
         {loading ? <LoadingIcon /> : null}
       </div>
       <div className="fixed bottom-[4.5rem] right-3">
