@@ -30,6 +30,18 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
     setSelectedMovement(null);
   }
 
+  const handleDeleteMovement = async () => {
+    if (selectedMovement?._id) {
+      await deleteMovement(selectedMovement._id);
+      setSelectedMovement(null);
+      if (isDebt) {
+        getDebtsBalance();
+      } else {
+        getBalance();
+      }
+    }
+  };
+
   return (
     <>
       <AiFillDelete onClick={open} />
@@ -61,17 +73,7 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
                     No, Keep It
                   </button>
                   <button
-                    onClick={async () => {
-                      if (selectedMovement?._id) {
-                        await deleteMovement(selectedMovement._id);
-                        setSelectedMovement(null);
-                        if (isDebt) {
-                          getDebtsBalance();
-                        } else {
-                          getBalance();
-                        }
-                      }
-                    }}
+                    onClick={handleDeleteMovement}
                     className="bg-red text-beige font-bold w-28 rounded-full py-2 px-4 text-sm focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white"
                   >
                     Yes, Delete

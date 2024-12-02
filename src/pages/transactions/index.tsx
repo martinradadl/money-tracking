@@ -76,11 +76,10 @@ export const Transactions: React.FC = () => {
   useEffect(() => {
     if (isLastPage) {
       setLoading(false);
-    }
-    if (loading === true && !isLastPage) {
+    } else if (loading === true && !isLastPage) {
       setPage((prevPage) => prevPage + 1);
     }
-  }, [loading]);
+  }, [loading, isLastPage]);
 
   const handleScroll = () => {
     const subtraction =
