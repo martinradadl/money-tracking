@@ -29,7 +29,7 @@ export const newDebtInitialState: DebtFormI = {
 export const DebtModal = ({ userId, close, isOpen }: props) => {
   const [newDebt, setNewDebt] = useRecoilState(newDebtState);
   const [selectedDebt] = useRecoilState(selectedDebtState);
-  const { addDebt, editDebt } = useDebts();
+  const { addDebt, editDebt, getBalance } = useDebts();
 
   useEffect(() => {
     if (selectedDebt) {
@@ -58,7 +58,7 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
     );
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (newDebt) {
       if (hasEmptyFields()) {
         createToastify({ text: "There are empty fields", type: "warning" });
@@ -68,10 +68,14 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
             createToastify({ text: "There are no changes", type: "warning" });
             return;
           } else {
-            editDebt(selectedDebt._id, newDebt);
+            await editDebt(selectedDebt._id, newDebt);
+            if (selectedDebt.amount !== newDebt.amount) {
+              getBalance();
+            }
           }
         } else {
-          addDebt(newDebt);
+          await addDebt(newDebt);
+          getBalance();
         }
         close();
       }

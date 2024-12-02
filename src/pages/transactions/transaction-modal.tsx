@@ -29,7 +29,7 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
   const [newTransaction, setNewTransaction] =
     useRecoilState(newTransactionState);
   const [selectedTransaction] = useRecoilState(selectedTransactionState);
-  const { addTransaction, editTransaction } = useTransactions();
+  const { addTransaction, editTransaction, getBalance } = useTransactions();
 
   useEffect(() => {
     if (selectedTransaction) {
@@ -57,7 +57,7 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
     );
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (newTransaction) {
       if (hasEmptyFields()) {
         createToastify({ text: "There are empty fields", type: "warning" });
@@ -67,10 +67,14 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
             createToastify({ text: "There are no changes", type: "warning" });
             return;
           } else {
-            editTransaction(selectedTransaction._id, newTransaction);
+            await editTransaction(selectedTransaction._id, newTransaction);
+            if (selectedTransaction.amount !== newTransaction.amount) {
+              getBalance();
+            }
           }
         } else {
-          addTransaction(newTransaction);
+          await addTransaction(newTransaction);
+          getBalance();
         }
         close();
       }
