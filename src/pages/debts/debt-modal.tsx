@@ -58,7 +58,7 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
     );
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (newDebt) {
       if (hasEmptyFields()) {
         createToastify({ text: "There are empty fields", type: "warning" });
@@ -68,12 +68,15 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
             createToastify({ text: "There are no changes", type: "warning" });
             return;
           } else {
-            editDebt(selectedDebt._id, newDebt);
+            await editDebt(selectedDebt._id, newDebt);
+            if (selectedDebt.amount !== newDebt.amount) {
+              getBalance();
+            }
           }
         } else {
-          addDebt(newDebt);
+          await addDebt(newDebt);
+          getBalance();
         }
-        getBalance();
         close();
       }
     }
