@@ -11,6 +11,7 @@ import { SignUp } from "./auth/sign-up";
 import { NonAuthLayout } from "./non-auth-layout";
 import { ResetPassword } from "./auth/reset-password";
 import { ForgotPassword } from "./auth/forgot-password";
+import { GraphPage } from "./dashboard/graph";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
         path: "/profile",
         element: <Profile />,
       },
+      { path: "/graph", element: <GraphPage /> },
     ],
   },
   {
