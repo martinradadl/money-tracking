@@ -42,6 +42,16 @@ export const debtsBalanceState = atom<number>({
   default: 0,
 });
 
+export const totalLoansState = atom<number>({
+  key: "totalLoansState",
+  default: 0,
+});
+
+export const totalDebtsState = atom<number>({
+  key: "totalDebtsState",
+  default: 0,
+});
+
 export const isLastPageDebtsState = atom<boolean>({
   key: "isLastPageDebtsState",
   default: false,
@@ -51,6 +61,8 @@ export const useDebts = () => {
   const [debtsList, setDebtsList] = useRecoilState(debtsListState);
   const [user] = useRecoilState(userState);
   const [balance, setBalance] = useRecoilState(debtsBalanceState);
+  const [totalLoans, setTotalLoans] = useRecoilState(totalLoansState);
+  const [totalDebts, setTotalDebts] = useRecoilState(totalDebtsState);
   const [isLastPage, setIsLastPage] = useRecoilState(isLastPageDebtsState);
   const [cookies] = useCookies(["jwt"]);
 
@@ -214,6 +226,64 @@ export const useDebts = () => {
     }
   };
 
+  const getTotalLoans = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/debts/balance/loans/${user?._id}`,
+        {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setTotalLoans(response.data);
+      } else {
+        createToastify({
+          text: "Could not calculate total loans",
+          type: "error",
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
+  const getTotalDebts = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/debts/balance/debts/${user?._id}`,
+        {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setTotalDebts(response.data);
+      } else {
+        createToastify({
+          text: "Could not calculate total expenses",
+          type: "error",
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
   return {
     getDebts,
     addDebt,
@@ -221,6 +291,10 @@ export const useDebts = () => {
     deleteDebt,
     getBalance,
     balance,
+    totalLoans,
+    getTotalLoans,
+    totalDebts,
+    getTotalDebts,
     debtsList,
     isLastPage,
   };

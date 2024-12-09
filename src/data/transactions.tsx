@@ -7,7 +7,7 @@ import { useCookies } from "react-cookie";
 import { CategoryI } from "./categories";
 import { API_URL } from "../helpers/env";
 
-type TranscationType = "income" | "outcome";
+type TranscationType = "income" | "expenses";
 
 export interface TransactionI {
   _id?: string;
@@ -42,6 +42,16 @@ export const balanceState = atom<number>({
   default: 0,
 });
 
+export const totalIncomeState = atom<number>({
+  key: "totalIncomeState",
+  default: 0,
+});
+
+export const totalExpensesState = atom<number>({
+  key: "totalExpensesState",
+  default: 0,
+});
+
 export const isLastPageState = atom<boolean>({
   key: "isLastPageState",
   default: false,
@@ -53,6 +63,8 @@ export const useTransactions = () => {
   );
   const [user] = useRecoilState(userState);
   const [balance, setBalance] = useRecoilState(balanceState);
+  const [totalIncome, setTotalIncome] = useRecoilState(totalIncomeState);
+  const [totalExpenses, setTotalExpenses] = useRecoilState(totalExpensesState);
   const [isLastPage, setIsLastPage] = useRecoilState(isLastPageState);
   const [cookies] = useCookies(["jwt"]);
 
@@ -229,6 +241,64 @@ export const useTransactions = () => {
     }
   };
 
+  const getTotalIncome = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/transactions/balance/income/${user?._id}`,
+        {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setTotalIncome(response.data);
+      } else {
+        createToastify({
+          text: "Could not calculate total income",
+          type: "error",
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
+  const getTotalExpenses = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/transactions/balance/expenses/${user?._id}`,
+        {
+          headers: {
+            Authorization: "Bearer " + cookies.jwt,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setTotalExpenses(response.data);
+      } else {
+        createToastify({
+          text: "Could not calculate total expenses",
+          type: "error",
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        createToastify({
+          text: err.response?.data.message || err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
   return {
     getTransactions,
     addTransaction,
@@ -237,6 +307,10 @@ export const useTransactions = () => {
     transactionsList,
     getBalance,
     balance,
+    totalIncome,
+    getTotalIncome,
+    totalExpenses,
+    getTotalExpenses,
     isLastPage,
   };
 };
