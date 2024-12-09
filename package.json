@@ -12,6 +12,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@carbon/charts-react": "^1.22.7",
     "@headlessui/react": "^2.1.2",
     "axios": "^1.7.4",
     "classnames": "^2.5.1",

@@ -180,4 +180,62 @@ describe("useTransactions", () => {
       expect(result.current.balance).toEqual(100);
     });
   });
+
+  describe("getTotalIncome", () => {
+    it("should not return total income when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useTransactions(), { wrapper });
+
+      await act(async () => {
+        result.current.getTotalIncome();
+      });
+      expect(result.current.balance).toEqual(0);
+    });
+
+    it("should return total income and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useTransactions(), { wrapper });
+
+      await act(async () => {
+        result.current.getTotalIncome();
+      });
+      expect(result.current.totalIncome).toEqual(100);
+    });
+  });
+
+  describe("getTotalExpenses", () => {
+    it("should not return total expenses when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useTransactions(), { wrapper });
+
+      await act(async () => {
+        result.current.getTotalExpenses();
+      });
+      expect(result.current.totalExpenses).toEqual(0);
+    });
+
+    it("should return total expenses and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useTransactions(), { wrapper });
+
+      await act(async () => {
+        result.current.getTotalExpenses();
+      });
+      expect(result.current.totalExpenses).toEqual(100);
+    });
+  });
 });

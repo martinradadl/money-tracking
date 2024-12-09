@@ -180,4 +180,62 @@ describe("useDebts", () => {
       expect(result.current.balance).toEqual(100);
     });
   });
+
+  describe("getTotalLoans", () => {
+    it("should not return total loans when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useDebts(), { wrapper });
+
+      await act(async () => {
+        result.current.getTotalLoans();
+      });
+      expect(result.current.totalLoans).toEqual(0);
+    });
+
+    it("should return total loans and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useDebts(), { wrapper });
+
+      await act(async () => {
+        result.current.getTotalLoans();
+      });
+      expect(result.current.totalLoans).toEqual(100);
+    });
+  });
+
+  describe("getTotalDebts", () => {
+    it("should not return total debts when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() => useDebts(), { wrapper });
+
+      await act(async () => {
+        result.current.getTotalDebts();
+      });
+      expect(result.current.totalDebts).toEqual(0);
+    });
+
+    it("should return total debts and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() => useDebts(), { wrapper });
+
+      await act(async () => {
+        result.current.getTotalDebts();
+      });
+      expect(result.current.totalDebts).toEqual(100);
+    });
+  });
 });
