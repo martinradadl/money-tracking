@@ -1,8 +1,13 @@
 import { Select } from "@headlessui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { Graph } from "../../components/graphs/graph";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { DonutChart } from "@carbon/charts-react";
+import { useGraphs } from "../../data/graphs";
+import { useTransactions } from "../../data/transactions";
+import { useDebts } from "../../data/debts";
+import { useAuth } from "../../data/authentication";
+import { useShallow } from "zustand/shallow";
 
 const months = [
   "January",
@@ -20,8 +25,40 @@ const months = [
 ];
 
 export const GraphPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const graphCode = searchParams.get("graphCode") || "";
   const [selectedMonth, setSelectedMonth] = useState(months[0]);
   const navigate = useNavigate();
+  const { mappedDataAndOptions } = useGraphs();
+  const { data, options } = mappedDataAndOptions[graphCode];
+  const { getTotalIncome, getTotalExpenses } = useTransactions();
+  const { getTotalLoans, getTotalDebts } = useDebts();
+  const { user } = useAuth(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+
+  const getBalances = async () => {
+    Promise.all([
+      getTotalIncome(),
+      getTotalExpenses(),
+      getTotalLoans(),
+      getTotalDebts(),
+    ]);
+  };
+
+  useEffect(() => {
+    if (!graphCode) {
+      navigate("/not-found");
+    }
+  }, [graphCode]);
+
+  useEffect(() => {
+    if (user?._id) {
+      getBalances();
+    }
+  }, [user?._id]);
 
   const handleChangeMonth = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMonth(event?.target.value);
@@ -33,7 +70,7 @@ export const GraphPage: React.FC = () => {
         <AiOutlineArrowLeft
           className="text-3xl text-beige cursor-pointer"
           onClick={() => {
-            navigate("/");
+            navigate(-1);
           }}
         />
       </div>
@@ -53,8 +90,9 @@ export const GraphPage: React.FC = () => {
           );
         })}
       </Select>
-
-      <Graph />
+      <div className="bg-beige w-full aspect-square rounded p-6">
+        <DonutChart {...{ data, options }} />
+      </div>
     </div>
   );
 };
