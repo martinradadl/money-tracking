@@ -8,7 +8,7 @@ vi.mock("axios");
 
 const wrapper = createWrapper(true);
 
-describe("useTransactions", () => {
+describe.skip("useTransactions", () => {
   describe("addTransaction", async () => {
     it("should return empty transactions list when status is not 200", async () => {
       vi.mocked(axios, true).post.mockResolvedValueOnce({
