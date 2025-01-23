@@ -4,13 +4,13 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import { MovementForm } from "../../components/movements/movement-form";
 import { createToastify } from "../../helpers/toastify";
 import {
-  newTransactionState,
-  selectedTransactionState,
-  TransactionFormI,
   useTransactions,
+  setNewTransaction,
+  addTransaction,
+  newTransactionInitialState,
 } from "../../data/transactions";
-import { useRecoilState } from "recoil";
-import { noCategory } from "../../helpers/categories";
+import { useCookies } from "react-cookie";
+import { useShallow } from "zustand/shallow";
 
 export interface props {
   userId?: string;
@@ -18,18 +18,23 @@ export interface props {
   isOpen: boolean;
 }
 
-export const newTransactionInitialState: TransactionFormI = {
-  type: "income",
-  concept: "",
-  category: noCategory,
-  amount: "",
-};
-
 export const TransactionModal = ({ userId, close, isOpen }: props) => {
-  const [newTransaction, setNewTransaction] =
-    useRecoilState(newTransactionState);
-  const [selectedTransaction] = useRecoilState(selectedTransactionState);
-  const { addTransaction, editTransaction, getBalance } = useTransactions();
+  const {
+    newTransaction,
+    selectedTransaction,
+    getTotalIncome,
+    getTotalExpenses,
+    editTransaction,
+  } = useTransactions(
+    useShallow((state) => ({
+      newTransaction: state.newTransaction,
+      selectedTransaction: state.selectedTransaction,
+      getTotalIncome: state.getTotalIncome,
+      getTotalExpenses: state.getTotalExpenses,
+      editTransaction: state.editTransaction,
+    }))
+  );
+  const [, , removeCookie] = useCookies(["incomeCache", "expensesCache"]);
 
   useEffect(() => {
     if (selectedTransaction) {
@@ -57,6 +62,16 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
     );
   };
 
+  const updateBalance = (type: string) => {
+    if (type === "income") {
+      removeCookie("incomeCache");
+      getTotalIncome();
+    } else {
+      removeCookie("expensesCache");
+      getTotalExpenses();
+    }
+  };
+
   const onSubmit = async () => {
     if (newTransaction) {
       if (hasEmptyFields()) {
@@ -69,12 +84,12 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
           } else {
             await editTransaction(selectedTransaction._id, newTransaction);
             if (selectedTransaction.amount !== newTransaction.amount) {
-              getBalance();
+              updateBalance(selectedTransaction.type);
             }
           }
         } else {
           await addTransaction(newTransaction);
-          getBalance();
+          updateBalance(newTransaction.type);
         }
         close();
       }

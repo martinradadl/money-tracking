@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useRecoilState } from "recoil";
-import { useAuth, userState } from "../../data/authentication";
+import { useAuth } from "../../data/authentication";
 import {
   AiFillEdit,
   AiFillLock,
@@ -12,9 +11,14 @@ import ChangePasswordModal from "./change-password";
 import AccountSettingsModal from "./account-settings";
 import { ConfirmPasswordModal } from "./confirm-password";
 import { ContactSupportModal } from "./contact-support";
+import { useShallow } from "zustand/shallow";
 
 export const Profile: React.FC = () => {
-  const [user] = useRecoilState(userState);
+  const { user } = useAuth(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const { logout } = useAuth();
 
@@ -35,7 +39,9 @@ export const Profile: React.FC = () => {
 
         <div className="flex flex-col flex-1 gap-1 whitespace-nowrap overflow-hidden">
           <p className="text-2xl overflow-hidden text-ellipsis">{user?.name}</p>
-          <p className="text-base overflow-hidden text-ellipsis">{user?.email}</p>
+          <p className="text-base overflow-hidden text-ellipsis">
+            {user?.email}
+          </p>
         </div>
 
         <AccountSettingsModal

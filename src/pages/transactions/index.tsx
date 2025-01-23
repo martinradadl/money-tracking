@@ -1,44 +1,58 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Transition } from "@headlessui/react";
 import { AiFillEdit } from "react-icons/ai";
 import { Card } from "../../components/movements/card";
 import classNames from "classnames";
-import { useRecoilState } from "recoil";
 import {
   useTransactions,
-  selectedTransactionState,
   TransactionI,
   TransactionFormI,
-  newTransactionState,
+  setSelectedTransaction,
+  setNewTransaction,
+  newTransactionInitialState,
 } from "../../data/transactions";
 import { DeleteMovementModal } from "../../components/movements/delete-movement";
-import { userState } from "../../data/authentication";
+import { useAuth } from "../../data/authentication";
 import { getCurrencyFormat } from "../../helpers/currency";
-import {
-  newTransactionInitialState,
-  TransactionModal,
-} from "./transaction-modal";
+import { TransactionModal } from "./transaction-modal";
 import { isMobile } from "../../helpers/utils";
 import { CardSkeleton } from "../../components/movements/card-skeleton";
 import { LoadingIcon } from "../../components/loading-icon";
+import { useShallow } from "zustand/shallow";
 
 export const Transactions: React.FC = () => {
-  const [selectedTransaction, setSelectedTransaction] = useRecoilState(
-    selectedTransactionState
-  );
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
-  const [, setNewTransaction] = useRecoilState(newTransactionState);
-  const [user] = useRecoilState(userState);
+  const { user } = useAuth(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+
   const {
     getTransactions,
-    getBalance,
     transactionsList,
-    balance,
+    selectedTransaction,
     deleteTransaction,
     isLastPage,
-  } = useTransactions();
+    totalIncome,
+    totalExpenses,
+    getTotalIncome,
+    getTotalExpenses,
+  } = useTransactions(
+    useShallow((state) => ({
+      getTransactions: state.getTransactions,
+      transactionsList: state.transactionsList,
+      selectedTransaction: state.selectedTransaction,
+      deleteTransaction: state.deleteTransaction,
+      isLastPage: state.isLastPage,
+      totalIncome: state.totalIncome,
+      totalExpenses: state.totalExpenses,
+      getTotalIncome: state.getTotalIncome,
+      getTotalExpenses: state.getTotalExpenses,
+    }))
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -56,8 +70,15 @@ export const Transactions: React.FC = () => {
   const container = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (user) getBalance();
+    if (user) {
+      getTotalIncome();
+      getTotalExpenses();
+    }
   }, [user?._id]);
+
+  const balance = useMemo(() => {
+    return totalIncome - totalExpenses;
+  }, [totalIncome, totalExpenses]);
 
   const fetchTransactions = async () => {
     if (user?._id) {
@@ -172,7 +193,8 @@ export const Transactions: React.FC = () => {
                     )}
                   >
                     <div
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         openModal();
                       }}
                       className="bg-beige text-navy rounded-full p-[0.4rem] text-2xl cursor-pointer"

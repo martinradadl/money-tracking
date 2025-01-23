@@ -3,33 +3,35 @@ import { useEffect } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { MovementForm } from "../../components/movements/movement-form";
 import { createToastify } from "../../helpers/toastify";
-import {
-  DebtFormI,
-  newDebtState,
-  selectedDebtState,
-  useDebts,
-} from "../../data/debts";
-import { useRecoilState } from "recoil";
-import { noCategory } from "../../helpers/categories";
+import { newDebtInitialState, setNewDebt, useDebts } from "../../data/debts";
+import { useCookies } from "react-cookie";
+import { useShallow } from "zustand/react/shallow";
 
-export interface props {
+interface Props {
   userId?: string;
   close: () => void;
   isOpen: boolean;
 }
 
-export const newDebtInitialState: DebtFormI = {
-  type: "loan",
-  entity: "",
-  concept: "",
-  category: noCategory,
-  amount: "",
-};
-
-export const DebtModal = ({ userId, close, isOpen }: props) => {
-  const [newDebt, setNewDebt] = useRecoilState(newDebtState);
-  const [selectedDebt] = useRecoilState(selectedDebtState);
-  const { addDebt, editDebt, getBalance } = useDebts();
+export const DebtModal = ({ userId, close, isOpen }: Props) => {
+  const {
+    newDebt,
+    selectedDebt,
+    getTotalLoans,
+    getTotalDebts,
+    addDebt,
+    editDebt,
+  } = useDebts(
+    useShallow((state) => ({
+      newDebt: state.newDebt,
+      selectedDebt: state.selectedDebt,
+      getTotalLoans: state.getTotalLoans,
+      getTotalDebts: state.getTotalDebts,
+      addDebt: state.addDebt,
+      editDebt: state.editDebt,
+    }))
+  );
+  const [, , removeCookie] = useCookies(["loansCache", "debtsCache"]);
 
   useEffect(() => {
     if (selectedDebt) {
@@ -58,6 +60,18 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
     );
   };
 
+  const updateBalance = (type: string) => {
+    if (type === "loan") {
+      removeCookie("loansCache");
+      getTotalLoans();
+    } else {
+      removeCookie("debtsCache");
+      setTimeout(() => {
+        getTotalDebts();
+      }, 500);
+    }
+  };
+
   const onSubmit = async () => {
     if (newDebt) {
       if (hasEmptyFields()) {
@@ -70,12 +84,12 @@ export const DebtModal = ({ userId, close, isOpen }: props) => {
           } else {
             await editDebt(selectedDebt._id, newDebt);
             if (selectedDebt.amount !== newDebt.amount) {
-              getBalance();
+              updateBalance(selectedDebt.type);
             }
           }
         } else {
           await addDebt(newDebt);
-          getBalance();
+          updateBalance(newDebt.type);
         }
         close();
       }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createToastify } from "../../helpers/toastify";
-import { useAuth, userState } from "../../data/authentication";
+import { useAuth } from "../../data/authentication";
 import {
   Button,
   Dialog,
@@ -10,7 +10,7 @@ import {
 } from "@headlessui/react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { ConfirmPasswordModal } from "./confirm-password";
-import { useRecoilState } from "recoil";
+import { useShallow } from "zustand/shallow";
 
 export interface props {
   userId?: string;
@@ -24,7 +24,11 @@ const accountFormInitialState = {
 };
 
 export default function AccountSettingsModal({ modalTrigger }: props) {
-  const [user] = useRecoilState(userState);
+  const { user } = useAuth(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
   const [accountForm, setAccountForm] = useState(accountFormInitialState);
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
