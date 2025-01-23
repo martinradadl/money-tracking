@@ -4,6 +4,7 @@ import { AiFillDelete, AiOutlineWarning } from "react-icons/ai";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { DebtFormI, useDebts } from "../../data/debts";
 import { TransactionFormI, useTransactions } from "../../data/transactions";
+import { useCookies } from "react-cookie";
 
 export interface props<T extends DebtFormI | TransactionFormI> {
   selectedMovement: T | null;
@@ -18,8 +19,14 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
 }: props<T>) => {
   const isDebt = selectedMovement && "entity" in selectedMovement;
   const [isOpen, setIsOpen] = useState(false);
-  const { getBalance } = useTransactions();
-  const { getBalance: getDebtsBalance } = useDebts();
+  const { getTotalIncome, getTotalExpenses } = useTransactions();
+  const { getTotalLoans, getTotalDebts } = useDebts();
+  const [, , removeCookie] = useCookies([
+    "incomeCache",
+    "expensesCache",
+    "loansCache",
+    "debtsCache",
+  ]);
 
   function open() {
     setIsOpen(true);
@@ -33,12 +40,28 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
   const handleDeleteMovement = async () => {
     if (selectedMovement?._id) {
       await deleteMovement(selectedMovement._id);
-      setSelectedMovement(null);
-      if (isDebt) {
-        getDebtsBalance();
-      } else {
-        getBalance();
+
+      switch (selectedMovement.type) {
+        case "income":
+          removeCookie("incomeCache");
+          getTotalIncome();
+          break;
+        case "expenses":
+          removeCookie("expensesCache");
+          getTotalExpenses();
+          break;
+        case "loan":
+          removeCookie("loansCache");
+          getTotalLoans();
+          break;
+        case "debt":
+          removeCookie("debtsCache");
+          getTotalDebts();
+          break;
+        default:
+          break;
       }
+      setSelectedMovement(null);
     }
   };
 
