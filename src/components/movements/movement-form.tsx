@@ -1,9 +1,9 @@
 import React from "react";
-import { useRecoilState } from "recoil";
 import { TransactionFormI } from "../../data/transactions";
 import { Select } from "@headlessui/react";
-import { categoriesState } from "../../data/categories";
+import { useCategories } from "../../data/categories";
 import { DebtFormI } from "../../data/debts";
+import { useShallow } from "zustand/shallow";
 
 function isDebt(movement: TransactionFormI | DebtFormI | null) {
   return movement && "entity" in movement;
@@ -18,7 +18,11 @@ export const MovementForm = <T extends DebtFormI | TransactionFormI | null>({
   newMovement,
   setNewMovement,
 }: props<T>) => {
-  const [categories] = useRecoilState(categoriesState);
+  const { categories } = useCategories(
+    useShallow((state) => ({
+      categories: state.categories,
+    }))
+  );
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
