@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { SetterOrUpdater } from "recoil";
 import { AiFillDelete, AiOutlineWarning } from "react-icons/ai";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { DebtFormI, useDebts } from "../../data/debts";
@@ -8,7 +7,7 @@ import { useCookies } from "react-cookie";
 
 export interface props<T extends DebtFormI | TransactionFormI> {
   selectedMovement: T | null;
-  setSelectedMovement: SetterOrUpdater<T | null>;
+  setSelectedMovement: T | null;
   deleteMovement: (id: string) => Promise<void>;
 }
 
