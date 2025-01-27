@@ -6,7 +6,6 @@ import { createToastify } from "../../helpers/toastify";
 import {
   useTransactions,
   setNewTransaction,
-  addTransaction,
   newTransactionInitialState,
 } from "../../data/transactions";
 import { useCookies } from "react-cookie";
@@ -24,6 +23,7 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
     selectedTransaction,
     getTotalIncome,
     getTotalExpenses,
+    addTransaction,
     editTransaction,
   } = useTransactions(
     useShallow((state) => ({
@@ -31,6 +31,7 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
       selectedTransaction: state.selectedTransaction,
       getTotalIncome: state.getTotalIncome,
       getTotalExpenses: state.getTotalExpenses,
+      addTransaction: state.addTransaction,
       editTransaction: state.editTransaction,
     }))
   );

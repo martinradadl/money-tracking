@@ -1,14 +1,12 @@
 import { CategoryI } from "./categories";
-import { useAuth } from "./authentication";
 import axios, { AxiosError } from "axios";
 import { createToastify } from "../helpers/toastify";
 import { Cookies } from "react-cookie";
 import { API_URL } from "../helpers/env";
 import { noCategory } from "../helpers/categories";
 import { create } from "zustand";
-import { useShallow } from "zustand/shallow";
 
-export type DebtType = "debt" | "loan";
+type DebtType = "debt" | "loan";
 
 export interface DebtI {
   _id?: string;
@@ -32,13 +30,31 @@ export const newDebtInitialState: DebtFormI = {
   amount: "",
 };
 
+type State = {
+  newDebt: DebtFormI | null;
+  selectedDebt: DebtFormI | null;
+  debtsList: DebtI[];
+  totalLoans: number;
+  totalDebts: number;
+  isLastPage: boolean;
+};
+
+type Action = {
+  getDebts: (page?: number, limit?: number) => void;
+  addDebt: (newItem: DebtFormI) => void;
+  editDebt: (id: string, updatedItem: DebtFormI) => void;
+  deleteDebt: (id: string) => void;
+  getTotalLoans: () => void;
+  getTotalDebts: () => void;
+};
+
 const cookies = new Cookies();
 const jwt = cookies.get("jwt");
 const loansCache = cookies.get("loansCache");
 const debtsCache = cookies.get("debtsCache");
 const user = cookies.get("user");
 
-export const setNewDebt = (newDebt) =>
+export const setNewDebt = (newDebt: DebtFormI | null) =>
   useDebts.setState((state) => {
     return {
       ...state,
@@ -46,7 +62,7 @@ export const setNewDebt = (newDebt) =>
     };
   });
 
-export const setSelectedDebt = (selectedDebt) =>
+export const setSelectedDebt = (selectedDebt: DebtFormI | null) =>
   useDebts.setState((state) => {
     return {
       ...state,
@@ -54,7 +70,7 @@ export const setSelectedDebt = (selectedDebt) =>
     };
   });
 
-export const setDebtsList = (debtsList) =>
+export const setDebtsList = (debtsList: DebtI[]) =>
   useDebts.setState((state) => {
     return {
       ...state,
@@ -62,7 +78,7 @@ export const setDebtsList = (debtsList) =>
     };
   });
 
-export const setTotalDebts = (totalDebts) =>
+export const setTotalDebts = (totalDebts: number) =>
   useDebts.setState((state) => {
     return {
       ...state,
@@ -70,7 +86,7 @@ export const setTotalDebts = (totalDebts) =>
     };
   });
 
-export const setTotalLoans = (totalLoans) =>
+export const setTotalLoans = (totalLoans: number) =>
   useDebts.setState((state) => {
     return {
       ...state,
@@ -78,46 +94,13 @@ export const setTotalLoans = (totalLoans) =>
     };
   });
 
-export const setIsLastPage = (isLastPage) =>
+export const setIsLastPage = (isLastPage: boolean) =>
   useDebts.setState((state) => {
     return {
       ...state,
       isLastPage,
     };
   });
-
-const getDebts = async (page?: number, limit?: number) => {
-  try {
-    const response = await axios.get(
-      `${API_URL}/debts/${user?._id}?page=${page || 1}&limit=${limit || 10}`,
-      {
-        headers: {
-          Authorization: "Bearer " + jwt,
-        },
-      }
-    );
-    if (response.status === 200) {
-      useDebts.setState((state) => {
-        const newState = { ...state };
-        newState.debtsList = [...newState.debtsList, ...response.data];
-        if (limit && response.data.length < limit) {
-          newState.isLastPage = true;
-        }
-        return newState;
-      });
-    } else {
-      createToastify({ text: "Debt or Loan not found", type: "error" });
-    }
-  } catch (err: unknown) {
-    if (err instanceof AxiosError) {
-      createToastify({
-        text: err.response?.data.message || err.message,
-        type: "error",
-      });
-      throw new Error(err.message);
-    }
-  }
-};
 
 const addDebt = async (newItem: DebtFormI) => {
   try {
@@ -132,10 +115,10 @@ const addDebt = async (newItem: DebtFormI) => {
       },
     });
     if (response.status === 200) {
-      useDebts.setState((state) => {
+      useDebts.setState((state: State) => {
         return {
           ...state,
-          debtsList: [...state.debtsList, ...response.data],
+          debtsList: [...state.debtsList, response.data],
         };
       });
     } else {
@@ -145,9 +128,10 @@ const addDebt = async (newItem: DebtFormI) => {
       });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
       throw new Error(err.message);
@@ -168,21 +152,21 @@ const editDebt = async (id: string, updatedItem: DebtFormI) => {
       },
     });
     if (response.status === 200) {
-      const i = debtsList.findIndex((elem) => elem._id === id);
-      if (i !== -1) {
-        useDebts.setState((state) => {
+      useDebts.setState((state: State) => {
+        const i = state.debtsList.findIndex((elem) => elem._id === id);
+        if (i !== -1) {
           return {
             ...state,
             debtsList: [
               ...state.debtsList.slice(0, i),
-              ...response.data,
+              response.data,
               ...state.debtsList.slice(i + 1),
             ],
           };
-        });
-      } else {
-        throw new Error("ID not found updating debts list");
-      }
+        } else {
+          throw new Error("ID not found updating debts list");
+        }
+      });
     } else {
       createToastify({
         text: "Edit Debt not successful",
@@ -190,9 +174,11 @@ const editDebt = async (id: string, updatedItem: DebtFormI) => {
       });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    console.log("error: ", err);
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
       throw new Error(err.message);
@@ -208,9 +194,9 @@ const deleteDebt = async (id: string) => {
       },
     });
     if (response.status === 200) {
-      const i = debtsList.findIndex((elem) => elem._id === id);
-      if (i !== -1) {
-        useDebts.setState((state) => {
+      useDebts.setState((state: State) => {
+        const i = state.debtsList.findIndex((elem) => elem._id === id);
+        if (i !== -1) {
           return {
             ...state,
             debtsList: [
@@ -218,10 +204,10 @@ const deleteDebt = async (id: string) => {
               ...state.debtsList.slice(i + 1),
             ],
           };
-        });
-      } else {
-        throw new Error("ID not found deleting debt");
-      }
+        } else {
+          throw new Error("ID not found deleting debt");
+        }
+      });
     } else {
       createToastify({
         text: "Add Debt not successful",
@@ -229,9 +215,10 @@ const deleteDebt = async (id: string) => {
       });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
       throw new Error(err.message);
@@ -241,21 +228,7 @@ const deleteDebt = async (id: string) => {
 
 const getTotalLoans = async () => {
   if (cookies.get("loansCache")) {
-    try {
-      setTotalLoans(loansCache);
-
-      useDebts.setState((state) => {
-        return {
-          ...state,
-          totalLoans: loansCache,
-        };
-      });
-    } catch (e) {
-      createToastify({
-        text: "Could not calculate total loans",
-        type: "error",
-      });
-    }
+    setTotalLoans(loansCache);
   } else {
     try {
       const response = await axios.get(
@@ -276,9 +249,12 @@ const getTotalLoans = async () => {
         });
       }
     } catch (err: unknown) {
-      if (err instanceof AxiosError) {
+      if (err instanceof Error || err instanceof AxiosError) {
         createToastify({
-          text: err.response?.data.message || err.message,
+          text:
+            err instanceof AxiosError
+              ? err.response?.data.message
+              : err.message,
           type: "error",
         });
         throw new Error(err.message);
@@ -289,21 +265,7 @@ const getTotalLoans = async () => {
 
 const getTotalDebts = async () => {
   if (cookies.get("debtsCache")) {
-    try {
-      setTotalDebts(debtsCache);
-
-      useDebts.setState((state) => {
-        return {
-          ...state,
-          totalDebts: debtsCache,
-        };
-      });
-    } catch (e) {
-      createToastify({
-        text: "Could not calculate total debts",
-        type: "error",
-      });
-    }
+    setTotalDebts(debtsCache);
   } else {
     try {
       const response = await axios.get(
@@ -324,9 +286,12 @@ const getTotalDebts = async () => {
         });
       }
     } catch (err: unknown) {
-      if (err instanceof AxiosError) {
+      if (err instanceof Error || err instanceof AxiosError) {
         createToastify({
-          text: err.response?.data.message || err.message,
+          text:
+            err instanceof AxiosError
+              ? err.response?.data.message
+              : err.message,
           type: "error",
         });
         throw new Error(err.message);
@@ -335,11 +300,47 @@ const getTotalDebts = async () => {
   }
 };
 
-export const useDebts = create((set) => {
+export const useDebts = create<State & Action>((set) => {
+  const getDebts = async (page?: number, limit?: number) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/debts/${user?._id}?page=${page || 1}&limit=${limit || 10}`,
+        {
+          headers: {
+            Authorization: "Bearer " + jwt,
+          },
+        }
+      );
+      if (response.status === 200) {
+        set((state: State) => {
+          const newState = { ...state };
+          newState.debtsList = [...newState.debtsList, ...response.data];
+          if (limit && response.data.length < limit) {
+            newState.isLastPage = true;
+          }
+          return newState;
+        });
+      } else {
+        createToastify({ text: "Debt or Loan not found", type: "error" });
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error || err instanceof AxiosError) {
+        createToastify({
+          text:
+            err instanceof AxiosError
+              ? err.response?.data.message
+              : err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
   return {
     newDebt: null,
     selectedDebt: null,
-    debtsList: [],
+    debtsList: [] as DebtI[],
     totalLoans: 0,
     totalDebts: 0,
     isLastPage: false,

@@ -28,13 +28,31 @@ export const newTransactionInitialState: TransactionFormI = {
   amount: "",
 };
 
+type State = {
+  newTransaction: TransactionFormI | null;
+  selectedTransaction: TransactionFormI | null;
+  transactionsList: TransactionI[];
+  totalIncome: number;
+  totalExpenses: number;
+  isLastPage: boolean;
+};
+
+type Action = {
+  getTransactions: (page?: number, limit?: number) => void;
+  addTransaction: (newItem: TransactionFormI) => void;
+  editTransaction: (id: string, updatedItem: TransactionFormI) => void;
+  deleteTransaction: (id: string) => void;
+  getTotalIncome: () => void;
+  getTotalExpenses: () => void;
+};
+
 const cookies = new Cookies();
 const jwt = cookies.get("jwt");
 const incomeCache = cookies.get("incomeCache");
 const expensesCache = cookies.get("expensesCache");
 const user = cookies.get("user");
 
-export const setNewTransaction = (newTransaction) =>
+export const setNewTransaction = (newTransaction: TransactionFormI | null) =>
   useTransactions.setState((state) => {
     return {
       ...state,
@@ -42,7 +60,9 @@ export const setNewTransaction = (newTransaction) =>
     };
   });
 
-export const setSelectedTransaction = (selectedTransaction) =>
+export const setSelectedTransaction = (
+  selectedTransaction: TransactionFormI | null
+) =>
   useTransactions.setState((state) => {
     return {
       ...state,
@@ -50,7 +70,7 @@ export const setSelectedTransaction = (selectedTransaction) =>
     };
   });
 
-export const setTransactionsList = (transactionsList) =>
+export const setTransactionsList = (transactionsList: TransactionI[]) =>
   useTransactions.setState((state) => {
     return {
       ...state,
@@ -58,7 +78,7 @@ export const setTransactionsList = (transactionsList) =>
     };
   });
 
-export const setTotalExpenses = (totalExpenses) =>
+export const setTotalExpenses = (totalExpenses: number) =>
   useTransactions.setState((state) => {
     return {
       ...state,
@@ -66,7 +86,7 @@ export const setTotalExpenses = (totalExpenses) =>
     };
   });
 
-export const setTotalIncome = (totalIncome) =>
+export const setTotalIncome = (totalIncome: number) =>
   useTransactions.setState((state) => {
     return {
       ...state,
@@ -74,7 +94,7 @@ export const setTotalIncome = (totalIncome) =>
     };
   });
 
-export const setIsLastPage = (isLastPage) =>
+export const setIsLastPage = (isLastPage: boolean) =>
   useTransactions.setState((state) => {
     return {
       ...state,
@@ -82,45 +102,7 @@ export const setIsLastPage = (isLastPage) =>
     };
   });
 
-const getTransactions = async (page?: number, limit?: number) => {
-  try {
-    const response = await axios.get(
-      `${API_URL}/transactions/${user?._id}?page=${page || 1}&limit=${
-        limit || 10
-      }`,
-      {
-        headers: {
-          Authorization: "Bearer " + jwt,
-        },
-      }
-    );
-    if (response.status === 200) {
-      useTransactions.setState((state) => {
-        const newState = { ...state };
-        newState.transactionsList = [
-          ...newState.transactionsList,
-          ...response.data,
-        ];
-        if (limit && response.data.length < limit) {
-          newState.isLastPage = true;
-        }
-        return newState;
-      });
-    } else {
-      createToastify({ text: "Transactions not found", type: "error" });
-    }
-  } catch (err: unknown) {
-    if (err instanceof AxiosError) {
-      createToastify({
-        text: err.response?.data.message || err.message,
-        type: "error",
-      });
-      throw new Error(err.message);
-    }
-  }
-};
-
-export const addTransaction = async (newItem: TransactionFormI) => {
+const addTransaction = async (newItem: TransactionFormI) => {
   try {
     const parsedItem = {
       ...newItem,
@@ -133,13 +115,11 @@ export const addTransaction = async (newItem: TransactionFormI) => {
       },
     });
     if (response.status === 200) {
-      const a = () =>
-        useTransactions.setState((state) => {
-          return {
-            transactionsList: [...state.transactionsList, ...response.data],
-          };
-        });
-      a();
+      useTransactions.setState((state) => {
+        return {
+          transactionsList: [...state.transactionsList, response.data],
+        };
+      });
     } else {
       createToastify({
         text: "Add Transaction not successful",
@@ -147,9 +127,10 @@ export const addTransaction = async (newItem: TransactionFormI) => {
       });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
       throw new Error(err.message);
@@ -174,21 +155,21 @@ const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
       }
     );
     if (response.status === 200) {
-      const i = transactionsList.findIndex((elem) => elem._id === id);
-      if (i !== -1) {
-        useTransactions.setState((state) => {
+      useTransactions.setState((state) => {
+        const i = state.transactionsList.findIndex((elem) => elem._id === id);
+        if (i !== -1) {
           return {
             ...state,
             transactionsList: [
               ...state.transactionsList.slice(0, i),
-              ...response.data,
+              response.data,
               ...state.transactionsList.slice(i + 1),
             ],
           };
-        });
-      } else {
-        throw new Error("ID not found updating transactions list");
-      }
+        } else {
+          throw new Error("ID not found updating transactions list");
+        }
+      });
     } else {
       createToastify({
         text: "Edit Transaction not successful",
@@ -196,9 +177,10 @@ const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
       });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
       throw new Error(err.message);
@@ -214,9 +196,9 @@ const deleteTransaction = async (id: string) => {
       },
     });
     if (response.status === 200) {
-      const i = transactionsList.findIndex((elem) => elem._id === id);
-      if (i !== -1) {
-        useTransactions.setState((state) => {
+      useTransactions.setState((state) => {
+        const i = state.transactionsList.findIndex((elem) => elem._id === id);
+        if (i !== -1) {
           return {
             ...state,
             transactionsList: [
@@ -224,10 +206,10 @@ const deleteTransaction = async (id: string) => {
               ...state.transactionsList.slice(i + 1),
             ],
           };
-        });
-      } else {
-        throw new Error("ID not found deleting transaction");
-      }
+        } else {
+          throw new Error("ID not found deleting transaction");
+        }
+      });
     } else {
       createToastify({
         text: "Add Transaction not successful",
@@ -235,9 +217,10 @@ const deleteTransaction = async (id: string) => {
       });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
       throw new Error(err.message);
@@ -247,14 +230,7 @@ const deleteTransaction = async (id: string) => {
 
 const getTotalIncome = async () => {
   if (cookies.get("incomeCache")) {
-    try {
-      setTotalIncome(incomeCache);
-    } catch (e) {
-      createToastify({
-        text: "Could not calculate total income",
-        type: "error",
-      });
-    }
+    setTotalIncome(incomeCache);
   } else {
     try {
       const response = await axios.get(
@@ -275,9 +251,12 @@ const getTotalIncome = async () => {
         });
       }
     } catch (err: unknown) {
-      if (err instanceof AxiosError) {
+      if (err instanceof Error || err instanceof AxiosError) {
         createToastify({
-          text: err.response?.data.message || err.message,
+          text:
+            err instanceof AxiosError
+              ? err.response?.data.message
+              : err.message,
           type: "error",
         });
         throw new Error(err.message);
@@ -288,14 +267,7 @@ const getTotalIncome = async () => {
 
 const getTotalExpenses = async () => {
   if (cookies.get("expensesCache")) {
-    try {
-      setTotalExpenses(expensesCache);
-    } catch (e) {
-      createToastify({
-        text: "Could not calculate total expenses",
-        type: "error",
-      });
-    }
+    setTotalExpenses(expensesCache);
   } else {
     try {
       const response = await axios.get(
@@ -316,9 +288,12 @@ const getTotalExpenses = async () => {
         });
       }
     } catch (err: unknown) {
-      if (err instanceof AxiosError) {
+      if (err instanceof Error || err instanceof AxiosError) {
         createToastify({
-          text: err.response?.data.message || err.message,
+          text:
+            err instanceof AxiosError
+              ? err.response?.data.message
+              : err.message,
           type: "error",
         });
         throw new Error(err.message);
@@ -327,15 +302,57 @@ const getTotalExpenses = async () => {
   }
 };
 
-export const useTransactions = create((set) => {
+export const useTransactions = create<State & Action>((set) => {
+  const getTransactions = async (page?: number, limit?: number) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/transactions/${user?._id}?page=${page || 1}&limit=${
+          limit || 10
+        }`,
+        {
+          headers: {
+            Authorization: "Bearer " + jwt,
+          },
+        }
+      );
+      if (response.status === 200) {
+        set((state: State) => {
+          const newState = { ...state };
+          newState.transactionsList = [
+            ...newState.transactionsList,
+            ...response.data,
+          ];
+          if (limit && response.data.length < limit) {
+            newState.isLastPage = true;
+          }
+          return newState;
+        });
+      } else {
+        createToastify({ text: "Transactions not found", type: "error" });
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error || err instanceof AxiosError) {
+        createToastify({
+          text:
+            err instanceof AxiosError
+              ? err.response?.data.message
+              : err.message,
+          type: "error",
+        });
+        throw new Error(err.message);
+      }
+    }
+  };
+
   return {
     newTransaction: null,
     selectedTransaction: null,
-    transactionsList: [],
+    transactionsList: [] as TransactionI[],
     totalIncome: 0,
     totalExpenses: 0,
     isLastPage: false,
     getTransactions,
+    addTransaction,
     editTransaction,
     deleteTransaction,
     getTotalIncome,

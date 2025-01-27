@@ -22,6 +22,23 @@ export interface CurrencyI {
   code: string;
 }
 
+type State = {
+  user: UserI | null;
+  currencies: CurrencyI[];
+};
+
+type Action = {
+  register: (newUser: UserI) => void;
+  login: (loggedUser: LoginI) => void;
+  logout: () => void;
+  changePassword: (userId: string, newPassword: string) => void;
+  forgotPassword: (email: string) => void;
+  resetPassword: (id: string, newPassword: string, token: string) => void;
+  editUser: (id: string, updatedItem: UserI) => void;
+  deleteUser: (id: string) => void;
+  getCurrencies: () => void;
+};
+
 export const checkPassword = async (id: string, password: string) => {
   try {
     const response = await axios.get(`${API_URL}/auth/${id}/check-password`, {
@@ -36,9 +53,10 @@ export const checkPassword = async (id: string, password: string) => {
       createToastify({ text: "Could not check password", type: "error" });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
     }
@@ -48,16 +66,16 @@ export const checkPassword = async (id: string, password: string) => {
 const cookies = new Cookies();
 const jwt = cookies.get("jwt");
 
-export const setUser = (user) =>
-  useAuth.setState((state) => {
+export const setUser = (user: UserI | null) =>
+  useAuth.setState((state: State) => {
     return {
       ...state,
       user,
     };
   });
 
-export const setCurrencies = (currencies) =>
-  useAuth.setState((state) => {
+export const setCurrencies = (currencies: CurrencyI[]) =>
+  useAuth.setState((state: State) => {
     return {
       ...state,
       currencies,
@@ -74,7 +92,7 @@ const register = async (newUser: UserI) => {
   try {
     const response = await axios.post(`${API_URL}/auth/register`, newUser);
     if (response.status === 200) {
-      useAuth.setState((state) => {
+      useAuth.setState((state: State) => {
         return {
           ...state,
           user: response.data.user,
@@ -99,7 +117,7 @@ const login = async (loggedUser: LoginI) => {
   try {
     const response = await axios.post(`${API_URL}/auth/login`, loggedUser);
     if (response.status === 200) {
-      useAuth.setState((state) => {
+      useAuth.setState((state: State) => {
         return {
           ...state,
           user: response.data.user,
@@ -111,9 +129,10 @@ const login = async (loggedUser: LoginI) => {
       createToastify({ text: "Login not successful", type: "error" });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
       throw err;
@@ -134,7 +153,7 @@ const changePassword = async (userId: string, newPassword: string) => {
       }
     );
     if (response.status === 200) {
-      useAuth.setState((state) => {
+      useAuth.setState((state: State) => {
         return {
           ...state,
           user: response.data,
@@ -147,9 +166,10 @@ const changePassword = async (userId: string, newPassword: string) => {
       });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
     }
@@ -166,9 +186,10 @@ const forgotPassword = async (email: string) => {
       type: "success",
     });
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
     }
@@ -202,9 +223,10 @@ const resetPassword = async (
       });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
     }
@@ -225,9 +247,10 @@ const editUser = async (id: string, updatedItem: UserI) => {
       createToastify({ text: "Edit not successful", type: "error" });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
     }
@@ -249,9 +272,10 @@ const deleteUser = async (id: string) => {
       createToastify({ text: "Delete not successful", type: "error" });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
     }
@@ -267,16 +291,17 @@ const getCurrencies = async () => {
       createToastify({ text: "Could not get currencies", type: "error" });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
     }
   }
 };
 
-export const useAuth = create((set) => {
+export const useAuth = create<State & Action>(() => {
   return {
     register,
     login,

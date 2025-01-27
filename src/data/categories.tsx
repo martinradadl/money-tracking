@@ -8,6 +8,14 @@ export interface CategoryI {
   label: string;
 }
 
+type State = {
+  categories: CategoryI[];
+};
+
+type Action = {
+  getCategories: () => void;
+};
+
 const getCategories = async () => {
   try {
     const response = await axios.get(`${API_URL}/categories/`);
@@ -22,9 +30,10 @@ const getCategories = async () => {
       createToastify({ text: "Categories not found", type: "error" });
     }
   } catch (err: unknown) {
-    if (err instanceof AxiosError) {
+    if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
-        text: err.response?.data.message || err.message,
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
         type: "error",
       });
       throw new Error(err.message);
@@ -32,7 +41,7 @@ const getCategories = async () => {
   }
 };
 
-export const useCategories = create((set) => {
+export const useCategories = create<State & Action>(() => {
   return {
     getCategories,
     categories: [],
