@@ -27,18 +27,6 @@ type State = {
   currencies: CurrencyI[];
 };
 
-type Action = {
-  register: (newUser: UserI) => void;
-  login: (loggedUser: LoginI) => void;
-  logout: () => void;
-  changePassword: (userId: string, newPassword: string) => void;
-  forgotPassword: (email: string) => void;
-  resetPassword: (id: string, newPassword: string, token: string) => void;
-  editUser: (id: string, updatedItem: UserI) => void;
-  deleteUser: (id: string) => void;
-  getCurrencies: () => void;
-};
-
 export const checkPassword = async (id: string, password: string) => {
   try {
     const response = await axios.get(`${API_URL}/auth/${id}/check-password`, {
@@ -82,13 +70,13 @@ export const setCurrencies = (currencies: CurrencyI[]) =>
     };
   });
 
-const logout = () => {
+export const logout = () => {
   setUser(null);
   cookies.remove("user", { path: "/" });
   cookies.remove("jwt", { path: "/" });
 };
 
-const register = async (newUser: UserI) => {
+export const register = async (newUser: UserI) => {
   try {
     const response = await axios.post(`${API_URL}/auth/register`, newUser);
     if (response.status === 200) {
@@ -113,7 +101,7 @@ const register = async (newUser: UserI) => {
   }
 };
 
-const login = async (loggedUser: LoginI) => {
+export const login = async (loggedUser: LoginI) => {
   try {
     const response = await axios.post(`${API_URL}/auth/login`, loggedUser);
     if (response.status === 200) {
@@ -140,7 +128,7 @@ const login = async (loggedUser: LoginI) => {
   }
 };
 
-const changePassword = async (userId: string, newPassword: string) => {
+export const changePassword = async (userId: string, newPassword: string) => {
   try {
     const response = await axios.put(
       `${API_URL}/auth/${userId}/change-password`,
@@ -176,7 +164,7 @@ const changePassword = async (userId: string, newPassword: string) => {
   }
 };
 
-const forgotPassword = async (email: string) => {
+export const forgotPassword = async (email: string) => {
   try {
     const response = await axios.get(
       `${API_URL}/auth/forgot-password/${email}`
@@ -196,7 +184,7 @@ const forgotPassword = async (email: string) => {
   }
 };
 
-const resetPassword = async (
+export const resetPassword = async (
   id: string,
   newPassword: string,
   token: string
@@ -233,7 +221,7 @@ const resetPassword = async (
   }
 };
 
-const editUser = async (id: string, updatedItem: UserI) => {
+export const editUser = async (id: string, updatedItem: UserI) => {
   try {
     const response = await axios.put(`${API_URL}/auth/${id}`, updatedItem, {
       headers: {
@@ -257,7 +245,7 @@ const editUser = async (id: string, updatedItem: UserI) => {
   }
 };
 
-const deleteUser = async (id: string) => {
+export const deleteUser = async (id: string) => {
   try {
     const response = await axios.delete(`${API_URL}/auth/${id}`, {
       headers: {
@@ -282,7 +270,7 @@ const deleteUser = async (id: string) => {
   }
 };
 
-const getCurrencies = async () => {
+export const getCurrencies = async () => {
   try {
     const response = await axios.get(`${API_URL}/auth/currencies`);
     if (response.status === 200) {
@@ -301,17 +289,8 @@ const getCurrencies = async () => {
   }
 };
 
-export const useAuth = create<State & Action>(() => {
+export const useAuth = create<State>(() => {
   return {
-    register,
-    login,
-    logout,
-    changePassword,
-    forgotPassword,
-    resetPassword,
-    editUser,
-    deleteUser,
-    getCurrencies,
     user: null,
     currencies: [],
   };

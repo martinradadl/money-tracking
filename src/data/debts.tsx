@@ -39,15 +39,6 @@ type State = {
   isLastPage: boolean;
 };
 
-type Action = {
-  getDebts: (page?: number, limit?: number) => void;
-  addDebt: (newItem: DebtFormI) => void;
-  editDebt: (id: string, updatedItem: DebtFormI) => void;
-  deleteDebt: (id: string) => void;
-  getTotalLoans: () => void;
-  getTotalDebts: () => void;
-};
-
 const cookies = new Cookies();
 const jwt = cookies.get("jwt");
 const loansCache = cookies.get("loansCache");
@@ -102,7 +93,41 @@ export const setIsLastPage = (isLastPage: boolean) =>
     };
   });
 
-const addDebt = async (newItem: DebtFormI) => {
+export const getDebts = async (page?: number, limit?: number) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/debts/${user?._id}?page=${page || 1}&limit=${limit || 10}`,
+      {
+        headers: {
+          Authorization: "Bearer " + jwt,
+        },
+      }
+    );
+    if (response.status === 200) {
+      useDebts.setState((state: State) => {
+        const newState = { ...state };
+        newState.debtsList = [...newState.debtsList, ...response.data];
+        if (limit && response.data.length < limit) {
+          newState.isLastPage = true;
+        }
+        return newState;
+      });
+    } else {
+      createToastify({ text: "Debt or Loan not found", type: "error" });
+    }
+  } catch (err: unknown) {
+    if (err instanceof Error || err instanceof AxiosError) {
+      createToastify({
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
+        type: "error",
+      });
+      throw new Error(err.message);
+    }
+  }
+};
+
+export const addDebt = async (newItem: DebtFormI) => {
   try {
     const parsedItem = {
       ...newItem,
@@ -139,7 +164,7 @@ const addDebt = async (newItem: DebtFormI) => {
   }
 };
 
-const editDebt = async (id: string, updatedItem: DebtFormI) => {
+export const editDebt = async (id: string, updatedItem: DebtFormI) => {
   try {
     const parsedItem = {
       ...updatedItem,
@@ -186,7 +211,7 @@ const editDebt = async (id: string, updatedItem: DebtFormI) => {
   }
 };
 
-const deleteDebt = async (id: string) => {
+export const deleteDebt = async (id: string) => {
   try {
     const response = await axios.delete(`${API_URL}/debts/${id}`, {
       headers: {
@@ -226,7 +251,7 @@ const deleteDebt = async (id: string) => {
   }
 };
 
-const getTotalLoans = async () => {
+export const getTotalLoans = async () => {
   if (cookies.get("loansCache")) {
     setTotalLoans(loansCache);
   } else {
@@ -263,7 +288,7 @@ const getTotalLoans = async () => {
   }
 };
 
-const getTotalDebts = async () => {
+export const getTotalDebts = async () => {
   if (cookies.get("debtsCache")) {
     setTotalDebts(debtsCache);
   } else {
@@ -300,43 +325,7 @@ const getTotalDebts = async () => {
   }
 };
 
-export const useDebts = create<State & Action>((set) => {
-  const getDebts = async (page?: number, limit?: number) => {
-    try {
-      const response = await axios.get(
-        `${API_URL}/debts/${user?._id}?page=${page || 1}&limit=${limit || 10}`,
-        {
-          headers: {
-            Authorization: "Bearer " + jwt,
-          },
-        }
-      );
-      if (response.status === 200) {
-        set((state: State) => {
-          const newState = { ...state };
-          newState.debtsList = [...newState.debtsList, ...response.data];
-          if (limit && response.data.length < limit) {
-            newState.isLastPage = true;
-          }
-          return newState;
-        });
-      } else {
-        createToastify({ text: "Debt or Loan not found", type: "error" });
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error || err instanceof AxiosError) {
-        createToastify({
-          text:
-            err instanceof AxiosError
-              ? err.response?.data.message
-              : err.message,
-          type: "error",
-        });
-        throw new Error(err.message);
-      }
-    }
-  };
-
+export const useDebts = create<State>(() => {
   return {
     newDebt: null,
     selectedDebt: null,
@@ -344,11 +333,5 @@ export const useDebts = create<State & Action>((set) => {
     totalLoans: 0,
     totalDebts: 0,
     isLastPage: false,
-    getDebts,
-    addDebt,
-    editDebt,
-    deleteDebt,
-    getTotalLoans,
-    getTotalDebts,
   };
 });

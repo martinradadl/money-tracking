@@ -12,11 +12,7 @@ type State = {
   categories: CategoryI[];
 };
 
-type Action = {
-  getCategories: () => void;
-};
-
-const getCategories = async () => {
+export const getCategories = async () => {
   try {
     const response = await axios.get(`${API_URL}/categories/`);
     if (response.status === 200) {
@@ -41,9 +37,8 @@ const getCategories = async () => {
   }
 };
 
-export const useCategories = create<State & Action>(() => {
+export const useCategories = create<State>(() => {
   return {
-    getCategories,
     categories: [],
   };
 });

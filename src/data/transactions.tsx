@@ -35,15 +35,7 @@ type State = {
   totalIncome: number;
   totalExpenses: number;
   isLastPage: boolean;
-};
-
-type Action = {
-  getTransactions: (page?: number, limit?: number) => void;
-  addTransaction: (newItem: TransactionFormI) => void;
-  editTransaction: (id: string, updatedItem: TransactionFormI) => void;
-  deleteTransaction: (id: string) => void;
-  getTotalIncome: () => void;
-  getTotalExpenses: () => void;
+  getTransactions : (page?: number, limit?: number) => Promise<void>
 };
 
 const cookies = new Cookies();
@@ -102,7 +94,47 @@ export const setIsLastPage = (isLastPage: boolean) =>
     };
   });
 
-const addTransaction = async (newItem: TransactionFormI) => {
+export const getTransactions = async (page?: number, limit?: number) => {
+  // try {
+  const response = await axios.get(
+    `${API_URL}/transactions/${user?._id}?page=${page || 1}&limit=${
+      limit || 10
+    }`,
+    {
+      headers: {
+        Authorization: "Bearer " + jwt,
+      },
+    }
+  );
+  if (response.status === 200) {
+    useTransactions.setState((state: State) => {
+      const newState = { ...state };
+      newState.transactionsList = [
+        ...newState.transactionsList,
+        ...response.data,
+      ];
+      if (limit && response.data.length < limit) {
+        newState.isLastPage = true;
+      }
+      return newState;
+    });
+  } else {
+    createToastify({ text: "Transactions not found", type: "error" });
+  }
+  // } catch (err: unknown) {
+  //   console.log(err)
+  //   if (err instanceof Error || err instanceof AxiosError) {
+  //     createToastify({
+  //       text:
+  //         err instanceof AxiosError ? err.response?.data.message : err.message,
+  //       type: "error",
+  //     });
+  //     throw new Error(err.message);
+  //   }
+  // }
+};
+
+export const addTransaction = async (newItem: TransactionFormI) => {
   try {
     const parsedItem = {
       ...newItem,
@@ -138,7 +170,10 @@ const addTransaction = async (newItem: TransactionFormI) => {
   }
 };
 
-const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
+export const editTransaction = async (
+  id: string,
+  updatedItem: TransactionFormI
+) => {
   try {
     const parsedItem = {
       ...updatedItem,
@@ -188,7 +223,7 @@ const editTransaction = async (id: string, updatedItem: TransactionFormI) => {
   }
 };
 
-const deleteTransaction = async (id: string) => {
+export const deleteTransaction = async (id: string) => {
   try {
     const response = await axios.delete(`${API_URL}/transactions/${id}`, {
       headers: {
@@ -228,7 +263,7 @@ const deleteTransaction = async (id: string) => {
   }
 };
 
-const getTotalIncome = async () => {
+export const getTotalIncome = async () => {
   if (cookies.get("incomeCache")) {
     setTotalIncome(incomeCache);
   } else {
@@ -265,7 +300,7 @@ const getTotalIncome = async () => {
   }
 };
 
-const getTotalExpenses = async () => {
+export const getTotalExpenses = async () => {
   if (cookies.get("expensesCache")) {
     setTotalExpenses(expensesCache);
   } else {
@@ -302,48 +337,7 @@ const getTotalExpenses = async () => {
   }
 };
 
-export const useTransactions = create<State & Action>((set) => {
-  const getTransactions = async (page?: number, limit?: number) => {
-    try {
-      const response = await axios.get(
-        `${API_URL}/transactions/${user?._id}?page=${page || 1}&limit=${
-          limit || 10
-        }`,
-        {
-          headers: {
-            Authorization: "Bearer " + jwt,
-          },
-        }
-      );
-      if (response.status === 200) {
-        set((state: State) => {
-          const newState = { ...state };
-          newState.transactionsList = [
-            ...newState.transactionsList,
-            ...response.data,
-          ];
-          if (limit && response.data.length < limit) {
-            newState.isLastPage = true;
-          }
-          return newState;
-        });
-      } else {
-        createToastify({ text: "Transactions not found", type: "error" });
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error || err instanceof AxiosError) {
-        createToastify({
-          text:
-            err instanceof AxiosError
-              ? err.response?.data.message
-              : err.message,
-          type: "error",
-        });
-        throw new Error(err.message);
-      }
-    }
-  };
-
+export const useTransactions = create<State>(() => {
   return {
     newTransaction: null,
     selectedTransaction: null,
@@ -351,11 +345,6 @@ export const useTransactions = create<State & Action>((set) => {
     totalIncome: 0,
     totalExpenses: 0,
     isLastPage: false,
-    getTransactions,
-    addTransaction,
-    editTransaction,
-    deleteTransaction,
-    getTotalIncome,
-    getTotalExpenses,
+    getTransactions
   };
 });
