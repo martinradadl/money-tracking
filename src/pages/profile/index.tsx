@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAuth } from "../../data/authentication";
+import { useAuth, logout } from "../../data/authentication";
 import {
   AiFillEdit,
   AiFillLock,
@@ -20,7 +20,6 @@ export const Profile: React.FC = () => {
     }))
   );
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const { logout } = useAuth();
 
   const openConfirmModal = () => {
     setIsConfirmModalOpen(true);

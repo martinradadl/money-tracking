@@ -3,7 +3,15 @@ import { useEffect } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { MovementForm } from "../../components/movements/movement-form";
 import { createToastify } from "../../helpers/toastify";
-import { newDebtInitialState, setNewDebt, useDebts } from "../../data/debts";
+import {
+  newDebtInitialState,
+  setNewDebt,
+  useDebts,
+  getTotalLoans,
+  getTotalDebts,
+  addDebt,
+  editDebt,
+} from "../../data/debts";
 import { useCookies } from "react-cookie";
 import { useShallow } from "zustand/react/shallow";
 
@@ -14,21 +22,10 @@ interface Props {
 }
 
 export const DebtModal = ({ userId, close, isOpen }: Props) => {
-  const {
-    newDebt,
-    selectedDebt,
-    getTotalLoans,
-    getTotalDebts,
-    addDebt,
-    editDebt,
-  } = useDebts(
+  const { newDebt, selectedDebt } = useDebts(
     useShallow((state) => ({
       newDebt: state.newDebt,
       selectedDebt: state.selectedDebt,
-      getTotalLoans: state.getTotalLoans,
-      getTotalDebts: state.getTotalDebts,
-      addDebt: state.addDebt,
-      editDebt: state.editDebt,
     }))
   );
   const [, , removeCookie] = useCookies(["loansCache", "debtsCache"]);

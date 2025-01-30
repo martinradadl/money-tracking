@@ -4,8 +4,8 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DonutChart } from "@carbon/charts-react";
 import { useGraphs } from "../../data/graphs";
-import { useTransactions } from "../../data/transactions";
-import { useDebts } from "../../data/debts";
+import { getTotalIncome, getTotalExpenses } from "../../data/transactions";
+import { getTotalLoans, getTotalDebts } from "../../data/debts";
 import { useAuth } from "../../data/authentication";
 import { useShallow } from "zustand/shallow";
 
@@ -31,8 +31,6 @@ export const GraphPage: React.FC = () => {
   const navigate = useNavigate();
   const { mappedDataAndOptions } = useGraphs();
   const { data, options } = mappedDataAndOptions[graphCode];
-  const { getTotalIncome, getTotalExpenses } = useTransactions();
-  const { getTotalLoans, getTotalDebts } = useDebts();
   const { user } = useAuth(
     useShallow((state) => ({
       user: state.user,

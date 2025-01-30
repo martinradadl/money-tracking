@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   DebtFormI,
   DebtI,
+  deleteDebt,
+  getDebts,
+  getTotalDebts,
+  getTotalLoans,
   newDebtInitialState,
   setNewDebt,
   setSelectedDebt,
@@ -31,29 +35,16 @@ export const Debts: React.FC = () => {
     }))
   );
 
-  const {
-    getDebts,
-    debtsList,
-    selectedDebt,
-    deleteDebt,
-    isLastPage,
-    totalLoans,
-    totalDebts,
-    getTotalLoans,
-    getTotalDebts,
-  } = useDebts(
-    useShallow((state) => ({
-      getDebts: state.getDebts,
-      debtsList: state.debtsList,
-      selectedDebt: state.selectedDebt,
-      deleteDebt: state.deleteDebt,
-      isLastPage: state.isLastPage,
-      totalLoans: state.totalLoans,
-      totalDebts: state.totalDebts,
-      getTotalLoans: state.getTotalLoans,
-      getTotalDebts: state.getTotalDebts,
-    }))
-  );
+  const { debtsList, selectedDebt, isLastPage, totalLoans, totalDebts } =
+    useDebts(
+      useShallow((state) => ({
+        debtsList: state.debtsList,
+        selectedDebt: state.selectedDebt,
+        isLastPage: state.isLastPage,
+        totalLoans: state.totalLoans,
+        totalDebts: state.totalDebts,
+      }))
+    );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);

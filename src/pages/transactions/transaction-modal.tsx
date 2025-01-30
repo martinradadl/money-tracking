@@ -7,6 +7,10 @@ import {
   useTransactions,
   setNewTransaction,
   newTransactionInitialState,
+  getTotalIncome,
+  getTotalExpenses,
+  addTransaction,
+  editTransaction,
 } from "../../data/transactions";
 import { useCookies } from "react-cookie";
 import { useShallow } from "zustand/shallow";
@@ -18,21 +22,10 @@ export interface props {
 }
 
 export const TransactionModal = ({ userId, close, isOpen }: props) => {
-  const {
-    newTransaction,
-    selectedTransaction,
-    getTotalIncome,
-    getTotalExpenses,
-    addTransaction,
-    editTransaction,
-  } = useTransactions(
+  const { newTransaction, selectedTransaction } = useTransactions(
     useShallow((state) => ({
       newTransaction: state.newTransaction,
       selectedTransaction: state.selectedTransaction,
-      getTotalIncome: state.getTotalIncome,
-      getTotalExpenses: state.getTotalExpenses,
-      addTransaction: state.addTransaction,
-      editTransaction: state.editTransaction,
     }))
   );
   const [, , removeCookie] = useCookies(["incomeCache", "expensesCache"]);

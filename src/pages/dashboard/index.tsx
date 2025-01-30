@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useAuth } from "../../data/authentication";
-import { useTransactions } from "../../data/transactions";
-import { useDebts } from "../../data/debts";
+import { getTotalIncome, getTotalExpenses } from "../../data/transactions";
+import { getTotalLoans, getTotalDebts } from "../../data/debts";
 import { useNavigate } from "react-router-dom";
 import { DonutChart } from "@carbon/charts-react";
 import "@carbon/charts-react/styles.css";
@@ -15,8 +15,6 @@ export const Dashboard: React.FC = () => {
       user: state.user,
     }))
   );
-  const { getTotalIncome, getTotalExpenses } = useTransactions();
-  const { getTotalLoans, getTotalDebts } = useDebts();
   const { mappedDataAndOptions } = useGraphs();
   const {
     TOTAL_BALANCE,

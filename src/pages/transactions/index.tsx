@@ -10,6 +10,10 @@ import {
   setSelectedTransaction,
   setNewTransaction,
   newTransactionInitialState,
+  getTransactions,
+  deleteTransaction,
+  getTotalIncome,
+  getTotalExpenses,
 } from "../../data/transactions";
 import { DeleteMovementModal } from "../../components/movements/delete-movement";
 import { useAuth } from "../../data/authentication";
@@ -31,26 +35,18 @@ export const Transactions: React.FC = () => {
   );
 
   const {
-    getTransactions,
     transactionsList,
     selectedTransaction,
-    deleteTransaction,
     isLastPage,
     totalIncome,
     totalExpenses,
-    getTotalIncome,
-    getTotalExpenses,
   } = useTransactions(
     useShallow((state) => ({
-      getTransactions: state.getTransactions,
       transactionsList: state.transactionsList,
       selectedTransaction: state.selectedTransaction,
-      deleteTransaction: state.deleteTransaction,
       isLastPage: state.isLastPage,
       totalIncome: state.totalIncome,
       totalExpenses: state.totalExpenses,
-      getTotalIncome: state.getTotalIncome,
-      getTotalExpenses: state.getTotalExpenses,
     }))
   );
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../data/authentication";
+import { register } from "../../data/authentication";
 import { createToastify } from "../../helpers/toastify";
 
 export const SignUp: React.FC = () => {
   const [user, setUser] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
-  const { register } = useAuth();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (user) {

@@ -1,14 +1,12 @@
 import { AiFillCheckCircle } from "react-icons/ai";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import { useAuth } from "../../data/authentication";
+import { logout } from "../../data/authentication";
 
 export interface props {
   isOpen: boolean;
 }
 
 export const SuccessModal = ({ isOpen }: props) => {
-  const { logout } = useAuth();
-
   return (
     <>
       <Dialog

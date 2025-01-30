@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../../data/authentication";
+import { resetPassword } from "../../data/authentication";
 import { createToastify } from "../../helpers/toastify";
 
 export const ResetPassword = () => {
   const [params] = useSearchParams();
   const [password, setPassword] = useState({ new: "", confirm: "" });
   const navigate = useNavigate();
-  const { resetPassword } = useAuth();
   const userId = params.get("userId");
   const token = params.get("token");
 
