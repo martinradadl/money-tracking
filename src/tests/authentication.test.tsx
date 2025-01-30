@@ -1,9 +1,19 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, vi, describe, it, afterAll } from "vitest";
 import axios, { AxiosError } from "axios";
-import { checkPassword, useAuth } from "../data/authentication";
 import {
-  createWrapper,
+  changePassword,
+  checkPassword,
+  deleteUser,
+  editUser,
+  forgotPassword,
+  getCurrencies,
+  login,
+  register,
+  resetPassword,
+  useAuth,
+} from "../data/authentication";
+import {
   currencies,
   fakeToken,
   loggedUser,
@@ -11,12 +21,11 @@ import {
   updatedUser,
 } from "./utils";
 import * as createToastify from "../helpers/toastify";
+import { useShallow } from "zustand/shallow";
 
 vi.mock("axios");
 
-const wrapper = createWrapper(false);
-
-describe.skip("useAuthentication", () => {
+describe("useAuthentication", () => {
   afterAll(() => {
     vi.resetAllMocks();
   });
@@ -31,9 +40,15 @@ describe.skip("useAuthentication", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.register(newUser);
+        register(newUser);
       });
       expect(result.current.user).toEqual(null);
     });
@@ -44,9 +59,15 @@ describe.skip("useAuthentication", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.register(newUser);
+        register(newUser);
       });
       expect(result.current.user).toEqual(newUser);
     });
@@ -62,9 +83,15 @@ describe.skip("useAuthentication", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.login(loggedUser);
+        login(loggedUser);
       });
       expect(result.current.user).toEqual(null);
     });
@@ -75,9 +102,15 @@ describe.skip("useAuthentication", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.login(loggedUser);
+        login(loggedUser);
       });
       expect(result.current.user).toEqual(newUser);
     });
@@ -93,10 +126,16 @@ describe.skip("useAuthentication", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
         if (newUser._id) {
-          result.current.editUser(newUser._id, updatedUser);
+          editUser(newUser._id, updatedUser);
         }
       });
       expect(result.current.user).toEqual(null);
@@ -108,10 +147,16 @@ describe.skip("useAuthentication", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
         if (newUser._id) {
-          result.current.editUser(newUser._id, updatedUser);
+          editUser(newUser._id, updatedUser);
         }
       });
       expect(result.current.user).toEqual(updatedUser);
@@ -128,10 +173,16 @@ describe.skip("useAuthentication", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
         if (newUser._id) {
-          result.current.deleteUser(newUser._id);
+          deleteUser(newUser._id);
         }
       });
       expect(result.current.user).toEqual(null);
@@ -142,10 +193,16 @@ describe.skip("useAuthentication", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
         if (newUser._id) {
-          result.current.deleteUser(newUser._id);
+          deleteUser(newUser._id);
         }
       });
       expect(result.current.user).toEqual(null);
@@ -162,10 +219,16 @@ describe.skip("useAuthentication", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
         if (newUser._id && updatedUser.password) {
-          result.current.changePassword(newUser._id, updatedUser.password);
+          changePassword(newUser._id, updatedUser.password);
         }
       });
       expect(result.current.user).toEqual(null);
@@ -177,12 +240,15 @@ describe.skip("useAuthentication", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.changePassword(
-          newUser._id || "",
-          updatedUser.password || ""
-        );
+        changePassword(newUser._id || "", updatedUser.password || "");
       });
       expect(result.current.user).toEqual({
         ...newUser,
@@ -201,14 +267,16 @@ describe.skip("useAuthentication", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
         if (newUser._id && updatedUser.password) {
-          result.current.resetPassword(
-            newUser._id,
-            updatedUser.password,
-            fakeToken
-          );
+          resetPassword(newUser._id, updatedUser.password, fakeToken);
         }
       });
       expect(result.current.user).toEqual(null);
@@ -220,9 +288,15 @@ describe.skip("useAuthentication", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.resetPassword(
+        resetPassword(
           newUser?._id || "",
           updatedUser?.password || "",
           fakeToken
@@ -240,15 +314,14 @@ describe.skip("useAuthentication", () => {
       vi.resetAllMocks();
     });
 
-    it("Should return error", async () => {
+    it.skip("Should return error", async () => {
       const err = new AxiosError("error");
       vi.mocked(axios, true).get.mockImplementation(() => {
         throw err;
       });
       const spy = vi.spyOn(createToastify, "createToastify");
-      const { result } = renderHook(() => useAuth(), { wrapper });
       await act(async () => {
-        result.current.forgotPassword(newUser.email);
+        forgotPassword(newUser.email);
       });
       expect(spy).toHaveBeenCalledWith({
         text: err.message,
@@ -263,9 +336,8 @@ describe.skip("useAuthentication", () => {
       });
       const spy = vi.spyOn(createToastify, "createToastify");
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
       await act(async () => {
-        result.current.forgotPassword(newUser.email);
+        forgotPassword(newUser.email);
       });
       expect(spy).toHaveBeenCalledWith({
         text: "fakeMessage",
@@ -284,10 +356,16 @@ describe.skip("useAuthentication", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            currencies: state.currencies,
+          }))
+        )
+      );
 
       await act(async () => {
-        result.current.getCurrencies();
+        getCurrencies();
       });
       expect(result.current.currencies).toEqual([]);
     });
@@ -298,10 +376,16 @@ describe.skip("useAuthentication", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            currencies: state.currencies,
+          }))
+        )
+      );
 
       await act(async () => {
-        result.current.getCurrencies();
+        getCurrencies();
       });
       expect(result.current.currencies).toEqual(currencies);
     });

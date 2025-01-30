@@ -1,15 +1,6 @@
-import { RecoilRoot } from "recoil";
 import { LoginI, UserI } from "../data/authentication";
 import { TransactionFormI } from "../data/transactions";
-import React from "react";
 import { DebtFormI } from "../data/debts";
-
-export const createWrapper = () => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <RecoilRoot>{children}</RecoilRoot>
-  );
-  return wrapper;
-};
 
 // USERS
 

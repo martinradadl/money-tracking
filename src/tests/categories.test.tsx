@@ -1,12 +1,11 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import axios from "axios";
-import { categories, createWrapper } from "./utils.js";
-import { useCategories } from "../data/categories.js";
+import { categories } from "./utils.js";
+import { getCategories, useCategories } from "../data/categories.js";
+import { useShallow } from "zustand/shallow";
 
 vi.mock("axios");
-
-const wrapper = createWrapper(true);
 
 describe("getCategories", () => {
   it("should return empty categories list when status is not 200", async () => {
@@ -14,10 +13,16 @@ describe("getCategories", () => {
       status: 500,
     });
 
-    const { result } = renderHook(() => useCategories(), { wrapper });
+    const { result } = renderHook(() =>
+      useCategories(
+        useShallow((state) => ({
+          categories: state.categories,
+        }))
+      )
+    );
 
     await act(async () => {
-      result.current.getCategories();
+      getCategories();
     });
     expect(result.current.categories).toEqual([]);
   });
@@ -28,10 +33,16 @@ describe("getCategories", () => {
       status: 200,
     });
 
-    const { result } = renderHook(() => useCategories(), { wrapper });
+    const { result } = renderHook(() =>
+      useCategories(
+        useShallow((state) => ({
+          categories: state.categories,
+        }))
+      )
+    );
 
     await act(async () => {
-      result.current.getCategories();
+      getCategories();
     });
     expect(result.current.categories).toEqual(categories);
   });
