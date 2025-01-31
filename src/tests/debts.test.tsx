@@ -1,12 +1,19 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import axios from "axios";
-import { createWrapper, newDebt, updatedDebt } from "./utils.js";
-import { useDebts } from "../data/debts.js";
+import { newDebt, updatedDebt } from "./utils.js";
+import {
+  addDebt,
+  deleteDebt,
+  editDebt,
+  getDebts,
+  getTotalDebts,
+  getTotalLoans,
+  useDebts,
+} from "../data/debts.js";
+import { useShallow } from "zustand/shallow";
 
 vi.mock("axios");
-
-const wrapper = createWrapper(true);
 
 describe("useDebts", () => {
   describe("addDebt", async () => {
@@ -15,9 +22,15 @@ describe("useDebts", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.addDebt(newDebt);
+        addDebt(newDebt);
       });
       expect(result.current.debtsList).toEqual([]);
     });
@@ -28,9 +41,15 @@ describe("useDebts", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.addDebt(newDebt);
+        addDebt(newDebt);
       });
       expect(result.current.debtsList).toEqual([newDebt]);
     });
@@ -38,13 +57,19 @@ describe("useDebts", () => {
 
   describe("getDebts", () => {
     it("should return empty debts list when status is not 200", async () => {
-      vi.mocked(axios, true).post.mockResolvedValueOnce({
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
         status: 500,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.getDebts();
+        getDebts();
       });
       expect(result.current.debtsList).toEqual([]);
     });
@@ -55,10 +80,16 @@ describe("useDebts", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
 
       await act(async () => {
-        result.current.getDebts();
+        getDebts();
       });
       expect(result.current.debtsList).toEqual([newDebt]);
     });
@@ -66,22 +97,21 @@ describe("useDebts", () => {
 
   describe("editDebt", () => {
     it("should return empty debts list when status is not 200", async () => {
-      vi.mocked(axios, true).post.mockResolvedValueOnce({
-        data: newDebt,
-        status: 200,
-      });
       vi.mocked(axios, true).put.mockResolvedValueOnce({
         data: updatedDebt,
         status: 500,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
-      await act(async () => {
-        result.current.addDebt(newDebt);
-      });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
 
       await act(async () => {
-        result.current.editDebt("01", updatedDebt);
+        editDebt("01", updatedDebt);
       });
       expect(result.current.debtsList).toEqual([]);
     });
@@ -96,14 +126,20 @@ describe("useDebts", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
 
       await act(async () => {
-        result.current.addDebt(newDebt);
+        addDebt(newDebt);
       });
 
       await act(async () => {
-        result.current.editDebt("01", updatedDebt);
+        editDebt("01", updatedDebt);
       });
       expect(result.current.debtsList).toEqual([updatedDebt]);
     });
@@ -119,13 +155,19 @@ describe("useDebts", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
       await act(async () => {
-        result.current.addDebt(newDebt);
+        addDebt(newDebt);
       });
 
       await act(async () => {
-        result.current.deleteDebt("01");
+        deleteDebt("01");
       });
       expect(result.current.debtsList).toEqual([newDebt]);
     });
@@ -139,45 +181,104 @@ describe("useDebts", () => {
         status: 200,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
 
       await act(async () => {
-        result.current.addDebt(newDebt);
+        addDebt(newDebt);
       });
 
       await act(async () => {
-        result.current.deleteDebt("fakeId");
+        deleteDebt("fakeId");
       });
       expect(result.current.debtsList).toEqual([]);
     });
   });
 
-  describe("getBalance", () => {
-    it("should not return balance when status is not 200", async () => {
+  describe("getTotalLoans", () => {
+    it("should not return total loans when status is not 200", async () => {
       vi.mocked(axios, true).get.mockResolvedValueOnce({
         status: 500,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            totalLoans: state.totalLoans,
+          }))
+        )
+      );
 
       await act(async () => {
-        result.current.getBalance();
+        getTotalLoans();
       });
-      expect(result.current.balance).toEqual(0);
+      expect(result.current.totalLoans).toEqual(0);
     });
 
-    it("should return balance and statusCode 200", async () => {
+    it("should return total loans and statusCode 200", async () => {
       vi.mocked(axios, true).get.mockResolvedValueOnce({
         data: 100,
         status: 200,
       });
 
-      const { result } = renderHook(() => useDebts(), { wrapper });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            totalLoans: state.totalLoans,
+          }))
+        )
+      );
 
       await act(async () => {
-        result.current.getBalance();
+        getTotalLoans();
       });
-      expect(result.current.balance).toEqual(100);
+      expect(result.current.totalLoans).toEqual(100);
+    });
+  });
+
+  describe("getTotalDebts", () => {
+    it("should not return total debts when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            totalDebts: state.totalDebts,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalDebts();
+      });
+      expect(result.current.totalDebts).toEqual(0);
+    });
+
+    it("should return total debts and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            totalDebts: state.totalDebts,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalDebts();
+      });
+      expect(result.current.totalDebts).toEqual(100);
     });
   });
 });

@@ -1,33 +1,50 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useRecoilState } from "recoil";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   DebtFormI,
   DebtI,
-  newDebtState,
-  selectedDebtState,
+  deleteDebt,
+  getDebts,
+  getTotalDebts,
+  getTotalLoans,
+  newDebtInitialState,
+  setNewDebt,
+  setSelectedDebt,
   useDebts,
 } from "../../data/debts";
-import { userState } from "../../data/authentication";
+import { useAuth } from "../../data/authentication";
 import { Transition } from "@headlessui/react";
 import classNames from "classnames";
 import { AiFillEdit } from "react-icons/ai";
 import { Card } from "../../components/movements/card";
 import { DeleteMovementModal } from "../../components/movements/delete-movement";
-import { DebtModal, newDebtInitialState } from "./debt-modal";
+import { DebtModal } from "./debt-modal";
 import { isMobile } from "../../helpers/utils";
 import { getCurrencyFormat } from "../../helpers/currency";
 import { CardSkeleton } from "../../components/movements/card-skeleton";
 import { LoadingIcon } from "../../components/loading-icon";
+import { useShallow } from "zustand/shallow";
 
 export const Debts: React.FC = () => {
-  const [selectedDebt, setSelectedDebt] = useRecoilState(selectedDebtState);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
-  const [, setNewDebt] = useRecoilState(newDebtState);
-  const [user] = useRecoilState(userState);
-  const { getDebts, debtsList, deleteDebt, balance, getBalance, isLastPage } =
-    useDebts();
+
+  const { user } = useAuth(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+
+  const { debtsList, selectedDebt, isLastPage, totalLoans, totalDebts } =
+    useDebts(
+      useShallow((state) => ({
+        debtsList: state.debtsList,
+        selectedDebt: state.selectedDebt,
+        isLastPage: state.isLastPage,
+        totalLoans: state.totalLoans,
+        totalDebts: state.totalDebts,
+      }))
+    );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -45,8 +62,15 @@ export const Debts: React.FC = () => {
   const container = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (user) getBalance();
-  }, [user?._id, debtsList]);
+    if (user) {
+      getTotalLoans();
+      getTotalDebts();
+    }
+  }, [user?._id]);
+
+  const balance = useMemo(() => {
+    return totalLoans - totalDebts;
+  }, [totalLoans, totalDebts]);
 
   const fetchDebts = async () => {
     if (user?._id) {

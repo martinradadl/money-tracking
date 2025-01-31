@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { AiOutlineWarning } from "react-icons/ai";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import { checkPassword, useAuth, UserI } from "../../data/authentication";
+import {
+  checkPassword,
+  deleteUser,
+  editUser,
+  UserI,
+} from "../../data/authentication";
 import { createToastify } from "../../helpers/toastify";
 
 export interface props {
@@ -22,7 +27,6 @@ export const ConfirmPasswordModal = ({
   closeAccountSettings,
 }: props) => {
   const [password, setPassword] = useState("");
-  const { editUser, deleteUser } = useAuth();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);

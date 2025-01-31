@@ -1,25 +1,6 @@
-import { RecoilRoot } from "recoil";
-import { LoginI, UserI, userState } from "../data/authentication";
+import { LoginI, UserI } from "../data/authentication";
 import { TransactionFormI } from "../data/transactions";
-import React from "react";
 import { DebtFormI } from "../data/debts";
-
-export const createWrapper = (withUser: boolean) => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <RecoilRoot
-      initializeState={
-        withUser
-          ? ({ set }) => {
-              set(userState, newUser);
-            }
-          : undefined
-      }
-    >
-      {children}
-    </RecoilRoot>
-  );
-  return wrapper;
-};
 
 // USERS
 
