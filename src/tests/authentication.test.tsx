@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, vi, describe, it, afterAll } from "vitest";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import {
   changePassword,
   checkPassword,
@@ -314,8 +314,8 @@ describe("useAuthentication", () => {
       vi.resetAllMocks();
     });
 
-    it.skip("Should return error", async () => {
-      const err = new AxiosError("error");
+    it("Should return error", async () => {
+      const err = new Error("error");
       vi.mocked(axios, true).get.mockImplementation(() => {
         throw err;
       });

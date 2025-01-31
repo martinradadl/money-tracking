@@ -189,7 +189,11 @@ export const editDebt = async (id: string, updatedItem: DebtFormI) => {
             ],
           };
         } else {
-          throw new Error("ID not found updating debts list");
+          createToastify({
+            text: "ID not found updating debts list",
+            type: "error",
+          });
+          return state;
         }
       });
     } else {

@@ -56,8 +56,8 @@ describe("useDebts", () => {
   });
 
   describe("getDebts", () => {
-    it.skip("should return empty debts list when status is not 200", async () => {
-      vi.mocked(axios, true).post.mockResolvedValueOnce({
+    it("should return empty debts list when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
         status: 500,
       });
 
@@ -95,12 +95,8 @@ describe("useDebts", () => {
     });
   });
 
-  describe.skip("editDebt", () => {
+  describe("editDebt", () => {
     it("should return empty debts list when status is not 200", async () => {
-      vi.mocked(axios, true).post.mockResolvedValueOnce({
-        data: newDebt,
-        status: 200,
-      });
       vi.mocked(axios, true).put.mockResolvedValueOnce({
         data: updatedDebt,
         status: 500,
@@ -113,9 +109,6 @@ describe("useDebts", () => {
           }))
         )
       );
-      await act(async () => {
-        addDebt(newDebt);
-      });
 
       await act(async () => {
         editDebt("01", updatedDebt);

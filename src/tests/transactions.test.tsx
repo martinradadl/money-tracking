@@ -61,8 +61,8 @@ describe("useTransactions", () => {
     beforeEach(() => {
       vi.resetAllMocks();
     });
-    it.skip("should return empty transactions list when status is not 200", async () => {
-      vi.mocked(axios, true).post.mockResolvedValueOnce({
+    it("should return empty transactions list when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
         status: 500,
       });
 
@@ -105,11 +105,7 @@ describe("useTransactions", () => {
     beforeEach(() => {
       vi.resetAllMocks();
     });
-    it.skip("should return empty transactions list when status is not 200", async () => {
-      vi.mocked(axios, true).post.mockResolvedValueOnce({
-        data: newTransaction,
-        status: 200,
-      });
+    it("should return empty transactions list when status is not 200", async () => {
       vi.mocked(axios, true).put.mockResolvedValueOnce({
         data: updatedTransaction,
         status: 500,
@@ -122,9 +118,6 @@ describe("useTransactions", () => {
           }))
         )
       );
-      await act(async () => {
-        addTransaction(newTransaction);
-      });
 
       await act(async () => {
         editTransaction("01", updatedTransaction);
