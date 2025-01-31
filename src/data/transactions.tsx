@@ -122,7 +122,6 @@ export const getTransactions = async (page?: number, limit?: number) => {
       createToastify({ text: "Transactions not found", type: "error" });
     }
   } catch (err: unknown) {
-    console.log(err);
     if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
         text:

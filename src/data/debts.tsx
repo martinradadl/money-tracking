@@ -203,7 +203,6 @@ export const editDebt = async (id: string, updatedItem: DebtFormI) => {
       });
     }
   } catch (err: unknown) {
-    console.log("error: ", err);
     if (err instanceof Error || err instanceof AxiosError) {
       createToastify({
         text:
