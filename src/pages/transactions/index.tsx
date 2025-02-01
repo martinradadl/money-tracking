@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Transition } from "@headlessui/react";
 import { AiFillEdit } from "react-icons/ai";
 import { Card } from "../../components/movements/card";
@@ -23,6 +29,7 @@ import { isMobile } from "../../helpers/utils";
 import { CardSkeleton } from "../../components/movements/card-skeleton";
 import { LoadingIcon } from "../../components/loading-icon";
 import { useShallow } from "zustand/shallow";
+import debounce from "lodash.debounce";
 
 export const Transactions: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -76,18 +83,21 @@ export const Transactions: React.FC = () => {
     return totalIncome - totalExpenses;
   }, [totalIncome, totalExpenses]);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     if (user?._id) {
+      console.log("page: ", page);
       await getTransactions(page, 10);
       if (firstLoad) {
         setFirstLoad(false);
       }
+      // setLoading(false);
     }
-    setLoading(false);
-  };
+  }, [user?._id, page, firstLoad]);
+
+  const debouncedFetchTransactions = debounce(fetchTransactions, 200);
 
   useEffect(() => {
-    fetchTransactions();
+    debouncedFetchTransactions();
   }, [page, user?._id]);
 
   useEffect(() => {
