@@ -71,9 +71,13 @@ export const setCurrencies = (currencies: CurrencyI[]) =>
   });
 
 export const logout = () => {
-  setUser(null);
   cookies.remove("user", { path: "/" });
   cookies.remove("jwt", { path: "/" });
+  cookies.remove("debtsCache", { path: "/" });
+  cookies.remove("expensesCache", { path: "/" });
+  cookies.remove("incomeCache", { path: "/" });
+  cookies.remove("loansCache", { path: "/" });
+  setUser(null);
 };
 
 export const register = async (newUser: UserI) => {
