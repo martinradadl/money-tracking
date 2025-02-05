@@ -35,6 +35,8 @@ type State = {
   totalIncome: number;
   totalExpenses: number;
   isLastPage: boolean;
+  page: number;
+  isInitialLoad: boolean;
   getTransactions: (page?: number, limit?: number) => Promise<void>;
 };
 
@@ -91,6 +93,22 @@ export const setIsLastPage = (isLastPage: boolean) =>
     return {
       ...state,
       isLastPage,
+    };
+  });
+
+export const nextPage = () =>
+  useTransactions.setState((state) => {
+    return {
+      ...state,
+      page: state.page + 1,
+    };
+  });
+
+export const setIsInitialLoad = (isInitialLoad: boolean) =>
+  useTransactions.setState((state) => {
+    return {
+      ...state,
+      isInitialLoad,
     };
   });
 
@@ -348,6 +366,8 @@ export const useTransactions = create<State>(() => {
     totalIncome: 0,
     totalExpenses: 0,
     isLastPage: false,
+    page: 1,
+    isInitialLoad: true,
     getTransactions,
   };
 });
