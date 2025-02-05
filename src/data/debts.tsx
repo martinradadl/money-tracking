@@ -37,6 +37,8 @@ type State = {
   totalLoans: number;
   totalDebts: number;
   isLastPage: boolean;
+  page: number;
+  isInitialLoad: boolean;
 };
 
 const cookies = new Cookies();
@@ -90,6 +92,22 @@ export const setIsLastPage = (isLastPage: boolean) =>
     return {
       ...state,
       isLastPage,
+    };
+  });
+
+export const nextPage = () =>
+  useDebts.setState((state) => {
+    return {
+      ...state,
+      page: state.page + 1,
+    };
+  });
+
+export const setIsInitialLoad = (isInitialLoad: boolean) =>
+  useDebts.setState((state) => {
+    return {
+      ...state,
+      isInitialLoad,
     };
   });
 
@@ -336,5 +354,7 @@ export const useDebts = create<State>(() => {
     totalLoans: 0,
     totalDebts: 0,
     isLastPage: false,
+    page: 1,
+    isInitialLoad: true,
   };
 });

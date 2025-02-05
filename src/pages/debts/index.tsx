@@ -7,6 +7,8 @@ import {
   getTotalDebts,
   getTotalLoans,
   newDebtInitialState,
+  nextPage,
+  setIsInitialLoad,
   setNewDebt,
   setSelectedDebt,
   useDebts,
@@ -23,11 +25,10 @@ import { getCurrencyFormat } from "../../helpers/currency";
 import { CardSkeleton } from "../../components/movements/card-skeleton";
 import { LoadingIcon } from "../../components/loading-icon";
 import { useShallow } from "zustand/shallow";
+import debounce from "lodash.debounce";
 
 export const Debts: React.FC = () => {
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
 
   const { user } = useAuth(
     useShallow((state) => ({
@@ -35,16 +36,25 @@ export const Debts: React.FC = () => {
     }))
   );
 
-  const { debtsList, selectedDebt, isLastPage, totalLoans, totalDebts } =
-    useDebts(
-      useShallow((state) => ({
-        debtsList: state.debtsList,
-        selectedDebt: state.selectedDebt,
-        isLastPage: state.isLastPage,
-        totalLoans: state.totalLoans,
-        totalDebts: state.totalDebts,
-      }))
-    );
+  const {
+    debtsList,
+    selectedDebt,
+    isLastPage,
+    totalLoans,
+    totalDebts,
+    page,
+    isInitialLoad,
+  } = useDebts(
+    useShallow((state) => ({
+      debtsList: state.debtsList,
+      selectedDebt: state.selectedDebt,
+      isLastPage: state.isLastPage,
+      totalLoans: state.totalLoans,
+      totalDebts: state.totalDebts,
+      page: state.page,
+      isInitialLoad: state.isInitialLoad,
+    }))
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
@@ -75,24 +85,30 @@ export const Debts: React.FC = () => {
   const fetchDebts = async () => {
     if (user?._id) {
       await getDebts(page, 10);
-      if (firstLoad) {
-        setFirstLoad(false);
-      }
     }
-    setLoading(false);
   };
 
+  const debouncedFetchDebts = debounce(fetchDebts, 200);
+
   useEffect(() => {
-    fetchDebts();
-  }, [page, user?._id]);
+    if (isInitialLoad && user?._id) {
+      getDebts(1, 10).then(() => {
+        setIsInitialLoad(false);
+      });
+    }
+  }, [user, isInitialLoad]);
 
   useEffect(() => {
     if (isLastPage) {
       setLoading(false);
     } else if (loading === true && !isLastPage) {
-      setPage((prevPage) => prevPage + 1);
+      nextPage();
     }
   }, [loading, isLastPage]);
+
+  useEffect(() => {
+    if (page > 1 && user?._id && !isLastPage) debouncedFetchDebts();
+  }, [page, user?._id, isLastPage]);
 
   const handleScroll = () => {
     const subtraction =
@@ -166,7 +182,7 @@ export const Debts: React.FC = () => {
         </p>
       </div>
       <div className="flex flex-col gap-3">
-        {firstLoad ? (
+        {isInitialLoad ? (
           <>
             <CardSkeleton />
             <CardSkeleton isIncomeOrLoan={true} />
