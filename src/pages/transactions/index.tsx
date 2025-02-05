@@ -14,6 +14,8 @@ import {
   deleteTransaction,
   getTotalIncome,
   getTotalExpenses,
+  setIsInitialLoad,
+  nextPage,
 } from "../../data/transactions";
 import { DeleteMovementModal } from "../../components/movements/delete-movement";
 import { useAuth } from "../../data/authentication";
@@ -23,11 +25,10 @@ import { isMobile } from "../../helpers/utils";
 import { CardSkeleton } from "../../components/movements/card-skeleton";
 import { LoadingIcon } from "../../components/loading-icon";
 import { useShallow } from "zustand/shallow";
+import debounce from "lodash.debounce";
 
 export const Transactions: React.FC = () => {
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
   const { user } = useAuth(
     useShallow((state) => ({
       user: state.user,
@@ -40,11 +41,15 @@ export const Transactions: React.FC = () => {
     isLastPage,
     totalIncome,
     totalExpenses,
+    page,
+    isInitialLoad,
   } = useTransactions(
     useShallow((state) => ({
       transactionsList: state.transactionsList,
       selectedTransaction: state.selectedTransaction,
       isLastPage: state.isLastPage,
+      page: state.page,
+      isInitialLoad: state.isInitialLoad,
       totalIncome: state.totalIncome,
       totalExpenses: state.totalExpenses,
     }))
@@ -79,24 +84,30 @@ export const Transactions: React.FC = () => {
   const fetchTransactions = async () => {
     if (user?._id) {
       await getTransactions(page, 10);
-      if (firstLoad) {
-        setFirstLoad(false);
-      }
     }
-    setLoading(false);
   };
 
+  const debouncedFetchTransactions = debounce(fetchTransactions, 200);
+
   useEffect(() => {
-    fetchTransactions();
-  }, [page, user?._id]);
+    if (isInitialLoad && user?._id) {
+      getTransactions(1, 10).then(() => {
+        setIsInitialLoad(false);
+      });
+    }
+  }, [user, isInitialLoad]);
 
   useEffect(() => {
     if (isLastPage) {
       setLoading(false);
     } else if (loading === true && !isLastPage) {
-      setPage((prevPage) => prevPage + 1);
+      nextPage();
     }
   }, [loading, isLastPage]);
+
+  useEffect(() => {
+    if (page > 1 && user?._id && !isLastPage) debouncedFetchTransactions();
+  }, [page, user?._id, isLastPage]);
 
   const handleScroll = () => {
     const subtraction =
@@ -170,7 +181,7 @@ export const Transactions: React.FC = () => {
         </p>
       </div>
       <div className="flex flex-col gap-3">
-        {firstLoad ? (
+        {isInitialLoad ? (
           <>
             <CardSkeleton />
             <CardSkeleton isIncomeOrLoan={true} />
