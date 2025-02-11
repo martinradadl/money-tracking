@@ -1,12 +1,12 @@
-import { useCookies } from "react-cookie";
 import { NavBar } from "../components/nav-bar/nav-bar";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { setUser, getCurrencies } from "../data/authentication";
+import { setUser, getCurrencies, useAuth } from "../data/authentication";
 import { getCategories } from "../data/categories";
+import { user as userCookie } from "../helpers/cookies";
 
 export const MainLayout = () => {
-  const [cookies] = useCookies(["user"]);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,12 +15,16 @@ export const MainLayout = () => {
   }, []);
 
   useEffect(() => {
-    if (!cookies.user) {
+    if (!user && !userCookie()) {
+      console.log("first useEffect", user);
       navigate(`/login`);
-    } else {
-      setUser(cookies.user);
     }
-  }, [cookies.user]);
+  }, [user]);
+
+  useEffect(() => {
+    const userCookieValue = userCookie();
+    setUser(userCookieValue);
+  }, []);
 
   return (
     <div className="flex flex-col h-dvh bg-navy">
