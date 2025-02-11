@@ -1,10 +1,16 @@
 import { CategoryI } from "./categories";
 import axios, { AxiosError } from "axios";
 import { createToastify } from "../helpers/toastify";
-import { Cookies } from "react-cookie";
 import { API_URL } from "../helpers/env";
 import { noCategory } from "../helpers/categories";
 import { create } from "zustand";
+import {
+  debtsCache,
+  jwt,
+  loansCache,
+  setCookie,
+  user,
+} from "../helpers/cookies";
 
 type DebtType = "debt" | "loan";
 
@@ -41,11 +47,22 @@ type State = {
   isInitialLoad: boolean;
 };
 
-const cookies = new Cookies();
-const jwt = cookies.get("jwt");
-const loansCache = cookies.get("loansCache");
-const debtsCache = cookies.get("debtsCache");
-const user = cookies.get("user");
+const initialState = {
+  newDebt: null,
+  selectedDebt: null,
+  debtsList: [] as DebtI[],
+  totalLoans: 0,
+  totalDebts: 0,
+  isLastPage: false,
+  page: 1,
+  isInitialLoad: true,
+};
+
+export const setDebtsInitialState = () => {
+  return useDebts.setState(() => {
+    return initialState;
+  });
+};
 
 export const setNewDebt = (newDebt: DebtFormI | null) =>
   useDebts.setState((state) => {
@@ -114,10 +131,10 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
 export const getDebts = async (page?: number, limit?: number) => {
   try {
     const response = await axios.get(
-      `${API_URL}/debts/${user?._id}?page=${page || 1}&limit=${limit || 10}`,
+      `${API_URL}/debts/${user()?._id}?page=${page || 1}&limit=${limit || 10}`,
       {
         headers: {
-          Authorization: "Bearer " + jwt,
+          Authorization: "Bearer " + jwt(),
         },
       }
     );
@@ -150,11 +167,11 @@ export const addDebt = async (newItem: DebtFormI) => {
     const parsedItem = {
       ...newItem,
       amount: parseInt(newItem.amount),
-      userId: user?._id,
+      userId: user()?._id,
     };
     const response = await axios.post(`${API_URL}/debts/`, parsedItem, {
       headers: {
-        Authorization: "Bearer " + jwt,
+        Authorization: `Bearer ${jwt()}`,
       },
     });
     if (response.status === 200) {
@@ -187,11 +204,11 @@ export const editDebt = async (id: string, updatedItem: DebtFormI) => {
     const parsedItem = {
       ...updatedItem,
       amount: parseInt(updatedItem.amount),
-      userId: user?._id,
+      userId: user()?._id,
     };
     const response = await axios.put(`${API_URL}/debts/${id}`, parsedItem, {
       headers: {
-        Authorization: "Bearer " + jwt,
+        Authorization: `Bearer ${jwt()}`,
       },
     });
     if (response.status === 200) {
@@ -236,7 +253,7 @@ export const deleteDebt = async (id: string) => {
   try {
     const response = await axios.delete(`${API_URL}/debts/${id}`, {
       headers: {
-        Authorization: "Bearer " + jwt,
+        Authorization: `Bearer ${jwt()}`,
       },
     });
     if (response.status === 200) {
@@ -273,21 +290,22 @@ export const deleteDebt = async (id: string) => {
 };
 
 export const getTotalLoans = async () => {
-  if (cookies.get("loansCache")) {
-    setTotalLoans(loansCache);
+  const loansCacheTemp = loansCache();
+  if (loansCacheTemp) {
+    setTotalLoans(loansCacheTemp);
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/debts/balance/loans/${user?._id}`,
+        `${API_URL}/debts/balance/loans/${user()?._id}`,
         {
           headers: {
-            Authorization: "Bearer " + jwt,
+            Authorization: `Bearer ${jwt()}`,
           },
         }
       );
       if (response.status === 200) {
         setTotalLoans(response.data);
-        cookies.set("loansCache", response.data);
+        setCookie("loansCache", response.data);
       } else {
         createToastify({
           text: "Could not calculate total loans",
@@ -310,21 +328,22 @@ export const getTotalLoans = async () => {
 };
 
 export const getTotalDebts = async () => {
-  if (cookies.get("debtsCache")) {
-    setTotalDebts(debtsCache);
+  const debtsCacheTemp = debtsCache();
+  if (debtsCacheTemp) {
+    setTotalDebts(debtsCacheTemp);
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/debts/balance/debts/${user?._id}`,
+        `${API_URL}/debts/balance/debts/${user()?._id}`,
         {
           headers: {
-            Authorization: "Bearer " + jwt,
+            Authorization: `Bearer ${jwt()}`,
           },
         }
       );
       if (response.status === 200) {
         setTotalDebts(response.data);
-        cookies.set("debtsCache", response.data);
+        setCookie("debtsCache", response.data);
       } else {
         createToastify({
           text: "Could not calculate total expenses",
@@ -347,14 +366,5 @@ export const getTotalDebts = async () => {
 };
 
 export const useDebts = create<State>(() => {
-  return {
-    newDebt: null,
-    selectedDebt: null,
-    debtsList: [] as DebtI[],
-    totalLoans: 0,
-    totalDebts: 0,
-    isLastPage: false,
-    page: 1,
-    isInitialLoad: true,
-  };
+  return initialState;
 });

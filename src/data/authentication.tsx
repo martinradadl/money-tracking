@@ -1,8 +1,10 @@
 import axios, { AxiosError } from "axios";
-import { Cookies } from "react-cookie";
 import { createToastify } from "../helpers/toastify";
 import { API_URL } from "../helpers/env";
 import { create } from "zustand";
+import { setTransactionsInitialState } from "./transactions";
+import { clearCookies, jwt, setCookieWithPath } from "../helpers/cookies";
+import { setDebtsInitialState } from "./debts";
 
 export interface UserI {
   _id?: string;
@@ -31,7 +33,7 @@ export const checkPassword = async (id: string, password: string) => {
   try {
     const response = await axios.get(`${API_URL}/auth/${id}/check-password`, {
       headers: {
-        Authorization: "Bearer " + jwt,
+        Authorization: `Bearer ${jwt()}`,
         password,
       },
     });
@@ -51,9 +53,6 @@ export const checkPassword = async (id: string, password: string) => {
   }
 };
 
-const cookies = new Cookies();
-const jwt = cookies.get("jwt");
-
 export const setUser = (user: UserI | null) =>
   useAuth.setState((state: State) => {
     return {
@@ -71,13 +70,12 @@ export const setCurrencies = (currencies: CurrencyI[]) =>
   });
 
 export const logout = () => {
-  cookies.remove("user", { path: "/" });
-  cookies.remove("jwt", { path: "/" });
-  cookies.remove("debtsCache", { path: "/" });
-  cookies.remove("expensesCache", { path: "/" });
-  cookies.remove("incomeCache", { path: "/" });
-  cookies.remove("loansCache", { path: "/" });
-  setUser(null);
+  clearCookies();
+  setTransactionsInitialState();
+  setDebtsInitialState();
+  setTimeout(() => {
+    setUser(null);
+  }, 3000);
 };
 
 export const register = async (newUser: UserI) => {
@@ -90,8 +88,8 @@ export const register = async (newUser: UserI) => {
           user: response.data.user,
         };
       });
-      cookies.set("user", JSON.stringify(response.data.user), { path: "/" });
-      cookies.set("jwt", JSON.stringify(response.data.token), { path: "/" });
+      setCookieWithPath("user", JSON.stringify(response.data.user));
+      setCookieWithPath("jwt", JSON.stringify(response.data.token));
     } else {
       createToastify({ text: "Register not successful", type: "error" });
     }
@@ -115,8 +113,8 @@ export const login = async (loggedUser: LoginI) => {
           user: response.data.user,
         };
       });
-      cookies.set("user", JSON.stringify(response.data.user), { path: "/" });
-      cookies.set("jwt", response.data.token);
+      setCookieWithPath("user", JSON.stringify(response.data.user));
+      setCookieWithPath("jwt", response.data.token);
     } else {
       createToastify({ text: "Login not successful", type: "error" });
     }
@@ -139,7 +137,7 @@ export const changePassword = async (userId: string, newPassword: string) => {
       {},
       {
         headers: {
-          Authorization: "Bearer " + jwt,
+          Authorization: `Bearer ${jwt()}`,
           newPassword,
         },
       }
@@ -229,12 +227,12 @@ export const editUser = async (id: string, updatedItem: UserI) => {
   try {
     const response = await axios.put(`${API_URL}/auth/${id}`, updatedItem, {
       headers: {
-        Authorization: "Bearer " + jwt,
+        Authorization: "Bearer " + `Bearer ${jwt()}`,
       },
     });
     if (response.status === 200) {
       setUser(response.data);
-      cookies.set("user", JSON.stringify(response.data), { path: "/" });
+      setCookieWithPath("user", JSON.stringify(response.data));
     } else {
       createToastify({ text: "Edit not successful", type: "error" });
     }
@@ -258,8 +256,7 @@ export const deleteUser = async (id: string) => {
     });
     if (response.status === 200) {
       setUser(null);
-      cookies.remove("user", { path: "/" });
-      cookies.remove("jwt", { path: "/" });
+      clearCookies();
     } else {
       createToastify({ text: "Delete not successful", type: "error" });
     }

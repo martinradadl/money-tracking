@@ -87,13 +87,12 @@ export const Transactions: React.FC = () => {
     }
   };
 
-  const debouncedFetchTransactions = debounce(fetchTransactions, 200);
+  const debouncedFetchTransactions = debounce(fetchTransactions, 1000);
 
   useEffect(() => {
     if (isInitialLoad && user?._id) {
-      getTransactions(1, 10).then(() => {
-        setIsInitialLoad(false);
-      });
+      debouncedFetchTransactions();
+      setIsInitialLoad(false);
     }
   }, [user, isInitialLoad]);
 

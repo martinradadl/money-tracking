@@ -6,6 +6,7 @@ import {
   editTransaction,
   getTotalExpenses,
   getTotalIncome,
+  getTransactions,
   useTransactions,
 } from "../data/transactions.js";
 import axios from "axios";
@@ -70,12 +71,11 @@ describe("useTransactions", () => {
         useTransactions(
           useShallow((state) => ({
             transactionsList: state.transactionsList,
-            getTransactions: state.getTransactions,
           }))
         )
       );
       await act(async () => {
-        result.current.getTransactions();
+        getTransactions();
       });
       expect(result.current.transactionsList).toEqual([]);
     });
@@ -89,13 +89,12 @@ describe("useTransactions", () => {
         useTransactions(
           useShallow((state) => ({
             transactionsList: state.transactionsList,
-            getTransactions: state.getTransactions,
           }))
         )
       );
 
       await act(async () => {
-        result.current.getTransactions();
+        getTransactions();
       });
       expect(result.current.transactionsList).toEqual([newTransaction]);
     });
