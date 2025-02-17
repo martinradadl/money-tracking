@@ -32,7 +32,11 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
   const [accountForm, setAccountForm] = useState(accountFormInitialState);
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const { currencies } = useAuth();
+  const { currencies } = useAuth(
+    useShallow((state) => ({
+      currencies: state.currencies,
+    }))
+  );
 
   useEffect(() => {
     if (user) {
