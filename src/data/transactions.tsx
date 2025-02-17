@@ -8,7 +8,7 @@ import {
   expensesCache,
   incomeCache,
   jwt,
-  setCookieWithPath,
+  setCookie,
   user,
 } from "../helpers/cookies";
 
@@ -316,7 +316,7 @@ export const getTotalIncome = async () => {
       );
       if (response.status === 200) {
         setTotalIncome(response.data);
-        setCookieWithPath("incomeCache", response.data);
+        setCookie("incomeCache", response.data);
       } else {
         createToastify({
           text: "Could not calculate total income",
@@ -354,7 +354,7 @@ export const getTotalExpenses = async () => {
       );
       if (response.status === 200) {
         setTotalExpenses(response.data);
-        setCookieWithPath("expensesCache", response.data);
+        setCookie("expensesCache", response.data);
       } else {
         createToastify({
           text: "Could not calculate total expenses",

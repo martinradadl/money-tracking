@@ -12,8 +12,8 @@ import {
   addDebt,
   editDebt,
 } from "../../data/debts";
-import { useCookies } from "react-cookie";
 import { useShallow } from "zustand/react/shallow";
+import { removeCookie } from "../../helpers/cookies";
 
 interface Props {
   userId?: string;
@@ -28,7 +28,6 @@ export const DebtModal = ({ userId, close, isOpen }: Props) => {
       selectedDebt: state.selectedDebt,
     }))
   );
-  const [, , removeCookie] = useCookies(["loansCache", "debtsCache"]);
 
   useEffect(() => {
     if (selectedDebt) {
@@ -63,9 +62,7 @@ export const DebtModal = ({ userId, close, isOpen }: Props) => {
       getTotalLoans();
     } else {
       removeCookie("debtsCache");
-      setTimeout(() => {
-        getTotalDebts();
-      }, 500);
+      getTotalDebts();
     }
   };
 
