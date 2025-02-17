@@ -1,10 +1,16 @@
 import { createToastify } from "../helpers/toastify";
-import { Cookies } from "react-cookie";
 import { CategoryI } from "./categories";
 import { API_URL } from "../helpers/env";
 import { create } from "zustand";
 import axios, { AxiosError } from "axios";
 import { noCategory } from "../helpers/categories";
+import {
+  expensesCache,
+  incomeCache,
+  jwt,
+  setCookie,
+  user,
+} from "../helpers/cookies";
 
 type TranscationType = "income" | "expenses";
 
@@ -37,14 +43,24 @@ type State = {
   isLastPage: boolean;
   page: number;
   isInitialLoad: boolean;
-  getTransactions: (page?: number, limit?: number) => Promise<void>;
 };
 
-const cookies = new Cookies();
-const jwt = cookies.get("jwt");
-const incomeCache = cookies.get("incomeCache");
-const expensesCache = cookies.get("expensesCache");
-const user = cookies.get("user");
+const initialState = {
+  newTransaction: null,
+  selectedTransaction: null,
+  transactionsList: [] as TransactionI[],
+  totalIncome: 0,
+  totalExpenses: 0,
+  isLastPage: false,
+  page: 1,
+  isInitialLoad: true,
+};
+
+export const setTransactionsInitialState = () => {
+  return useTransactions.setState(() => {
+    return initialState;
+  });
+};
 
 export const setNewTransaction = (newTransaction: TransactionFormI | null) =>
   useTransactions.setState((state) => {
@@ -115,12 +131,12 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
 export const getTransactions = async (page?: number, limit?: number) => {
   try {
     const response = await axios.get(
-      `${API_URL}/transactions/${user?._id}?page=${page || 1}&limit=${
+      `${API_URL}/transactions/${user()?._id}?page=${page || 1}&limit=${
         limit || 10
       }`,
       {
         headers: {
-          Authorization: "Bearer " + jwt,
+          Authorization: `Bearer ${jwt()}`,
         },
       }
     );
@@ -156,11 +172,11 @@ export const addTransaction = async (newItem: TransactionFormI) => {
     const parsedItem = {
       ...newItem,
       amount: parseInt(newItem.amount),
-      userId: user?._id,
+      userId: user()?._id,
     };
     const response = await axios.post(`${API_URL}/transactions/`, parsedItem, {
       headers: {
-        Authorization: "Bearer " + jwt,
+        Authorization: `Bearer ${jwt()}`,
       },
     });
     if (response.status === 200) {
@@ -195,14 +211,14 @@ export const editTransaction = async (
     const parsedItem = {
       ...updatedItem,
       amount: parseInt(updatedItem.amount),
-      userId: user?._id,
+      userId: user()?._id,
     };
     const response = await axios.put(
       `${API_URL}/transactions/${id}`,
       parsedItem,
       {
         headers: {
-          Authorization: "Bearer " + jwt,
+          Authorization: `Bearer ${jwt()}`,
         },
       }
     );
@@ -248,7 +264,7 @@ export const deleteTransaction = async (id: string) => {
   try {
     const response = await axios.delete(`${API_URL}/transactions/${id}`, {
       headers: {
-        Authorization: "Bearer " + jwt,
+        Authorization: `Bearer ${jwt()}`,
       },
     });
     if (response.status === 200) {
@@ -285,21 +301,22 @@ export const deleteTransaction = async (id: string) => {
 };
 
 export const getTotalIncome = async () => {
-  if (cookies.get("incomeCache")) {
-    setTotalIncome(incomeCache);
+  const incomeCacheTemp = incomeCache();
+  if (incomeCacheTemp) {
+    setTotalIncome(incomeCacheTemp);
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/transactions/balance/income/${user?._id}`,
+        `${API_URL}/transactions/balance/income/${user()?._id}`,
         {
           headers: {
-            Authorization: "Bearer " + jwt,
+            Authorization: `Bearer ${jwt()}`,
           },
         }
       );
       if (response.status === 200) {
         setTotalIncome(response.data);
-        cookies.set("incomeCache", response.data);
+        setCookie("incomeCache", response.data);
       } else {
         createToastify({
           text: "Could not calculate total income",
@@ -322,21 +339,22 @@ export const getTotalIncome = async () => {
 };
 
 export const getTotalExpenses = async () => {
-  if (cookies.get("expensesCache")) {
-    setTotalExpenses(expensesCache);
+  const expensesCacheTemp = expensesCache();
+  if (expensesCacheTemp) {
+    setTotalExpenses(expensesCacheTemp);
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/transactions/balance/expenses/${user?._id}`,
+        `${API_URL}/transactions/balance/expenses/${user()?._id}`,
         {
           headers: {
-            Authorization: "Bearer " + jwt,
+            Authorization: `Bearer ${jwt()}`,
           },
         }
       );
       if (response.status === 200) {
         setTotalExpenses(response.data);
-        cookies.set("expensesCache", response.data);
+        setCookie("expensesCache", response.data);
       } else {
         createToastify({
           text: "Could not calculate total expenses",
@@ -359,15 +377,5 @@ export const getTotalExpenses = async () => {
 };
 
 export const useTransactions = create<State>(() => {
-  return {
-    newTransaction: null,
-    selectedTransaction: null,
-    transactionsList: [] as TransactionI[],
-    totalIncome: 0,
-    totalExpenses: 0,
-    isLastPage: false,
-    page: 1,
-    isInitialLoad: true,
-    getTransactions,
-  };
+  return initialState;
 });
