@@ -3,8 +3,9 @@ import { createToastify } from "../helpers/toastify";
 import { API_URL } from "../helpers/env";
 import { create } from "zustand";
 import { setTransactionsInitialState } from "./transactions";
-import { clearCookies, jwt, setCookieWithPath } from "../helpers/cookies";
+import { clearCookies, jwt, setCookie } from "../helpers/cookies";
 import { setDebtsInitialState } from "./debts";
+import { isExpired, setExpiresOn } from "../helpers/utils";
 
 export interface UserI {
   _id?: string;
@@ -27,7 +28,21 @@ export interface CurrencyI {
 type State = {
   user: UserI | null;
   currencies: CurrencyI[];
+  isExpirationModalOpen: boolean;
+  isSplashScreenLoading: boolean;
 };
+
+axios.interceptors.request.use(
+  (config) => {
+    if (isExpired()) {
+      setIsExpirationModalOpen(true);
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const checkPassword = async (id: string, password: string) => {
   try {
@@ -69,13 +84,29 @@ export const setCurrencies = (currencies: CurrencyI[]) =>
     };
   });
 
+export const setIsExpirationModalOpen = (isExpirationModalOpen: boolean) => {
+  useAuth.setState((state: State) => {
+    return {
+      ...state,
+      isExpirationModalOpen,
+    };
+  });
+};
+
+export const setIsSplashScreenLoading = (isSplashScreenLoading: boolean) => {
+  useAuth.setState((state: State) => {
+    return {
+      ...state,
+      isSplashScreenLoading,
+    };
+  });
+};
+
 export const logout = () => {
   clearCookies();
   setTransactionsInitialState();
   setDebtsInitialState();
-  setTimeout(() => {
-    setUser(null);
-  }, 3000);
+  setUser(null);
 };
 
 export const register = async (newUser: UserI) => {
@@ -88,8 +119,9 @@ export const register = async (newUser: UserI) => {
           user: response.data.user,
         };
       });
-      setCookieWithPath("user", JSON.stringify(response.data.user));
-      setCookieWithPath("jwt", JSON.stringify(response.data.token));
+      setCookie("user", response.data.user);
+      setCookie("jwt", response.data.token);
+      setExpiresOn(response.data.expiration);
     } else {
       createToastify({ text: "Register not successful", type: "error" });
     }
@@ -113,8 +145,9 @@ export const login = async (loggedUser: LoginI) => {
           user: response.data.user,
         };
       });
-      setCookieWithPath("user", JSON.stringify(response.data.user));
-      setCookieWithPath("jwt", response.data.token);
+      setCookie("user", response.data.user);
+      setCookie("jwt", response.data.token);
+      setExpiresOn(response.data.expiration);
     } else {
       createToastify({ text: "Login not successful", type: "error" });
     }
@@ -232,7 +265,7 @@ export const editUser = async (id: string, updatedItem: UserI) => {
     });
     if (response.status === 200) {
       setUser(response.data);
-      setCookieWithPath("user", JSON.stringify(response.data));
+      setCookie("user", response.data);
     } else {
       createToastify({ text: "Edit not successful", type: "error" });
     }
@@ -294,5 +327,7 @@ export const useAuth = create<State>(() => {
   return {
     user: null,
     currencies: [],
+    isExpirationModalOpen: false,
+    isSplashScreenLoading: true,
   };
 });

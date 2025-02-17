@@ -7,13 +7,14 @@ export const incomeCache = () => cookies.get("incomeCache");
 export const expensesCache = () => cookies.get("expensesCache");
 export const loansCache = () => cookies.get("loansCache");
 export const debtsCache = () => cookies.get("debtsCache");
+export const expiresOn = () => cookies.get("expiresOn");
 
-export const setCookie = (name: string, value: typeof Cookies) => {
-  cookies.set(name, value);
+export const setCookie: typeof cookies.set = (name, value) => {
+  cookies.set(name, value, { path: "/" });
 };
 
-export const setCookieWithPath = (name: string, value: string) => {
-  cookies.set(name, value, { path: "/" });
+export const removeCookie = (name: string) => {
+  cookies.remove(name, { path: "/" });
 };
 
 export const clearCookies = () => {
@@ -23,4 +24,5 @@ export const clearCookies = () => {
   cookies.remove("expensesCache", { path: "/" });
   cookies.remove("loansCache", { path: "/" });
   cookies.remove("debtsCache", { path: "/" });
+  cookies.remove("expiresOn", { path: "/" });
 };
