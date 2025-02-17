@@ -57,6 +57,7 @@ export const Transactions: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
+  const isInitialLoadRef = useRef<boolean>(true);
 
   function openModal() {
     setIsModalOpen(true);
@@ -87,12 +88,14 @@ export const Transactions: React.FC = () => {
     }
   };
 
-  const debouncedFetchTransactions = debounce(fetchTransactions, 1000);
+  const debouncedFetchTransactions = debounce(fetchTransactions, 200);
 
   useEffect(() => {
-    if (isInitialLoad && user?._id) {
-      debouncedFetchTransactions();
-      setIsInitialLoad(false);
+    if (isInitialLoadRef.current && isInitialLoad && user?._id) {
+      isInitialLoadRef.current = false;
+      getTransactions(1, 10).then(() => {
+        setIsInitialLoad(false);
+      });
     }
   }, [user, isInitialLoad]);
 

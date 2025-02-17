@@ -58,6 +58,7 @@ export const Debts: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
+  const isInitialLoadRef = useRef<boolean>(true);
 
   function openModal() {
     setIsModalOpen(true);
@@ -91,7 +92,8 @@ export const Debts: React.FC = () => {
   const debouncedFetchDebts = debounce(fetchDebts, 200);
 
   useEffect(() => {
-    if (isInitialLoad && user?._id) {
+    if (isInitialLoadRef.current && isInitialLoad && user?._id) {
+      isInitialLoadRef.current = false;
       getDebts(1, 10).then(() => {
         setIsInitialLoad(false);
       });
