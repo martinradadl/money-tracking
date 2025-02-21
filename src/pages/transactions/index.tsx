@@ -65,7 +65,9 @@ export const Transactions: React.FC = () => {
 
   function closeModal() {
     setIsModalOpen(false);
-    setSelectedTransaction(null);
+    setTimeout(() => {
+      setSelectedTransaction(null);
+    }, 200);
     setNewTransaction(newTransactionInitialState);
   }
 
