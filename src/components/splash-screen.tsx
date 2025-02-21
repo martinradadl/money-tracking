@@ -49,7 +49,13 @@ export const SplashScreen = () => {
       <h1 className="text-3xl font-semibold">Money Tracking</h1>
       <div className="flex flex-col items-center gap-2">
         <h2 className="text-2xl">Loading...</h2>
-        <progress className="rounded" value={progress} />
+
+        <div className="bg-light-gray rounded w-40 h-4">
+          <div
+            className="bg-dark-green rounded h-4"
+            style={{ width: `${progress * 100}%` }}
+          />
+        </div>
       </div>
     </div>
   );
