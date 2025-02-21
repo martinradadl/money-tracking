@@ -66,7 +66,9 @@ export const Debts: React.FC = () => {
 
   function closeModal() {
     setIsModalOpen(false);
-    setSelectedDebt(null);
+    setTimeout(() => {
+      setSelectedDebt(null);
+    }, 200);
     setNewDebt(newDebtInitialState);
   }
 
