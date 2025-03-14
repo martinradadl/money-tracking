@@ -34,16 +34,22 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
     if (selectedTransaction) {
       setNewTransaction({ ...selectedTransaction });
     } else {
-      setNewTransaction({ ...newTransactionInitialState, userId });
+      setNewTransaction({
+        ...newTransactionInitialState,
+        userId,
+      });
     }
   }, [selectedTransaction]);
+
+  useEffect(() => {}, [newTransaction]);
 
   const isSameTransaction = () => {
     return (
       newTransaction?.type === selectedTransaction?.type &&
       newTransaction?.concept === selectedTransaction?.concept &&
       newTransaction?.amount === selectedTransaction?.amount &&
-      newTransaction?.category._id === selectedTransaction?.category._id
+      newTransaction?.category._id === selectedTransaction?.category._id &&
+      newTransaction?.date === selectedTransaction?.date
     );
   };
 
