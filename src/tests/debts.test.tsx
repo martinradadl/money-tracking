@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import axios from "axios";
 import { newDebt, updatedDebt } from "./utils.js";
 import {
@@ -17,6 +17,9 @@ vi.mock("axios");
 
 describe("useDebts", () => {
   describe("addDebt", async () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
     it("should return empty debts list when status is not 200", async () => {
       vi.mocked(axios, true).post.mockResolvedValueOnce({
         status: 500,
@@ -56,6 +59,9 @@ describe("useDebts", () => {
   });
 
   describe("getDebts", () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
     it("should return empty debts list when status is not 200", async () => {
       vi.mocked(axios, true).get.mockResolvedValueOnce({
         status: 500,
@@ -96,6 +102,9 @@ describe("useDebts", () => {
   });
 
   describe("editDebt", () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
     it("should return empty debts list when status is not 200", async () => {
       vi.mocked(axios, true).put.mockResolvedValueOnce({
         data: updatedDebt,
@@ -139,13 +148,16 @@ describe("useDebts", () => {
       });
 
       await act(async () => {
-        editDebt("01", updatedDebt);
+        editDebt("fakeId", updatedDebt);
       });
       expect(result.current.debtsList).toEqual([updatedDebt]);
     });
   });
 
   describe("deleteDebt", () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
     it("should return empty debts list when status is not 200", async () => {
       vi.mocked(axios, true).post.mockResolvedValueOnce({
         data: newDebt,
@@ -201,6 +213,9 @@ describe("useDebts", () => {
   });
 
   describe("getTotalLoans", () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
     it("should not return total loans when status is not 200", async () => {
       vi.mocked(axios, true).get.mockResolvedValueOnce({
         status: 500,
@@ -242,6 +257,9 @@ describe("useDebts", () => {
   });
 
   describe("getTotalDebts", () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
     it("should not return total debts when status is not 200", async () => {
       vi.mocked(axios, true).get.mockResolvedValueOnce({
         status: 500,
