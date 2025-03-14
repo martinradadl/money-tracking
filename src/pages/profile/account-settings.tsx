@@ -21,6 +21,7 @@ const accountFormInitialState = {
   name: "",
   email: "",
   currency: { name: "", code: "" },
+  timezone: { name: "", offset: "" },
 };
 
 export default function AccountSettingsModal({ modalTrigger }: props) {
@@ -32,9 +33,10 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
   const [accountForm, setAccountForm] = useState(accountFormInitialState);
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const { currencies } = useAuth(
+  const { currencies, timezones } = useAuth(
     useShallow((state) => ({
       currencies: state.currencies,
+      timezones: state.timezones,
     }))
   );
 
@@ -44,6 +46,7 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
         name: user.name,
         email: user.email,
         currency: { name: user.currency.name, code: user.currency.code },
+        timezone: { name: user.timezone.name, offset: user.timezone.offset },
       });
     }
   }, [isOpen]);
@@ -76,12 +79,24 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
     });
   };
 
+  const handleChangeTimeZone = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const timezoneSplitted = event.target.value.split(" | ");
+    setAccountForm({
+      ...accountForm,
+      timezone: { name: timezoneSplitted[0], offset: timezoneSplitted[1] },
+    });
+  };
+
   const hasEmptyFields = () => {
     return (
       accountForm.name === "" ||
       accountForm.email === "" ||
       accountForm.currency.name === "" ||
-      accountForm.currency.code === ""
+      accountForm.currency.code === "" ||
+      accountForm.timezone.name === "" ||
+      accountForm.timezone.offset === ""
     );
   };
 
@@ -89,7 +104,9 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
     return (
       accountForm.name === user?.name &&
       accountForm.currency.name === user.currency.name &&
-      accountForm.currency.code === user.currency.code
+      accountForm.currency.code === user.currency.code &&
+      accountForm.timezone.name === user.timezone.name &&
+      accountForm.timezone.offset === user.timezone.offset
     );
   };
 
@@ -161,6 +178,28 @@ export default function AccountSettingsModal({ modalTrigger }: props) {
                         return (
                           <option key={i} value={`${elem.name} - ${elem.code}`}>
                             {`${elem.name} - ${elem.code}`}
+                          </option>
+                        );
+                      })}
+                    </Select>
+                  </label>
+
+                  <label>
+                    <p className="text-2xl mb-2">Time Zone</p>
+                    <Select
+                      name="timezone"
+                      id="timezone"
+                      value={`${accountForm.timezone.name} | ${accountForm.timezone.offset}`}
+                      onChange={handleChangeTimeZone}
+                      className="w-full h-9 border-navy rounded bg-green border-b-2"
+                    >
+                      {timezones.map((elem, i) => {
+                        return (
+                          <option
+                            key={i}
+                            value={`${elem.name} | ${elem.offset}`}
+                          >
+                            {`${elem.name} | ${elem.offset}`}
                           </option>
                         );
                       })}
