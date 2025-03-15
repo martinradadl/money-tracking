@@ -5,7 +5,6 @@ import { useCategories } from "../../data/categories";
 import { DebtFormI } from "../../data/debts";
 import { useShallow } from "zustand/shallow";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 function isDebt(movement: TransactionFormI | DebtFormI | null) {
   return movement && "entity" in movement;
