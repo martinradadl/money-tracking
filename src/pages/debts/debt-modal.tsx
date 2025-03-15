@@ -33,7 +33,7 @@ export const DebtModal = ({ userId, close, isOpen }: Props) => {
     if (selectedDebt) {
       setNewDebt({ ...selectedDebt });
     } else {
-      setNewDebt({ ...newDebtInitialState, userId });
+      setNewDebt({ ...newDebtInitialState, userId, date: new Date() });
     }
   }, [selectedDebt]);
 
@@ -43,7 +43,8 @@ export const DebtModal = ({ userId, close, isOpen }: Props) => {
       newDebt?.entity === selectedDebt?.entity &&
       newDebt?.concept === selectedDebt?.concept &&
       newDebt?.amount === selectedDebt?.amount &&
-      newDebt?.category._id === selectedDebt?.category._id
+      newDebt?.category._id === selectedDebt?.category._id &&
+      newDebt?.date === selectedDebt?.date
     );
   };
 

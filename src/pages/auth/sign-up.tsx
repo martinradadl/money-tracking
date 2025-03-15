@@ -1,10 +1,24 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { register } from "../../data/authentication";
+import { register, useAuth } from "../../data/authentication";
 import { createToastify } from "../../helpers/toastify";
+import { Select } from "@headlessui/react";
+import { useShallow } from "zustand/shallow";
 
 export const SignUp: React.FC = () => {
-  const [user, setUser] = useState({ name: "", email: "", password: "" });
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+    currency: { name: "Colombian Peso", code: "COP" },
+    timezone: { name: "CO - Colombia - America/Bogota", offset: "-05:00" },
+  });
+  const { currencies, timezones } = useAuth(
+    useShallow((state) => ({
+      currencies: state.currencies,
+      timezones: state.timezones,
+    }))
+  );
   const navigate = useNavigate();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,6 +30,26 @@ export const SignUp: React.FC = () => {
     }
   };
 
+  const handleChangeCurrency = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const currencySplitted = event.target.value.split(" - ");
+    setUser({
+      ...user,
+      currency: { name: currencySplitted[0], code: currencySplitted[1] },
+    });
+  };
+
+  const handleChangeTimeZone = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const timezoneSplitted = event.target.value.split(" | ");
+    setUser({
+      ...user,
+      timezone: { name: timezoneSplitted[0], offset: timezoneSplitted[1] },
+    });
+  };
+
   const hasEmptyFields = () => {
     return user.name === "" || user.email === "" || user.password === "";
   };
@@ -25,11 +59,7 @@ export const SignUp: React.FC = () => {
       if (hasEmptyFields()) {
         createToastify({ text: "Faltan campos por llenar", type: "warning" });
       } else {
-        const parsedUser = {
-          ...user,
-          currency: { name: "Colombian Peso", code: "COP" },
-        };
-        await register(parsedUser);
+        await register(user);
         navigate("/");
       }
     } catch (err: unknown) {
@@ -72,6 +102,43 @@ export const SignUp: React.FC = () => {
           value={user?.password}
           onChange={handleChange}
         />
+      </label>
+      <label>
+        <p className="text-2xl mb-2">Currency</p>
+        <Select
+          name="currency"
+          id="currency"
+          value={`${user.currency.name} - ${user.currency.code}`}
+          onChange={handleChangeCurrency}
+          className="w-full h-9 border-green rounded bg-navy border-b-2"
+        >
+          {currencies.map((elem, i) => {
+            return (
+              <option key={i} value={`${elem.name} - ${elem.code}`}>
+                {`${elem.name} - ${elem.code}`}
+              </option>
+            );
+          })}
+        </Select>
+      </label>
+
+      <label>
+        <p className="text-2xl mb-2">Time Zone</p>
+        <Select
+          name="timezone"
+          id="timezone"
+          value={`${user.timezone.name} | ${user.timezone.offset}`}
+          onChange={handleChangeTimeZone}
+          className="w-full h-9 border-green rounded bg-navy border-b-2"
+        >
+          {timezones.map((elem, i) => {
+            return (
+              <option key={i} value={`${elem.name} | ${elem.offset}`}>
+                {`${elem.name} | ${elem.offset}`}
+              </option>
+            );
+          })}
+        </Select>
       </label>
       <div className="mt-4 flex flex-col gap-2 justify-items-center items-center">
         <button

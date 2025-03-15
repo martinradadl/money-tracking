@@ -5,6 +5,7 @@ import { DebtFormI } from "../data/debts";
 // USERS
 
 export const currencies = [{ name: "fakeCurrency", code: "FAKE" }];
+export const timezones = [{ name: "fakeTimezone", offset: "fakeOffset" }];
 
 export const newUser: UserI = {
   _id: "fakeId",
@@ -12,6 +13,7 @@ export const newUser: UserI = {
   email: "fakeEmail",
   password: "fakePassword",
   currency: currencies[0],
+  timezone: timezones[0],
 };
 
 export const updatedUser: UserI = {
@@ -20,6 +22,7 @@ export const updatedUser: UserI = {
   email: "fakeUpdatedEmail",
   password: "fakeUpdatedPassword",
   currency: currencies[0],
+  timezone: timezones[0],
 };
 
 export const loggedUser: LoginI = {
@@ -39,6 +42,7 @@ export const newTransaction: TransactionFormI = {
   concept: "fakeConcept",
   category: { _id: "fakeId", label: "fakeLabel" },
   amount: "fakeAmount",
+  date: new Date("1999-02-10T12:30:00"),
   userId: "fakeUserId",
 };
 
@@ -48,6 +52,7 @@ export const updatedTransaction: TransactionFormI = {
   concept: "fakeUpdatedConcept",
   category: { _id: "fakeId", label: "fakeLabel" },
   amount: "fakeUpdatedAmount",
+  date: new Date("2000-02-10T12:30:00"),
   userId: "fakeUpdatedUserId",
 };
 
@@ -62,6 +67,7 @@ export const newDebt: DebtFormI = {
   concept: "fakeConcept",
   category: { _id: "fakeId", label: "fakeLabel" },
   amount: "fakeAmount",
+  date: new Date("1999-02-10T12:30:00"),
   userId: "fakeUserId",
 };
 
@@ -72,5 +78,6 @@ export const updatedDebt: DebtFormI = {
   concept: "fakeConcept",
   category: { _id: "fakeId", label: "fakeLabel" },
   amount: "fakeAmount",
+  date: new Date("2000-02-10T12:30:00"),
   userId: "fakeUserId",
 };

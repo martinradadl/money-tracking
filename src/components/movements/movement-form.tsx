@@ -4,6 +4,8 @@ import { Select } from "@headlessui/react";
 import { useCategories } from "../../data/categories";
 import { DebtFormI } from "../../data/debts";
 import { useShallow } from "zustand/shallow";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function isDebt(movement: TransactionFormI | DebtFormI | null) {
   return movement && "entity" in movement;
@@ -152,6 +154,23 @@ export const MovementForm = <T extends DebtFormI | TransactionFormI | null>({
           name="amount"
           value={newMovement?.amount}
           onChange={handleChangeAmount}
+        />
+      </label>
+
+      <label>
+        <p className="capitalize text-2xl mb-2">date</p>
+        <DatePicker
+          className="w-full h-9 px-2 border-navy bg-green border-b-2"
+          selected={newMovement?.date}
+          onChange={(date) =>
+            setNewMovement({
+              ...newMovement,
+              date,
+            })
+          }
+          timeInputLabel="Time:"
+          dateFormat="MM/dd/yyyy h:mm aa"
+          showTimeInput
         />
       </label>
     </div>

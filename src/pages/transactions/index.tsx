@@ -61,6 +61,9 @@ export const Transactions: React.FC = () => {
 
   function openModal() {
     setIsModalOpen(true);
+    if (!selectedTransaction) {
+      setNewTransaction({ ...newTransactionInitialState, date: new Date() });
+    }
   }
 
   function closeModal() {

@@ -22,6 +22,7 @@ export interface DebtI {
   concept: string;
   category: CategoryI;
   amount: number;
+  date: Date | null;
 }
 
 export interface DebtFormI extends Omit<DebtI, "amount"> {
@@ -34,6 +35,7 @@ export const newDebtInitialState: DebtFormI = {
   concept: "",
   category: noCategory,
   amount: "",
+  date: null,
 };
 
 type State = {

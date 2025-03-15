@@ -13,6 +13,7 @@ export interface UserI {
   email: string;
   password?: string;
   currency: CurrencyI;
+  timezone: TimezoneI;
 }
 
 export interface LoginI {
@@ -25,9 +26,15 @@ export interface CurrencyI {
   code: string;
 }
 
+export interface TimezoneI {
+  name: string;
+  offset: string;
+}
+
 type State = {
   user: UserI | null;
   currencies: CurrencyI[];
+  timezones: TimezoneI[];
   isExpirationModalOpen: boolean;
   isSplashScreenLoading: boolean;
 };
@@ -81,6 +88,14 @@ export const setCurrencies = (currencies: CurrencyI[]) =>
     return {
       ...state,
       currencies,
+    };
+  });
+
+export const setTimeZones = (timezones: TimezoneI[]) =>
+  useAuth.setState((state: State) => {
+    return {
+      ...state,
+      timezones,
     };
   });
 
@@ -260,7 +275,7 @@ export const editUser = async (id: string, updatedItem: UserI) => {
   try {
     const response = await axios.put(`${API_URL}/auth/${id}`, updatedItem, {
       headers: {
-        Authorization: "Bearer " + `Bearer ${jwt()}`,
+        Authorization: `Bearer ${jwt()}`,
       },
     });
     if (response.status === 200) {
@@ -284,7 +299,7 @@ export const deleteUser = async (id: string) => {
   try {
     const response = await axios.delete(`${API_URL}/auth/${id}`, {
       headers: {
-        Authorization: "Bearer " + jwt,
+        Authorization: `Bearer ${jwt()}`,
       },
     });
     if (response.status === 200) {
@@ -323,10 +338,30 @@ export const getCurrencies = async () => {
   }
 };
 
+export const getTimezones = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/auth/timezones`);
+    if (response.status === 200) {
+      setTimeZones(response.data);
+    } else {
+      createToastify({ text: "Could not get time zones", type: "error" });
+    }
+  } catch (err: unknown) {
+    if (err instanceof Error || err instanceof AxiosError) {
+      createToastify({
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
+        type: "error",
+      });
+    }
+  }
+};
+
 export const useAuth = create<State>(() => {
   return {
     user: null,
     currencies: [],
+    timezones: [],
     isExpirationModalOpen: false,
     isSplashScreenLoading: true,
   };

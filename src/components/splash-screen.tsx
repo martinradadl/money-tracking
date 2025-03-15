@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   getCurrencies,
+  getTimezones,
   logout,
   setIsSplashScreenLoading,
   setUser,
@@ -13,7 +14,7 @@ export const SplashScreen = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    Promise.all([getCurrencies(), getCategories()]).then(() => {
+    Promise.all([getCurrencies(), getCategories(), getTimezones()]).then(() => {
       const min = 0.33;
       const max = 0.66;
       setProgress(Math.random() * (max - min) + min);

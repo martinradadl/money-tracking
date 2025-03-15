@@ -8,6 +8,7 @@ import {
   editUser,
   forgotPassword,
   getCurrencies,
+  getTimezones,
   login,
   register,
   resetPassword,
@@ -18,6 +19,7 @@ import {
   fakeToken,
   loggedUser,
   newUser,
+  timezones,
   updatedUser,
 } from "./utils";
 import * as createToastify from "../helpers/toastify";
@@ -388,6 +390,51 @@ describe("useAuthentication", () => {
         getCurrencies();
       });
       expect(result.current.currencies).toEqual(currencies);
+    });
+  });
+
+  describe("get time zones", () => {
+    afterAll(() => {
+      vi.resetAllMocks();
+    });
+
+    it("should not return time zones when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            timezones: state.timezones,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getCurrencies();
+      });
+      expect(result.current.timezones).toEqual([]);
+    });
+
+    it("should return time zones and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: timezones,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            timezones: state.timezones,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTimezones();
+      });
+      expect(result.current.timezones).toEqual(timezones);
     });
   });
 

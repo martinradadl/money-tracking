@@ -20,6 +20,7 @@ export interface TransactionI {
   concept: string;
   category: CategoryI;
   amount: number;
+  date: Date | null;
   userId?: string;
 }
 
@@ -32,6 +33,7 @@ export const newTransactionInitialState: TransactionFormI = {
   concept: "",
   category: noCategory,
   amount: "",
+  date: null,
 };
 
 type State = {
