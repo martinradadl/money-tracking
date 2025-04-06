@@ -11,6 +11,7 @@ import {
   setCookie,
   user,
 } from "../helpers/cookies";
+import { getAmountsSumParams, getMovementsParams } from "../helpers/movements";
 
 type TranscationType = "income" | "expenses";
 
@@ -130,12 +131,14 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
     };
   });
 
-export const getTransactions = async (page?: number, limit?: number) => {
+export const getTransactions = async (params: getMovementsParams) => {
   try {
     const response = await axios.get(
-      `${API_URL}/transactions/${user()?._id}?page=${page || 1}&limit=${
-        limit || 10
-      }`,
+      `${API_URL}/transactions/${user()?._id}?page=${params.page || 1}&limit=${
+        params.limit || 10
+      }&timePeriod=${params.timePeriod}&startDate=${params.startDate}&endDate=${
+        params.endDate
+      }&selectedDate=${params.selectedDate}`,
       {
         headers: {
           Authorization: `Bearer ${jwt()}`,
@@ -149,7 +152,7 @@ export const getTransactions = async (page?: number, limit?: number) => {
           ...newState.transactionsList,
           ...response.data,
         ];
-        if (limit && response.data.length < limit) {
+        if (params.limit && response.data.length < params.limit) {
           newState.isLastPage = true;
         }
         return newState;
@@ -302,14 +305,18 @@ export const deleteTransaction = async (id: string) => {
   }
 };
 
-export const getTotalIncome = async () => {
+export const getTotalIncome = async (params: getAmountsSumParams) => {
   const incomeCacheTemp = incomeCache();
   if (incomeCacheTemp) {
     setTotalIncome(incomeCacheTemp);
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/transactions/balance/income/${user()?._id}`,
+        `${API_URL}/transactions/${user()?._id}/balance/income?timePeriod=${
+          params.timePeriod
+        }&selectedDate=${params.selectedDate}&selectedStartDate=${
+          params.selectedStartDate
+        }&selectedEndDate=${params.selectedEndDate}`,
         {
           headers: {
             Authorization: `Bearer ${jwt()}`,
@@ -340,14 +347,18 @@ export const getTotalIncome = async () => {
   }
 };
 
-export const getTotalExpenses = async () => {
+export const getTotalExpenses = async (params: getAmountsSumParams) => {
   const expensesCacheTemp = expensesCache();
   if (expensesCacheTemp) {
     setTotalExpenses(expensesCacheTemp);
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/transactions/balance/expenses/${user()?._id}`,
+        `${API_URL}/transactions/${user()?._id}/balance/expenses?timePeriod=${
+          params.timePeriod
+        }&selectedDate=${params.selectedDate}&selectedStartDate=${
+          params.selectedStartDate
+        }&selectedEndDate=${params.selectedEndDate}`,
         {
           headers: {
             Authorization: `Bearer ${jwt()}`,
