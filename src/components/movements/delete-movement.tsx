@@ -45,19 +45,19 @@ export const DeleteMovementModal = <T extends DebtFormI | TransactionFormI>({
       switch (selectedMovement.type) {
         case "income":
           removeCookie("incomeCache");
-          getTotalIncome();
+          getTotalIncome({});
           break;
         case "expenses":
           removeCookie("expensesCache");
-          getTotalExpenses();
+          getTotalExpenses({});
           break;
         case "loan":
           removeCookie("loansCache");
-          getTotalLoans();
+          getTotalLoans({});
           break;
         case "debt":
           removeCookie("debtsCache");
-          getTotalDebts();
+          getTotalDebts({});
           break;
         default:
           break;

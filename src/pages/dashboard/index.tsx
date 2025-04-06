@@ -26,10 +26,10 @@ export const Dashboard: React.FC = () => {
 
   const getBalances = async () => {
     Promise.all([
-      getTotalIncome(),
-      getTotalExpenses(),
-      getTotalLoans(),
-      getTotalDebts(),
+      getTotalIncome({}),
+      getTotalExpenses({}),
+      getTotalLoans({}),
+      getTotalDebts({}),
     ]);
   };
 

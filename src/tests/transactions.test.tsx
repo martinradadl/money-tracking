@@ -75,7 +75,7 @@ describe("useTransactions", () => {
         )
       );
       await act(async () => {
-        getTransactions();
+        getTransactions({});
       });
       expect(result.current.transactionsList).toEqual([]);
     });
@@ -94,7 +94,7 @@ describe("useTransactions", () => {
       );
 
       await act(async () => {
-        getTransactions();
+        getTransactions({});
       });
       expect(result.current.transactionsList).toEqual([newTransaction]);
     });
@@ -229,7 +229,7 @@ describe("useTransactions", () => {
       );
 
       await act(async () => {
-        getTotalIncome();
+        getTotalIncome({});
       });
       expect(result.current.totalIncome).toEqual(0);
     });
@@ -249,7 +249,7 @@ describe("useTransactions", () => {
       );
 
       await act(async () => {
-        getTotalIncome();
+        getTotalIncome({});
       });
       expect(result.current.totalIncome).toEqual(100);
     });
@@ -273,7 +273,7 @@ describe("useTransactions", () => {
       );
 
       await act(async () => {
-        getTotalExpenses();
+        getTotalExpenses({});
       });
       expect(result.current.totalExpenses).toEqual(0);
     });
@@ -293,7 +293,7 @@ describe("useTransactions", () => {
       );
 
       await act(async () => {
-        getTotalExpenses();
+        getTotalExpenses({});
       });
       expect(result.current.totalExpenses).toEqual(100);
     });

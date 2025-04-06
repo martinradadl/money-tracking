@@ -76,8 +76,8 @@ export const Debts: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      getTotalLoans();
-      getTotalDebts();
+      getTotalLoans({});
+      getTotalDebts({});
     }
   }, [user?._id]);
 
@@ -87,7 +87,7 @@ export const Debts: React.FC = () => {
 
   const fetchDebts = async () => {
     if (user?._id) {
-      await getDebts(page, 10);
+      await getDebts({ page, limit: 10 });
     }
   };
 
@@ -96,7 +96,7 @@ export const Debts: React.FC = () => {
   useEffect(() => {
     if (isInitialLoadRef.current && isInitialLoad && user?._id) {
       isInitialLoadRef.current = false;
-      getDebts(1, 10).then(() => {
+      getDebts({ page: 1, limit: 10 }).then(() => {
         setIsInitialLoad(false);
       });
     }

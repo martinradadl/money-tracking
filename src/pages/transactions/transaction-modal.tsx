@@ -65,10 +65,10 @@ export const TransactionModal = ({ userId, close, isOpen }: props) => {
   const updateBalance = (type: string) => {
     if (type === "income") {
       removeCookie("incomeCache");
-      getTotalIncome();
+      getTotalIncome({});
     } else {
       removeCookie("expensesCache");
-      getTotalExpenses();
+      getTotalExpenses({});
     }
   };
 

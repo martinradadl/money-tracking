@@ -78,8 +78,8 @@ export const Transactions: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      getTotalIncome();
-      getTotalExpenses();
+      getTotalIncome({});
+      getTotalExpenses({});
     }
   }, [user?._id]);
 
@@ -89,7 +89,7 @@ export const Transactions: React.FC = () => {
 
   const fetchTransactions = async () => {
     if (user?._id) {
-      await getTransactions(page, 10);
+      await getTransactions({ page, limit: 10 });
     }
   };
 
@@ -98,7 +98,7 @@ export const Transactions: React.FC = () => {
   useEffect(() => {
     if (isInitialLoadRef.current && isInitialLoad && user?._id) {
       isInitialLoadRef.current = false;
-      getTransactions(1, 10).then(() => {
+      getTransactions({ page: 1, limit: 10 }).then(() => {
         setIsInitialLoad(false);
       });
     }
