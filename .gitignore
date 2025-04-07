@@ -25,5 +25,4 @@ dist-ssr
 
 .env
 src/tests/coverage
-coverage/*
-src/coverage/*
+src/coverage
