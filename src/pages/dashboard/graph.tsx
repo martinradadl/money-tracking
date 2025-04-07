@@ -9,12 +9,15 @@ import { getTotalLoans, getTotalDebts } from "../../data/debts";
 import { useAuth } from "../../data/authentication";
 import { useShallow } from "zustand/shallow";
 import DatePicker from "react-datepicker";
+import { filterTypes, timePeriods } from "../../helpers/movements";
 
 export const GraphPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const graphCode = searchParams.get("graphCode") || "";
-  const [selectedFilterType, setSelectedFilterType] = useState("Single Date");
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState("Day");
+  const [selectedFilterType, setSelectedFilterType] = useState(
+    filterTypes.singleDate
+  );
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState(timePeriods.day);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [selectedDateRange, setSelectedDateRange] = useState<(Date | null)[]>([
     null,
@@ -82,7 +85,7 @@ export const GraphPage: React.FC = () => {
         onChange={handleChangeFilterType}
         className="w-full text-xl rounded bg-beige text-navy border-b-2"
       >
-        {["Single Date", "Date Range"].map((elem, i) => {
+        {Object.values(filterTypes).map((elem, i) => {
           return (
             <option key={i} value={elem}>
               {elem}
@@ -97,7 +100,7 @@ export const GraphPage: React.FC = () => {
         onChange={handleChangeTimePeriod}
         className="w-full text-xl rounded bg-beige text-navy border-b-2"
       >
-        {["Day", "Month", "Year"].map((elem, i) => {
+        {Object.values(timePeriods).map((elem, i) => {
           return (
             <option key={i} value={elem}>
               {elem}
@@ -105,67 +108,41 @@ export const GraphPage: React.FC = () => {
           );
         })}
       </Select>
-      {selectedFilterType === "Single Date" ? (
-        selectedTimePeriod === "Day" ? (
-          <DatePicker
-            className="w-full h-9 px-2 rounded border-navy bg-beige border-b-2"
-            showIcon
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-          />
-        ) : selectedTimePeriod === "Month" ? (
-          <DatePicker
-            className="w-full h-9 px-2 rounded border-navy bg-beige border-b-2"
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            dateFormat="MM/yyyy"
-            showMonthYearPicker
-          />
-        ) : (
-          <DatePicker
-            className="w-full h-9 px-2 rounded border-navy bg-beige border-b-2"
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            showYearPicker
-            dateFormat="yyyy"
-          />
-        )
-      ) : selectedTimePeriod === "Day" ? (
+      {selectedFilterType === filterTypes.singleDate ? (
         <DatePicker
           className="w-full h-9 px-2 rounded border-navy bg-beige border-b-2"
-          selectsRange={true}
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(update) => {
-            setSelectedDateRange(update);
-          }}
-          isClearable={true}
-        />
-      ) : selectedTimePeriod === "Month" ? (
-        <DatePicker
-          className="w-full h-9 px-2 rounded border-navy bg-beige border-b-2"
-          selected={startDate}
-          onChange={(update) => {
-            setSelectedDateRange(update);
-          }}
-          selectsRange
-          startDate={startDate}
-          endDate={endDate}
-          dateFormat="MM/yyyy"
-          showMonthYearPicker
+          selected={selectedDate}
+          onChange={(date) => setSelectedDate(date)}
+          showIcon
+          dateFormat={
+            selectedTimePeriod === timePeriods.day
+              ? undefined
+              : selectedTimePeriod === timePeriods.month
+              ? "MM/yyyy"
+              : "yyyy"
+          }
+          showMonthYearPicker={selectedTimePeriod === timePeriods.month ? true : false}
+          showYearPicker={selectedTimePeriod === timePeriods.year ? true : false}
         />
       ) : (
         <DatePicker
           className="w-full h-9 px-2 rounded border-navy bg-beige border-b-2"
-          selected={startDate}
-          onChange={(update) => {
-            setSelectedDateRange(update);
-          }}
           selectsRange
           startDate={startDate}
           endDate={endDate}
-          dateFormat="yyyy"
-          showYearPicker
+          onChange={(update) => {
+            setSelectedDateRange(update);
+          }}
+          dateFormat={
+            selectedTimePeriod === timePeriods.day
+              ? undefined
+              : selectedTimePeriod === timePeriods.month
+              ? "MM/yyyy"
+              : "yyyy"
+          }
+          isClearable={selectedTimePeriod === timePeriods.day ? true : false}
+          showMonthYearPicker={selectedTimePeriod === timePeriods.month ? true : false}
+          showYearPicker={selectedTimePeriod === timePeriods.year ? true : false}
         />
       )}
       <div className="bg-beige w-full aspect-square rounded p-6 mt-4">
