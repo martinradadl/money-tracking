@@ -12,6 +12,7 @@ import {
   useDebts,
 } from "../data/debts.js";
 import { useShallow } from "zustand/shallow";
+import { timePeriods } from "../helpers/movements.js";
 
 vi.mock("axios");
 
@@ -96,6 +97,51 @@ describe("useDebts", () => {
 
       await act(async () => {
         getDebts({});
+      });
+      expect(result.current.debtsList).toEqual([newDebt]);
+    });
+
+    it("should return debts list with elements in a selected date and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [newDebt],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getDebts({
+          timePeriod: timePeriods.day,
+          selectedDate: "2020/02/02",
+        });
+      });
+      expect(result.current.debtsList).toEqual([newDebt]);
+    });
+
+    it("should return debts list with elements in a selected date range and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [newDebt],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsList: state.debtsList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getDebts({
+          timePeriod: timePeriods.day,
+          startDate: "2020/02/02",
+          endDate: "2020/02/20",
+        });
       });
       expect(result.current.debtsList).toEqual([newDebt]);
     });
@@ -254,6 +300,53 @@ describe("useDebts", () => {
       });
       expect(result.current.totalLoans).toEqual(100);
     });
+
+    it("should return total loans in a selected date and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            totalLoans: state.totalLoans,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalLoans({
+          timePeriod: timePeriods.day,
+          selectedDate: "2020/02/02",
+        });
+      });
+      expect(result.current.totalLoans).toEqual(100);
+    });
+
+    it("should return total loans in a selected date range and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            totalLoans: state.totalLoans,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalLoans({
+          timePeriod: timePeriods.day,
+          selectedStartDate: "2020/02/02",
+          selectedEndDate: "2020/02/20",
+        });
+      });
+      expect(result.current.totalLoans).toEqual(100);
+    });
   });
 
   describe("getTotalDebts", () => {
@@ -295,6 +388,53 @@ describe("useDebts", () => {
 
       await act(async () => {
         getTotalDebts({});
+      });
+      expect(result.current.totalDebts).toEqual(100);
+    });
+
+    it("should return total debts in a selected date and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            totalDebts: state.totalDebts,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalDebts({
+          timePeriod: timePeriods.day,
+          selectedDate: "2020/02/02",
+        });
+      });
+      expect(result.current.totalDebts).toEqual(100);
+    });
+
+    it("should return total debts in a selected date range and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            totalDebts: state.totalDebts,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalDebts({
+          timePeriod: timePeriods.day,
+          selectedStartDate: "2020/02/02",
+          selectedEndDate: "2020/02/20",
+        });
       });
       expect(result.current.totalDebts).toEqual(100);
     });

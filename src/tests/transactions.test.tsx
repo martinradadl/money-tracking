@@ -12,6 +12,7 @@ import {
 import axios from "axios";
 import { newTransaction, updatedTransaction } from "./utils.js";
 import { useShallow } from "zustand/shallow";
+import { timePeriods } from "../helpers/movements.js";
 
 vi.mock("axios");
 
@@ -95,6 +96,51 @@ describe("useTransactions", () => {
 
       await act(async () => {
         getTransactions({});
+      });
+      expect(result.current.transactionsList).toEqual([newTransaction]);
+    });
+
+    it("should return transactions list with elements in a selected date and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [newTransaction],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            transactionsList: state.transactionsList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTransactions({
+          timePeriod: timePeriods.day,
+          selectedDate: "2020/02/02",
+        });
+      });
+      expect(result.current.transactionsList).toEqual([newTransaction]);
+    });
+
+    it("should return transactions list with elements in a selected date range and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [newTransaction],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            transactionsList: state.transactionsList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTransactions({
+          timePeriod: timePeriods.day,
+          startDate: "2020/02/02",
+          endDate: "2020/02/20",
+        });
       });
       expect(result.current.transactionsList).toEqual([newTransaction]);
     });
@@ -253,6 +299,53 @@ describe("useTransactions", () => {
       });
       expect(result.current.totalIncome).toEqual(100);
     });
+
+    it("should return total income in a selected date and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            totalIncome: state.totalIncome,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalIncome({
+          timePeriod: timePeriods.day,
+          selectedDate: "2020/02/02",
+        });
+      });
+      expect(result.current.totalIncome).toEqual(100);
+    });
+
+    it("should return total income in a selected date range and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            totalIncome: state.totalIncome,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalIncome({
+          timePeriod: timePeriods.day,
+          selectedStartDate: "2020/02/02",
+          selectedEndDate: "2020/02/20",
+        });
+      });
+      expect(result.current.totalIncome).toEqual(100);
+    });
   });
 
   describe("getTotalExpenses", () => {
@@ -294,6 +387,53 @@ describe("useTransactions", () => {
 
       await act(async () => {
         getTotalExpenses({});
+      });
+      expect(result.current.totalExpenses).toEqual(100);
+    });
+
+    it("should return total expenses in a selected date and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            totalExpenses: state.totalExpenses,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalExpenses({
+          timePeriod: timePeriods.day,
+          selectedDate: "2020/02/02",
+        });
+      });
+      expect(result.current.totalExpenses).toEqual(100);
+    });
+
+    it("should return total expenses in a selected date range and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: 100,
+        status: 200,
+      });
+
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            totalExpenses: state.totalExpenses,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTotalExpenses({
+          timePeriod: timePeriods.day,
+          selectedStartDate: "2020/02/02",
+          selectedEndDate: "2020/02/20",
+        });
       });
       expect(result.current.totalExpenses).toEqual(100);
     });
