@@ -12,6 +12,7 @@ import {
   user,
 } from "../helpers/cookies";
 import { getAmountsSumParams, getMovementsParams } from "../helpers/movements";
+import { parseObjectToQueryParams } from "../helpers/utils";
 
 type DebtType = "debt" | "loan";
 
@@ -134,11 +135,7 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
 export const getDebts = async (params: getMovementsParams) => {
   try {
     const response = await axios.get(
-      `${API_URL}/debts/${user()?._id}?page=${params.page || 1}&limit=${
-        params.limit || 10
-      }&timePeriod=${params.timePeriod}&startDate=${params.startDate}&endDate=${
-        params.endDate
-      }&selectedDate=${params.selectedDate}`,
+      `${API_URL}/debts/${user()?._id}${parseObjectToQueryParams(params)}`,
       {
         headers: {
           Authorization: "Bearer " + jwt(),
@@ -303,11 +300,9 @@ export const getTotalLoans = async (params: getAmountsSumParams) => {
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/debts/${user()?._id}/balance/loans?timePeriod=${
-          params.timePeriod
-        }&selectedDate=${params.selectedDate}&selectedStartDate=${
-          params.selectedStartDate
-        }&selectedEndDate=${params.selectedEndDate}`,
+        `${API_URL}/debts/${
+          user()?._id
+        }/balance/loans${parseObjectToQueryParams(params)}`,
         {
           headers: {
             Authorization: `Bearer ${jwt()}`,
@@ -345,11 +340,9 @@ export const getTotalDebts = async (params: getAmountsSumParams) => {
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/debts/${user()?._id}/balance/debts?timePeriod=${
-          params.timePeriod
-        }&selectedDate=${params.selectedDate}&selectedStartDate=${
-          params.selectedStartDate
-        }&selectedEndDate=${params.selectedEndDate}`,
+        `${API_URL}/debts/${
+          user()?._id
+        }/balance/debts${parseObjectToQueryParams(params)}`,
         {
           headers: {
             Authorization: `Bearer ${jwt()}`,

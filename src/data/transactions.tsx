@@ -12,6 +12,7 @@ import {
   user,
 } from "../helpers/cookies";
 import { getAmountsSumParams, getMovementsParams } from "../helpers/movements";
+import { parseObjectToQueryParams } from "../helpers/utils";
 
 type TranscationType = "income" | "expenses";
 
@@ -134,11 +135,9 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
 export const getTransactions = async (params: getMovementsParams) => {
   try {
     const response = await axios.get(
-      `${API_URL}/transactions/${user()?._id}?page=${params.page || 1}&limit=${
-        params.limit || 10
-      }&timePeriod=${params.timePeriod}&startDate=${params.startDate}&endDate=${
-        params.endDate
-      }&selectedDate=${params.selectedDate}`,
+      `${API_URL}/transactions/${user()?._id}${parseObjectToQueryParams(
+        params
+      )}`,
       {
         headers: {
           Authorization: `Bearer ${jwt()}`,
@@ -312,11 +311,9 @@ export const getTotalIncome = async (params: getAmountsSumParams) => {
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/transactions/${user()?._id}/balance/income?timePeriod=${
-          params.timePeriod
-        }&selectedDate=${params.selectedDate}&selectedStartDate=${
-          params.selectedStartDate
-        }&selectedEndDate=${params.selectedEndDate}`,
+        `${API_URL}/transactions/${
+          user()?._id
+        }/balance/income${parseObjectToQueryParams(params)}`,
         {
           headers: {
             Authorization: `Bearer ${jwt()}`,
@@ -354,11 +351,9 @@ export const getTotalExpenses = async (params: getAmountsSumParams) => {
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/transactions/${user()?._id}/balance/expenses?timePeriod=${
-          params.timePeriod
-        }&selectedDate=${params.selectedDate}&selectedStartDate=${
-          params.selectedStartDate
-        }&selectedEndDate=${params.selectedEndDate}`,
+        `${API_URL}/transactions/${
+          user()?._id
+        }/balance/expenses${parseObjectToQueryParams(params)}`,
         {
           headers: {
             Authorization: `Bearer ${jwt()}`,
