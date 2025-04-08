@@ -11,6 +11,8 @@ import {
   setCookie,
   user,
 } from "../helpers/cookies";
+import { getAmountsSumParams, getMovementsParams } from "../helpers/movements";
+import { parseObjectToQueryParams } from "../helpers/utils";
 
 type DebtType = "debt" | "loan";
 
@@ -130,10 +132,10 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
     };
   });
 
-export const getDebts = async (page?: number, limit?: number) => {
+export const getDebts = async (params: getMovementsParams) => {
   try {
     const response = await axios.get(
-      `${API_URL}/debts/${user()?._id}?page=${page || 1}&limit=${limit || 10}`,
+      `${API_URL}/debts/${user()?._id}${parseObjectToQueryParams(params)}`,
       {
         headers: {
           Authorization: "Bearer " + jwt(),
@@ -144,7 +146,7 @@ export const getDebts = async (page?: number, limit?: number) => {
       useDebts.setState((state: State) => {
         const newState = { ...state };
         newState.debtsList = [...newState.debtsList, ...response.data];
-        if (limit && response.data.length < limit) {
+        if (params.limit && response.data.length < params.limit) {
           newState.isLastPage = true;
         }
         return newState;
@@ -291,14 +293,16 @@ export const deleteDebt = async (id: string) => {
   }
 };
 
-export const getTotalLoans = async () => {
+export const getTotalLoans = async (params: getAmountsSumParams) => {
   const loansCacheTemp = loansCache();
   if (loansCacheTemp) {
     setTotalLoans(loansCacheTemp);
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/debts/balance/loans/${user()?._id}`,
+        `${API_URL}/debts/${
+          user()?._id
+        }/balance/loans${parseObjectToQueryParams(params)}`,
         {
           headers: {
             Authorization: `Bearer ${jwt()}`,
@@ -329,14 +333,16 @@ export const getTotalLoans = async () => {
   }
 };
 
-export const getTotalDebts = async () => {
+export const getTotalDebts = async (params: getAmountsSumParams) => {
   const debtsCacheTemp = debtsCache();
   if (debtsCacheTemp) {
     setTotalDebts(debtsCacheTemp);
   } else {
     try {
       const response = await axios.get(
-        `${API_URL}/debts/balance/debts/${user()?._id}`,
+        `${API_URL}/debts/${
+          user()?._id
+        }/balance/debts${parseObjectToQueryParams(params)}`,
         {
           headers: {
             Authorization: `Bearer ${jwt()}`,

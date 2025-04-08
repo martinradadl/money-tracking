@@ -60,10 +60,10 @@ export const DebtModal = ({ userId, close, isOpen }: Props) => {
   const updateBalance = (type: string) => {
     if (type === "loan") {
       removeCookie("loansCache");
-      getTotalLoans();
+      getTotalLoans({});
     } else {
       removeCookie("debtsCache");
-      getTotalDebts();
+      getTotalDebts({});
     }
   };
 
