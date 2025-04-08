@@ -16,3 +16,14 @@ export const isExpired = () => {
   const now = new Date().getTime();
   return now > expiresOn();
 };
+
+export const parseObjectToQueryParams = (params: object) => {
+  let queryParams = "?";
+  Object.entries(params).map((elem) => {
+    if (elem[1]) {
+      if (queryParams !== "?") queryParams += "&";
+      queryParams += `${elem[0]}=${elem[1]}`;
+    }
+  });
+  return queryParams;
+};
