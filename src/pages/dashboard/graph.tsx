@@ -55,6 +55,20 @@ export const GraphPage: React.FC = () => {
       getTotalDebts(params),
     ]);
   };
+  const getAmountsSumParams = () => {
+    return {
+      timePeriod: selectedTimePeriod.toLowerCase(),
+      selectedDate: selectedDate
+        ? formatDateByPeriod(selectedTimePeriod, selectedDate)
+        : null,
+      selectedStartDate: selectedDateRange[0]
+        ? formatDateByPeriod(selectedTimePeriod, selectedDateRange[0])
+        : null,
+      selectedEndDate: selectedDateRange[1]
+        ? formatDateByPeriod(selectedTimePeriod, selectedDateRange[1])
+        : null,
+    };
+  };
 
   useEffect(() => {
     if (!graphCode) {
@@ -69,24 +83,12 @@ export const GraphPage: React.FC = () => {
   }, [user?._id]);
 
   useEffect(() => {
-    const params = {
-      timePeriod: selectedTimePeriod.toLowerCase(),
-      selectedDate: selectedDate
-        ? formatDateByPeriod(selectedTimePeriod, selectedDate)
-        : null,
-      selectedStartDate: selectedDateRange[0]
-        ? formatDateByPeriod(selectedTimePeriod, selectedDateRange[0])
-        : null,
-      selectedEndDate: selectedDateRange[1]
-        ? formatDateByPeriod(selectedTimePeriod, selectedDateRange[1])
-        : null,
-    };
     if (user?._id) {
       removeCookie("incomeCache");
       removeCookie("expensesCache");
       removeCookie("loansCache");
       removeCookie("debtsCache");
-      getBalances(params);
+      getBalances(getAmountsSumParams());
     }
   }, [selectedDate, selectedDateRange]);
 
