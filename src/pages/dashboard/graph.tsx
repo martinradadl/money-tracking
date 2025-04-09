@@ -178,15 +178,9 @@ export const GraphPage: React.FC = () => {
               ? "MM/yyyy"
               : "yyyy"
           }
-          showMonthYearPicker={
-            selectedTimePeriod === timePeriods.month ? true : false
-          }
-          showYearPicker={
-            selectedTimePeriod === timePeriods.year ? true : false
-          }
-          showYearDropdown={
-            selectedTimePeriod === timePeriods.day ? true : false
-          }
+          showMonthYearPicker={selectedTimePeriod === timePeriods.months}
+          showYearPicker={selectedTimePeriod === timePeriods.years}
+          showYearDropdown={selectedTimePeriod === timePeriods.days}
         />
       ) : (
         <DatePicker
@@ -205,16 +199,10 @@ export const GraphPage: React.FC = () => {
               ? "MM/yyyy"
               : "yyyy"
           }
-          isClearable={selectedTimePeriod === timePeriods.day ? true : false}
-          showMonthYearPicker={
-            selectedTimePeriod === timePeriods.month ? true : false
-          }
-          showYearPicker={
-            selectedTimePeriod === timePeriods.year ? true : false
-          }
-          showYearDropdown={
-            selectedTimePeriod === timePeriods.day ? true : false
-          }
+          isClearable={selectedTimePeriod === timePeriods.days}
+          showMonthYearPicker={selectedTimePeriod === timePeriods.months}
+          showYearPicker={selectedTimePeriod === timePeriods.years}
+          showYearDropdown={selectedTimePeriod === timePeriods.days}
         />
       )}
       <Button
