@@ -95,7 +95,6 @@ export const GraphPage: React.FC = () => {
   }, [user?._id]);
 
   useEffect(() => {
-    console.log("entré");
     if (user?._id) {
       removeCookie("incomeCache");
       removeCookie("expensesCache");
