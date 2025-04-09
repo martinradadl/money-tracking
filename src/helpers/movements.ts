@@ -1,4 +1,4 @@
-export type getMovementsParams = {
+export type GetMovementsParams = {
   page?: number;
   limit?: number;
   timePeriod?: string;
@@ -7,7 +7,7 @@ export type getMovementsParams = {
   selectedDate?: string;
 };
 
-export type getAmountsSumParams = {
+export type GetAmountsSumParams = {
   timePeriod?: string;
   selectedDate?: string | null;
   selectedStartDate?: string | null;
@@ -19,9 +19,9 @@ export const filterTypes = {
   dateRange: "Date Range",
 };
 
-export type timePeriod = "Day" | "Month" | "Year";
+export type TimePeriod = "Day" | "Month" | "Year";
 
-export const timePeriods: { [key: string]: timePeriod } = {
+export const timePeriods: { [key: string]: TimePeriod } = {
   day: "Day",
   month: "Month",
   year: "Year",

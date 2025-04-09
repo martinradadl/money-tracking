@@ -11,8 +11,8 @@ import { useShallow } from "zustand/shallow";
 import DatePicker from "react-datepicker";
 import {
   filterTypes,
-  getAmountsSumParams,
-  timePeriod,
+  GetAmountsSumParams,
+  TimePeriod,
   timePeriods,
 } from "../../helpers/movements";
 import { useCookies } from "react-cookie";
@@ -23,7 +23,7 @@ export const GraphPage: React.FC = () => {
   const [selectedFilterType, setSelectedFilterType] = useState(
     filterTypes.singleDate
   );
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState<timePeriod>(
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState<TimePeriod>(
     timePeriods.day
   );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -47,7 +47,7 @@ export const GraphPage: React.FC = () => {
     "debtsCache",
   ]);
 
-  const getBalances = async (params: getAmountsSumParams) => {
+  const getBalances = async (params: GetAmountsSumParams) => {
     Promise.all([
       getTotalIncome(params),
       getTotalExpenses(params),
@@ -90,7 +90,7 @@ export const GraphPage: React.FC = () => {
     }
   }, [selectedDate, selectedDateRange]);
 
-  const formatDateByPeriod = (timePeriod: timePeriod, date: Date) => {
+  const formatDateByPeriod = (timePeriod: TimePeriod, date: Date) => {
     const formattedDates = {
       Year: date.toISOString().slice(0, 4),
       Month: date.toISOString().slice(0, 7),
@@ -113,7 +113,7 @@ export const GraphPage: React.FC = () => {
   const handleChangeTimePeriod = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setSelectedTimePeriod(event?.target.value as timePeriod);
+    setSelectedTimePeriod(event?.target.value as TimePeriod);
   };
 
   const handleCleanFilter = () => {

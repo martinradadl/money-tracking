@@ -1,6 +1,6 @@
 import Toastify from "toastify-js";
 
-type toastifyOptionsI = {
+type ToastifyOptionsI = {
   text: string;
   type?: "success" | "error" | "warning" | "info";
   duration?: number;
@@ -20,7 +20,7 @@ const defaultStyles: OptionStylesI = {
   info: { background: "blue" },
 };
 
-export const createToastify = (options: toastifyOptionsI) => {
+export const createToastify = (options: ToastifyOptionsI) => {
   Toastify({
     text: options.text,
     duration: options.duration || 3000,

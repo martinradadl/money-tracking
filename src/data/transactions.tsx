@@ -11,7 +11,7 @@ import {
   setCookie,
   user,
 } from "../helpers/cookies";
-import { getAmountsSumParams, getMovementsParams } from "../helpers/movements";
+import { GetAmountsSumParams, GetMovementsParams } from "../helpers/movements";
 import { parseObjectToQueryParams } from "../helpers/utils";
 
 type TranscationType = "income" | "expenses";
@@ -132,7 +132,7 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
     };
   });
 
-export const getTransactions = async (params: getMovementsParams) => {
+export const getTransactions = async (params: GetMovementsParams) => {
   try {
     const response = await axios.get(
       `${API_URL}/transactions/${user()?._id}${parseObjectToQueryParams(
@@ -304,7 +304,7 @@ export const deleteTransaction = async (id: string) => {
   }
 };
 
-export const getTotalIncome = async (params: getAmountsSumParams) => {
+export const getTotalIncome = async (params: GetAmountsSumParams) => {
   const incomeCacheTemp = incomeCache();
   if (incomeCacheTemp) {
     setTotalIncome(incomeCacheTemp);
@@ -344,7 +344,7 @@ export const getTotalIncome = async (params: getAmountsSumParams) => {
   }
 };
 
-export const getTotalExpenses = async (params: getAmountsSumParams) => {
+export const getTotalExpenses = async (params: GetAmountsSumParams) => {
   const expensesCacheTemp = expensesCache();
   if (expensesCacheTemp) {
     setTotalExpenses(expensesCacheTemp);
