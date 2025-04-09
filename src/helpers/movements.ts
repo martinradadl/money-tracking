@@ -9,9 +9,9 @@ export type getMovementsParams = {
 
 export type getAmountsSumParams = {
   timePeriod?: string;
-  selectedDate?: string;
-  selectedStartDate?: string;
-  selectedEndDate?: string;
+  selectedDate?: string | null;
+  selectedStartDate?: string | null;
+  selectedEndDate?: string | null;
 };
 
 export const filterTypes = {
@@ -19,7 +19,9 @@ export const filterTypes = {
   dateRange: "Date Range",
 };
 
-export const timePeriods = {
+export type timePeriod = "Day" | "Month" | "Year";
+
+export const timePeriods: { [key: string]: timePeriod } = {
   day: "Day",
   month: "Month",
   year: "Year",

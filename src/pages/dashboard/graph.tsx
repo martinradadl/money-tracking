@@ -1,4 +1,4 @@
-import { Select } from "@headlessui/react";
+import { Button, Select } from "@headlessui/react";
 import React, { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -9,7 +9,13 @@ import { getTotalLoans, getTotalDebts } from "../../data/debts";
 import { useAuth } from "../../data/authentication";
 import { useShallow } from "zustand/shallow";
 import DatePicker from "react-datepicker";
-import { filterTypes, timePeriods } from "../../helpers/movements";
+import {
+  filterTypes,
+  getAmountsSumParams,
+  timePeriod,
+  timePeriods,
+} from "../../helpers/movements";
+import { useCookies } from "react-cookie";
 
 export const GraphPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -17,8 +23,10 @@ export const GraphPage: React.FC = () => {
   const [selectedFilterType, setSelectedFilterType] = useState(
     filterTypes.singleDate
   );
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState(timePeriods.day);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState<timePeriod>(
+    timePeriods.day
+  );
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedDateRange, setSelectedDateRange] = useState<(Date | null)[]>([
     null,
     null,
@@ -32,13 +40,19 @@ export const GraphPage: React.FC = () => {
       user: state.user,
     }))
   );
+  const [, , removeCookie] = useCookies([
+    "incomeCache",
+    "expensesCache",
+    "loansCache",
+    "debtsCache",
+  ]);
 
-  const getBalances = async () => {
+  const getBalances = async (params: getAmountsSumParams) => {
     Promise.all([
-      getTotalIncome({}),
-      getTotalExpenses({}),
-      getTotalLoans({}),
-      getTotalDebts({}),
+      getTotalIncome(params),
+      getTotalExpenses(params),
+      getTotalLoans(params),
+      getTotalDebts(params),
     ]);
   };
 
@@ -50,20 +64,63 @@ export const GraphPage: React.FC = () => {
 
   useEffect(() => {
     if (user?._id) {
-      getBalances();
+      getBalances({});
     }
   }, [user?._id]);
+
+  useEffect(() => {
+    const params = {
+      timePeriod: selectedTimePeriod.toLowerCase(),
+      selectedDate: selectedDate
+        ? formatDateByPeriod(selectedTimePeriod, selectedDate)
+        : null,
+      selectedStartDate: selectedDateRange[0]
+        ? formatDateByPeriod(selectedTimePeriod, selectedDateRange[0])
+        : null,
+      selectedEndDate: selectedDateRange[1]
+        ? formatDateByPeriod(selectedTimePeriod, selectedDateRange[1])
+        : null,
+    };
+    if (user?._id) {
+      removeCookie("incomeCache");
+      removeCookie("expensesCache");
+      removeCookie("loansCache");
+      removeCookie("debtsCache");
+      getBalances(params);
+    }
+  }, [selectedDate, selectedDateRange]);
+
+  const formatDateByPeriod = (timePeriod: timePeriod, date: Date) => {
+    const formattedDates = {
+      Year: date.toISOString().slice(0, 4),
+      Month: date.toISOString().slice(0, 7),
+      Day: date.toISOString().slice(0, 10),
+    };
+    return formattedDates[timePeriod];
+  };
 
   const handleChangeFilterType = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setSelectedFilterType(event?.target.value);
+    if (event?.target.value === filterTypes.singleDate) {
+      setSelectedDateRange([null, null]);
+    } else {
+      setSelectedDate(null);
+    }
   };
 
   const handleChangeTimePeriod = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setSelectedTimePeriod(event?.target.value);
+    setSelectedTimePeriod(event?.target.value as timePeriod);
+  };
+
+  const handleCleanFilter = () => {
+    setSelectedDateRange([null, null]);
+    setSelectedDate(null);
+    setSelectedFilterType(filterTypes.singleDate);
+    setSelectedTimePeriod(timePeriods.day);
   };
 
   return (
@@ -121,8 +178,15 @@ export const GraphPage: React.FC = () => {
               ? "MM/yyyy"
               : "yyyy"
           }
-          showMonthYearPicker={selectedTimePeriod === timePeriods.month ? true : false}
-          showYearPicker={selectedTimePeriod === timePeriods.year ? true : false}
+          showMonthYearPicker={
+            selectedTimePeriod === timePeriods.month ? true : false
+          }
+          showYearPicker={
+            selectedTimePeriod === timePeriods.year ? true : false
+          }
+          showYearDropdown={
+            selectedTimePeriod === timePeriods.day ? true : false
+          }
         />
       ) : (
         <DatePicker
@@ -133,6 +197,7 @@ export const GraphPage: React.FC = () => {
           onChange={(update) => {
             setSelectedDateRange(update);
           }}
+          showIcon
           dateFormat={
             selectedTimePeriod === timePeriods.day
               ? undefined
@@ -141,10 +206,23 @@ export const GraphPage: React.FC = () => {
               : "yyyy"
           }
           isClearable={selectedTimePeriod === timePeriods.day ? true : false}
-          showMonthYearPicker={selectedTimePeriod === timePeriods.month ? true : false}
-          showYearPicker={selectedTimePeriod === timePeriods.year ? true : false}
+          showMonthYearPicker={
+            selectedTimePeriod === timePeriods.month ? true : false
+          }
+          showYearPicker={
+            selectedTimePeriod === timePeriods.year ? true : false
+          }
+          showYearDropdown={
+            selectedTimePeriod === timePeriods.day ? true : false
+          }
         />
       )}
+      <Button
+        className="w-full rounded-md bg-yellow-category text-navy py-1 px-3 text-xl font-semibold"
+        onClick={handleCleanFilter}
+      >
+        Clear Filter
+      </Button>
       <div className="bg-beige w-full aspect-square rounded p-6 mt-4">
         <DonutChart {...{ data, options }} />
       </div>
