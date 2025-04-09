@@ -11,6 +11,7 @@ import { useShallow } from "zustand/shallow";
 import DatePicker from "react-datepicker";
 import {
   filterTypes,
+  formatDateByPeriod,
   GetAmountsSumParams,
   TimePeriod,
   timePeriods,
@@ -23,9 +24,7 @@ export const GraphPage: React.FC = () => {
   const [selectedFilterType, setSelectedFilterType] = useState(
     filterTypes.singleDate
   );
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState<TimePeriod>(
-    timePeriods.day
-  );
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState(timePeriods.day);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedDateRange, setSelectedDateRange] = useState<(Date | null)[]>([
     null,
@@ -56,18 +55,31 @@ export const GraphPage: React.FC = () => {
     ]);
   };
   const getAmountsSumParams = () => {
-    return {
-      timePeriod: selectedTimePeriod.toLowerCase(),
-      selectedDate: selectedDate
-        ? formatDateByPeriod(selectedTimePeriod, selectedDate)
-        : null,
-      selectedStartDate: selectedDateRange[0]
-        ? formatDateByPeriod(selectedTimePeriod, selectedDateRange[0])
-        : null,
-      selectedEndDate: selectedDateRange[1]
-        ? formatDateByPeriod(selectedTimePeriod, selectedDateRange[1])
-        : null,
+    const selectedTimePeriodKey = selectedTimePeriod.toLowerCase();
+    const params = {
+      timePeriod: selectedTimePeriodKey,
+      selectedDate: "",
+      selectedStartDate: "",
+      selectedEndDate: "",
     };
+    if (selectedDate)
+      params.selectedDate = formatDateByPeriod(
+        selectedTimePeriodKey,
+        selectedDate
+      );
+    else if (selectedDateRange[0] && selectedDateRange[1]) {
+      params.selectedStartDate = formatDateByPeriod(
+        selectedTimePeriodKey,
+        selectedDateRange[0]
+      );
+      params.selectedStartDate = formatDateByPeriod(
+        selectedTimePeriodKey,
+        selectedDateRange[1]
+      );
+    } else {
+      return {};
+    }
+    return params;
   };
 
   useEffect(() => {
@@ -83,6 +95,7 @@ export const GraphPage: React.FC = () => {
   }, [user?._id]);
 
   useEffect(() => {
+    console.log("entré");
     if (user?._id) {
       removeCookie("incomeCache");
       removeCookie("expensesCache");
@@ -91,15 +104,6 @@ export const GraphPage: React.FC = () => {
       getBalances(getAmountsSumParams());
     }
   }, [selectedDate, selectedDateRange]);
-
-  const formatDateByPeriod = (timePeriod: TimePeriod, date: Date) => {
-    const formattedDates = {
-      Year: date.toISOString().slice(0, 4),
-      Month: date.toISOString().slice(0, 7),
-      Day: date.toISOString().slice(0, 10),
-    };
-    return formattedDates[timePeriod];
-  };
 
   const handleChangeFilterType = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -180,9 +184,9 @@ export const GraphPage: React.FC = () => {
               ? "MM/yyyy"
               : "yyyy"
           }
-          showMonthYearPicker={selectedTimePeriod === timePeriods.months}
-          showYearPicker={selectedTimePeriod === timePeriods.years}
-          showYearDropdown={selectedTimePeriod === timePeriods.days}
+          showMonthYearPicker={selectedTimePeriod === timePeriods.month}
+          showYearPicker={selectedTimePeriod === timePeriods.year}
+          showYearDropdown={selectedTimePeriod === timePeriods.day}
         />
       ) : (
         <DatePicker
@@ -201,10 +205,10 @@ export const GraphPage: React.FC = () => {
               ? "MM/yyyy"
               : "yyyy"
           }
-          isClearable={selectedTimePeriod === timePeriods.days}
-          showMonthYearPicker={selectedTimePeriod === timePeriods.months}
-          showYearPicker={selectedTimePeriod === timePeriods.years}
-          showYearDropdown={selectedTimePeriod === timePeriods.days}
+          isClearable={selectedTimePeriod === timePeriods.day}
+          showMonthYearPicker={selectedTimePeriod === timePeriods.month}
+          showYearPicker={selectedTimePeriod === timePeriods.year}
+          showYearDropdown={selectedTimePeriod === timePeriods.day}
         />
       )}
       <Button
