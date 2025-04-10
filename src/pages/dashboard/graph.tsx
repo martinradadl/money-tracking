@@ -17,6 +17,7 @@ import {
   timePeriods,
 } from "../../helpers/movements";
 import { removeCookie } from "../../helpers/cookies";
+import { NoDataChart } from "../../components/no-data-chart";
 
 export const GraphPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -220,9 +221,13 @@ export const GraphPage: React.FC = () => {
       >
         Clear Filter
       </Button>
-      <div className="bg-beige w-full aspect-square rounded p-6 mt-4">
-        <DonutChart {...{ data, options }} />
-      </div>
+      {data.every((elem) => elem.value === 0) ? (
+        <NoDataChart />
+      ) : (
+        <div className="bg-beige w-full aspect-square rounded p-6 mt-4">
+          <DonutChart {...{ data, options }} />
+        </div>
+      )}
     </div>
   );
 };
