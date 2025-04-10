@@ -11,7 +11,7 @@ import {
   setCookie,
   user,
 } from "../helpers/cookies";
-import { getAmountsSumParams, getMovementsParams } from "../helpers/movements";
+import { GetAmountsSumParams, GetMovementsParams } from "../helpers/movements";
 import { parseObjectToQueryParams } from "../helpers/utils";
 
 type DebtType = "debt" | "loan";
@@ -132,7 +132,7 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
     };
   });
 
-export const getDebts = async (params: getMovementsParams) => {
+export const getDebts = async (params: GetMovementsParams) => {
   try {
     const response = await axios.get(
       `${API_URL}/debts/${user()?._id}${parseObjectToQueryParams(params)}`,
@@ -293,7 +293,7 @@ export const deleteDebt = async (id: string) => {
   }
 };
 
-export const getTotalLoans = async (params: getAmountsSumParams) => {
+export const getTotalLoans = async (params: GetAmountsSumParams) => {
   const loansCacheTemp = loansCache();
   if (loansCacheTemp) {
     setTotalLoans(loansCacheTemp);
@@ -333,7 +333,7 @@ export const getTotalLoans = async (params: getAmountsSumParams) => {
   }
 };
 
-export const getTotalDebts = async (params: getAmountsSumParams) => {
+export const getTotalDebts = async (params: GetAmountsSumParams) => {
   const debtsCacheTemp = debtsCache();
   if (debtsCacheTemp) {
     setTotalDebts(debtsCacheTemp);

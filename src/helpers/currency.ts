@@ -1,11 +1,11 @@
 import { CurrencyI } from "../data/authentication";
 
-export type monetaryValueI = {
+export type MonetaryValueI = {
   currency: CurrencyI;
   amount: number;
 };
 
-export const getCurrencyFormat = (value: monetaryValueI) => {
+export const getCurrencyFormat = (value: MonetaryValueI) => {
   return `${new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: value.currency.code,

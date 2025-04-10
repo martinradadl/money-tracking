@@ -1,4 +1,4 @@
-import { Select } from "@headlessui/react";
+import { Button, Select } from "@headlessui/react";
 import React, { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -9,7 +9,15 @@ import { getTotalLoans, getTotalDebts } from "../../data/debts";
 import { useAuth } from "../../data/authentication";
 import { useShallow } from "zustand/shallow";
 import DatePicker from "react-datepicker";
-import { filterTypes, timePeriods } from "../../helpers/movements";
+import {
+  filterTypes,
+  formatDateByPeriod,
+  GetAmountsSumParams,
+  TimePeriod,
+  timePeriods,
+} from "../../helpers/movements";
+import { removeCookie } from "../../helpers/cookies";
+import { NoDataChart } from "../../components/no-data-chart";
 
 export const GraphPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +26,7 @@ export const GraphPage: React.FC = () => {
     filterTypes.singleDate
   );
   const [selectedTimePeriod, setSelectedTimePeriod] = useState(timePeriods.day);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedDateRange, setSelectedDateRange] = useState<(Date | null)[]>([
     null,
     null,
@@ -32,14 +40,40 @@ export const GraphPage: React.FC = () => {
       user: state.user,
     }))
   );
-
-  const getBalances = async () => {
+  const getBalances = async (params: GetAmountsSumParams) => {
     Promise.all([
-      getTotalIncome({}),
-      getTotalExpenses({}),
-      getTotalLoans({}),
-      getTotalDebts({}),
+      getTotalIncome(params),
+      getTotalExpenses(params),
+      getTotalLoans(params),
+      getTotalDebts(params),
     ]);
+  };
+  const getAmountsSumParams = () => {
+    const selectedTimePeriodKey = selectedTimePeriod.toLowerCase();
+    const params = {
+      timePeriod: selectedTimePeriodKey,
+      selectedDate: "",
+      selectedStartDate: "",
+      selectedEndDate: "",
+    };
+    if (selectedDate)
+      params.selectedDate = formatDateByPeriod(
+        selectedTimePeriodKey,
+        selectedDate
+      );
+    else if (selectedDateRange[0] && selectedDateRange[1]) {
+      params.selectedStartDate = formatDateByPeriod(
+        selectedTimePeriodKey,
+        selectedDateRange[0]
+      );
+      params.selectedStartDate = formatDateByPeriod(
+        selectedTimePeriodKey,
+        selectedDateRange[1]
+      );
+    } else {
+      return {};
+    }
+    return params;
   };
 
   useEffect(() => {
@@ -50,20 +84,53 @@ export const GraphPage: React.FC = () => {
 
   useEffect(() => {
     if (user?._id) {
-      getBalances();
+      getBalances({});
     }
   }, [user?._id]);
+
+  useEffect(() => {
+    if (user?._id) {
+      if (
+        graphCode === "TOTAL_BALANCE" ||
+        graphCode === "TOTAL_BALANCE_DETAILED"
+      ) {
+        removeCookie("incomeCache");
+        removeCookie("expensesCache");
+        removeCookie("loansCache");
+        removeCookie("debtsCache");
+      } else if (graphCode === "DEBTS_BALANCE") {
+        removeCookie("loansCache");
+        removeCookie("debtsCache");
+      } else if (graphCode === "TRANSACTIONS_BALANCE") {
+        removeCookie("incomeCache");
+        removeCookie("expensesCache");
+      }
+      getBalances(getAmountsSumParams());
+    }
+  }, [selectedDate, selectedDateRange]);
 
   const handleChangeFilterType = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setSelectedFilterType(event?.target.value);
+    if (event?.target.value === filterTypes.singleDate) {
+      setSelectedDateRange([null, null]);
+    } else {
+      setSelectedDate(null);
+    }
   };
 
   const handleChangeTimePeriod = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setSelectedTimePeriod(event?.target.value);
+    setSelectedTimePeriod(event?.target.value as TimePeriod);
+  };
+
+  const handleCleanFilter = () => {
+    setSelectedDateRange([null, null]);
+    setSelectedDate(null);
+    setSelectedFilterType(filterTypes.singleDate);
+    setSelectedTimePeriod(timePeriods.day);
   };
 
   return (
@@ -121,8 +188,9 @@ export const GraphPage: React.FC = () => {
               ? "MM/yyyy"
               : "yyyy"
           }
-          showMonthYearPicker={selectedTimePeriod === timePeriods.month ? true : false}
-          showYearPicker={selectedTimePeriod === timePeriods.year ? true : false}
+          showMonthYearPicker={selectedTimePeriod === timePeriods.month}
+          showYearPicker={selectedTimePeriod === timePeriods.year}
+          showYearDropdown={selectedTimePeriod === timePeriods.day}
         />
       ) : (
         <DatePicker
@@ -133,6 +201,7 @@ export const GraphPage: React.FC = () => {
           onChange={(update) => {
             setSelectedDateRange(update);
           }}
+          showIcon
           dateFormat={
             selectedTimePeriod === timePeriods.day
               ? undefined
@@ -140,14 +209,25 @@ export const GraphPage: React.FC = () => {
               ? "MM/yyyy"
               : "yyyy"
           }
-          isClearable={selectedTimePeriod === timePeriods.day ? true : false}
-          showMonthYearPicker={selectedTimePeriod === timePeriods.month ? true : false}
-          showYearPicker={selectedTimePeriod === timePeriods.year ? true : false}
+          isClearable={selectedTimePeriod === timePeriods.day}
+          showMonthYearPicker={selectedTimePeriod === timePeriods.month}
+          showYearPicker={selectedTimePeriod === timePeriods.year}
+          showYearDropdown={selectedTimePeriod === timePeriods.day}
         />
       )}
-      <div className="bg-beige w-full aspect-square rounded p-6 mt-4">
-        <DonutChart {...{ data, options }} />
-      </div>
+      <Button
+        className="w-full rounded-md bg-yellow-category text-navy py-1 px-3 text-xl font-semibold"
+        onClick={handleCleanFilter}
+      >
+        Clear Filter
+      </Button>
+      {data.every((elem) => elem.value === 0) ? (
+        <NoDataChart />
+      ) : (
+        <div className="bg-beige w-full aspect-square rounded p-6 mt-4">
+          <DonutChart {...{ data, options }} />
+        </div>
+      )}
     </div>
   );
 };
