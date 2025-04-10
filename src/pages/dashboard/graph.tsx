@@ -96,10 +96,21 @@ export const GraphPage: React.FC = () => {
 
   useEffect(() => {
     if (user?._id) {
-      removeCookie("incomeCache");
-      removeCookie("expensesCache");
-      removeCookie("loansCache");
-      removeCookie("debtsCache");
+      if (
+        graphCode === "TOTAL_BALANCE" ||
+        graphCode === "TOTAL_BALANCE_DETAILED"
+      ) {
+        removeCookie("incomeCache");
+        removeCookie("expensesCache");
+        removeCookie("loansCache");
+        removeCookie("debtsCache");
+      } else if (graphCode === "DEBTS_BALANCE") {
+        removeCookie("loansCache");
+        removeCookie("debtsCache");
+      } else if (graphCode === "TRANSACTIONS_BALANCE") {
+        removeCookie("incomeCache");
+        removeCookie("expensesCache");
+      }
       getBalances(getAmountsSumParams());
     }
   }, [selectedDate, selectedDateRange]);
