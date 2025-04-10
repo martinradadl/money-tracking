@@ -16,7 +16,7 @@ import {
   TimePeriod,
   timePeriods,
 } from "../../helpers/movements";
-import { useCookies } from "react-cookie";
+import { removeCookie } from "../../helpers/cookies";
 
 export const GraphPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -39,13 +39,6 @@ export const GraphPage: React.FC = () => {
       user: state.user,
     }))
   );
-  const [, , removeCookie] = useCookies([
-    "incomeCache",
-    "expensesCache",
-    "loansCache",
-    "debtsCache",
-  ]);
-
   const getBalances = async (params: GetAmountsSumParams) => {
     Promise.all([
       getTotalIncome(params),
