@@ -36,3 +36,17 @@ export const formatDateByPeriod = (timePeriod: string, date: Date) => {
   };
   return formattedDates[timePeriod as "year" | "month" | "day"];
 };
+
+export type FilterMovementForm = {
+  type: string;
+  timePeriod: string;
+  date: Date | null;
+  dateRange: (Date | null)[];
+};
+
+export const filterFormInitialState: FilterMovementForm = {
+  type: filterTypes.singleDate,
+  timePeriod: timePeriods.day,
+  date: null,
+  dateRange: [null, null],
+};
