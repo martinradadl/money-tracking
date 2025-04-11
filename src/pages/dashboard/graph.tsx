@@ -150,7 +150,7 @@ export const GraphPage: React.FC = () => {
         id="filter-type"
         value={selectedFilterType}
         onChange={handleChangeFilterType}
-        className="w-full text-xl rounded bg-beige text-navy border-b-2"
+        className="w-full text-xl rounded bg-navy text-beige border-b-2"
       >
         {Object.values(filterTypes).map((elem, i) => {
           return (
@@ -165,7 +165,7 @@ export const GraphPage: React.FC = () => {
         id="time-period"
         value={selectedTimePeriod}
         onChange={handleChangeTimePeriod}
-        className="w-full text-xl rounded bg-beige text-navy border-b-2"
+        className="w-full text-xl rounded bg-navy text-beige border-b-2"
       >
         {Object.values(timePeriods).map((elem, i) => {
           return (
@@ -177,10 +177,10 @@ export const GraphPage: React.FC = () => {
       </Select>
       {selectedFilterType === filterTypes.singleDate ? (
         <DatePicker
-          className="w-full h-9 px-2 rounded border-navy bg-beige border-b-2"
+          className="w-full h-9 px-2 rounded border-beige bg-navy text-beige border-b-2"
+          placeholderText="Select a Date"
           selected={selectedDate}
           onChange={(date) => setSelectedDate(date)}
-          showIcon
           dateFormat={
             selectedTimePeriod === timePeriods.day
               ? undefined
@@ -194,14 +194,14 @@ export const GraphPage: React.FC = () => {
         />
       ) : (
         <DatePicker
-          className="w-full h-9 px-2 rounded border-navy bg-beige border-b-2"
+          className="w-full h-9 px-2 rounded border-beige bg-navy text-beige border-b-2"
+          placeholderText="Select a Date"
           selectsRange
           startDate={startDate}
           endDate={endDate}
           onChange={(update) => {
             setSelectedDateRange(update);
           }}
-          showIcon
           dateFormat={
             selectedTimePeriod === timePeriods.day
               ? undefined
