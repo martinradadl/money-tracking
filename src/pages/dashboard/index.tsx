@@ -43,11 +43,11 @@ export const Dashboard: React.FC = () => {
     <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 overflow-y-auto entrance-anim">
       <h1 className="page-title text-beige">Hi, {user?.name}</h1>
       <h2 className="text-beige text-2xl font-semibold">Your Balances: </h2>
-      <div className="flex flex-col bg-beige rounded p-2">
-        <h3 className="text-navy text-xl font-semibold m-auto">
-          Total Balance{" "}
-        </h3>
-        <div className="flex flex-col flex-wrap gap-1 pb-2">
+      <div className="bg-beige rounded p-2 flex flex-wrap gap-1">
+        <div className="w-full md:flex-1 pb-2">
+          <h3 className="text-navy text-xl font-semibold text-center">
+            Total Balance{" "}
+          </h3>
           {TOTAL_BALANCE.data[0].value === 0 &&
           TOTAL_BALANCE.data[1].value === 0 ? (
             <NoDataChart />
@@ -69,7 +69,11 @@ export const Dashboard: React.FC = () => {
               </button>
             </div>
           )}
-
+        </div>
+        <div className="w-full md:flex-1 pb-2">
+          <h3 className="text-navy text-xl font-semibold text-center">
+            Total Balance Detailed
+          </h3>
           {TOTAL_BALANCE_DETAILED.data[0].value === 0 &&
           TOTAL_BALANCE_DETAILED.data[1].value === 0 ? (
             <NoDataChart />
