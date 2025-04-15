@@ -10,9 +10,12 @@ import {
   filterFormInitialState,
   FilterMovementForm,
   filterTypes,
+  formatDateByPeriod,
   timePeriods,
 } from "../../helpers/movements";
 import DatePicker from "react-datepicker";
+import { getTransactions } from "../../data/transactions";
+import { getDebts } from "../../data/debts";
 
 interface props {
   close: () => void;
@@ -68,14 +71,41 @@ export const FilterMovementsModal = ({
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const { timePeriod, date, dateRange } = selectedFilters;
     if (
-      selectedFilters.date === filterFormInitialState.date &&
-      selectedFilters.dateRange === filterFormInitialState.dateRange
+      date === filterFormInitialState.date &&
+      dateRange === filterFormInitialState.dateRange
     ) {
       setIsFilterActive(false);
+      if (isDebts) {
+        await getDebts({});
+      } else {
+        await getTransactions({}, true);
+      }
     } else {
       setIsFilterActive(true);
+      const timePeriodKey = timePeriod.toLowerCase();
+      const params = {
+        timePeriod: timePeriodKey,
+        selectedDate: "",
+        startDate: "",
+        endDate: "",
+        page: 1,
+      };
+      if (date) {
+        const formattedDate = formatDateByPeriod(timePeriodKey, date);
+        params.selectedDate = formattedDate;
+      }
+      if (dateRange[0])
+        params.startDate = formatDateByPeriod(timePeriodKey, dateRange[0]);
+      if (dateRange[1])
+        params.startDate = formatDateByPeriod(timePeriodKey, dateRange[1]);
+      if (isDebts) {
+        await getDebts(params);
+      } else {
+        await getTransactions(params, true);
+      }
     }
     close();
   };
