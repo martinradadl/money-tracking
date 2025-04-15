@@ -9,8 +9,18 @@ interface TransactionProps {
   currency?: CurrencyI;
 }
 
+const splitDate = (fullDate: string) => {
+  const splittedDate = fullDate.split("T");
+  const date = splittedDate[0];
+  const hour = splittedDate[1].slice(0, 5);
+  return { date, hour };
+};
+
 export const Card = ({ content, currency }: TransactionProps) => {
-  const { type, concept, category, amount } = content;
+  const { type, concept, category, amount, date } = content;
+
+  let splittedDate = { date: "", hour: "" };
+  if (date) splittedDate = splitDate(date.toString());
 
   return (
     <div
@@ -21,22 +31,33 @@ export const Card = ({ content, currency }: TransactionProps) => {
           : "bg-red-pastel text-beige mr-4"
       )}
     >
-      <div className="flex flex-col gap-1">
-        {"entity" in content ? (
-          type === "loan" ? (
-            <p>
-              {content.entity} <span className="text-base">owes you</span>
-            </p>
+      <div className="flex place-content-between">
+        <div className="flex flex-col gap-1">
+          {"entity" in content ? (
+            type === "loan" ? (
+              <p>
+                {content.entity} <span className="text-base">owes you</span>
+              </p>
+            ) : (
+              <p>
+                {" "}
+                <span className="text-base">You owe to</span> {content.entity}
+              </p>
+            )
           ) : (
-            <p>
-              {" "}
-              <span className="text-base">You owe to</span> {content.entity}
-            </p>
-          )
-        ) : (
-          <p>{concept}</p>
-        )}
-        <p className="text-base">{"entity" in content ? concept : null}</p>
+            <p>{concept}</p>
+          )}
+          <p className="text-base">{"entity" in content ? concept : null}</p>
+        </div>
+
+        {currency ? (
+          <p>
+            {getCurrencyFormat({
+              currency,
+              amount: type === "income" || type === "loan" ? amount : -amount,
+            })}
+          </p>
+        ) : null}
       </div>
 
       <div
@@ -50,15 +71,10 @@ export const Card = ({ content, currency }: TransactionProps) => {
             {category?.label}{" "}
           </p>
         ) : null}
-
-        {currency ? (
-          <p>
-            {getCurrencyFormat({
-              currency,
-              amount: type === "income" || type === "loan" ? amount : -amount,
-            })}
-          </p>
-        ) : null}
+        <div className="flex flex-col items-end">
+          <p className="text-base p-0 leading-none">{splittedDate.date}</p>
+          <p className="text-sm p-0 leading-none">{splittedDate.hour}</p>
+        </div>
       </div>
     </div>
   );
