@@ -3,18 +3,12 @@ import { TransactionI } from "../../data/transactions";
 import { getCurrencyFormat } from "../../helpers/currency";
 import { CurrencyI } from "../../data/authentication";
 import { DebtI } from "../../data/debts";
+import { splitDate } from "../../helpers/movements";
 
 interface TransactionProps {
   content: TransactionI | DebtI;
   currency?: CurrencyI;
 }
-
-const splitDate = (fullDate: string) => {
-  const splittedDate = fullDate.split("T");
-  const date = splittedDate[0];
-  const hour = splittedDate[1].slice(0, 5);
-  return { date, hour };
-};
 
 export const Card = ({ content, currency }: TransactionProps) => {
   const { type, concept, category, amount, date } = content;

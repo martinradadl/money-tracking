@@ -50,3 +50,10 @@ export const filterFormInitialState: FilterMovementForm = {
   date: null,
   dateRange: [null, null],
 };
+
+export const splitDate = (fullDate: string) => {
+  const splittedDate = fullDate.split("T");
+  const date = splittedDate[0];
+  const hour = splittedDate[1].slice(0, 5);
+  return { date, hour };
+};
