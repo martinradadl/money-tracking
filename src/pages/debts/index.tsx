@@ -17,6 +17,7 @@ import { useAuth } from "../../data/authentication";
 import { Transition } from "@headlessui/react";
 import classNames from "classnames";
 import { AiFillEdit } from "react-icons/ai";
+import { MdFilterList, MdFilterListOff } from "react-icons/md";
 import { Card } from "../../components/movements/card";
 import { DeleteMovementModal } from "../../components/movements/delete-movement";
 import { DebtModal } from "./debt-modal";
@@ -26,6 +27,11 @@ import { CardSkeleton } from "../../components/movements/card-skeleton";
 import { LoadingIcon } from "../../components/loading-icon";
 import { useShallow } from "zustand/shallow";
 import debounce from "lodash.debounce";
+import { FilterMovementsModal } from "../../components/movements/filter-movements-modal";
+import {
+  filterFormInitialState,
+  FilterMovementForm,
+} from "../../helpers/movements";
 
 export const Debts: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -56,6 +62,11 @@ export const Debts: React.FC = () => {
     }))
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState<FilterMovementForm>(
+    filterFormInitialState
+  );
+  const [isFilterActive, setIsFilterActive] = useState<boolean>(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const selectedContainer = useRef<HTMLDivElement | null>(null);
   const isInitialLoadRef = useRef<boolean>(true);
@@ -103,11 +114,10 @@ export const Debts: React.FC = () => {
   }, [user, isInitialLoad]);
 
   useEffect(() => {
-    if (isLastPage) {
-      setLoading(false);
-    } else if (loading === true && !isLastPage) {
+    if (loading === true && !isLastPage) {
       nextPage();
     }
+    setLoading(false);
   }, [loading, isLastPage]);
 
   useEffect(() => {
@@ -119,7 +129,7 @@ export const Debts: React.FC = () => {
       (container.current?.scrollHeight || 0) -
       (container.current?.offsetHeight || 0);
 
-    if (subtraction - (container.current?.scrollTop || 0) === 0 && !loading) {
+    if (subtraction - (container.current?.scrollTop || 0) < 5 && !loading) {
       setLoading(true);
     }
   };
@@ -170,20 +180,52 @@ export const Debts: React.FC = () => {
       ref={container}
     >
       <h1 className="page-title text-beige">Debts</h1>
-      <div className="flex w-full gap-3 py-1 text-xl font-semibold">
-        <p className="text-beige">My Balance:</p>
-        <p
-          className={classNames(
-            balance >= 0
-              ? "bg-green-pastel text-navy"
-              : "bg-red-pastel text-beige",
-            "rounded px-2 py-0.5 font-semibold"
-          )}
-        >
-          {user
-            ? getCurrencyFormat({ amount: balance, currency: user.currency })
-            : null}
-        </p>
+      <div className="flex place-content-between items-center">
+        <div className="flex w-full gap-3 py-1 text-xl font-semibold">
+          <p className="text-beige">My Balance:</p>
+          <p
+            className={classNames(
+              balance >= 0
+                ? "bg-green-pastel text-navy"
+                : "bg-red-pastel text-beige",
+              "rounded px-2 py-0.5 font-semibold"
+            )}
+          >
+            {user
+              ? getCurrencyFormat({ amount: balance, currency: user.currency })
+              : null}
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <MdFilterList
+            className="text-4xl text-navy p-1 mr-1 bg-beige justify-center rounded-full cursor-pointer"
+            onClick={() => {
+              setIsFilterModalOpen(true);
+            }}
+          />
+          {isFilterActive ? (
+            <MdFilterListOff
+              className="text-4xl text-navy p-1 mr-1 bg-red-pastel justify-center rounded-full cursor-pointer"
+              onClick={async () => {
+                setIsFilterActive(false);
+                setSelectedFilters(filterFormInitialState);
+                await getDebts({});
+              }}
+            />
+          ) : null}
+          <FilterMovementsModal
+            {...{
+              close: () => {
+                setIsFilterModalOpen(false);
+              },
+              isOpen: isFilterModalOpen,
+              selectedFilters,
+              setSelectedFilters,
+              isFilterActive,
+              setIsFilterActive,
+            }}
+          />
+        </div>
       </div>
       <div className="flex flex-col gap-3">
         {isInitialLoad ? (

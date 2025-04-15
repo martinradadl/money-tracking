@@ -24,11 +24,12 @@ export interface DebtI {
   concept: string;
   category: CategoryI;
   amount: number;
-  date: Date | null;
+  date: Date;
 }
 
-export interface DebtFormI extends Omit<DebtI, "amount"> {
+export interface DebtFormI extends Omit<DebtI, "amount" | "date"> {
   amount: string;
+  date: Date | null;
 }
 
 export const newDebtInitialState: DebtFormI = {
@@ -132,7 +133,10 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
     };
   });
 
-export const getDebts = async (params: GetMovementsParams) => {
+export const getDebts = async (
+  params: GetMovementsParams,
+  isReset?: boolean
+) => {
   try {
     const response = await axios.get(
       `${API_URL}/debts/${user()?._id}${parseObjectToQueryParams(params)}`,
@@ -145,7 +149,10 @@ export const getDebts = async (params: GetMovementsParams) => {
     if (response.status === 200) {
       useDebts.setState((state: State) => {
         const newState = { ...state };
-        newState.debtsList = [...newState.debtsList, ...response.data];
+        newState.debtsList = isReset
+          ? [...response.data]
+          : [...newState.debtsList, ...response.data];
+
         if (params.limit && response.data.length < params.limit) {
           newState.isLastPage = true;
         }

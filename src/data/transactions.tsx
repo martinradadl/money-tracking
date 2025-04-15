@@ -22,12 +22,14 @@ export interface TransactionI {
   concept: string;
   category: CategoryI;
   amount: number;
-  date: Date | null;
+  date: Date;
   userId?: string;
 }
 
-export interface TransactionFormI extends Omit<TransactionI, "amount"> {
+export interface TransactionFormI
+  extends Omit<TransactionI, "amount" | "date"> {
   amount: string;
+  date: Date | null;
 }
 
 export const newTransactionInitialState: TransactionFormI = {
@@ -132,7 +134,10 @@ export const setIsInitialLoad = (isInitialLoad: boolean) =>
     };
   });
 
-export const getTransactions = async (params: GetMovementsParams) => {
+export const getTransactions = async (
+  params: GetMovementsParams,
+  isReset?: boolean
+) => {
   try {
     const response = await axios.get(
       `${API_URL}/transactions/${user()?._id}${parseObjectToQueryParams(
@@ -147,10 +152,10 @@ export const getTransactions = async (params: GetMovementsParams) => {
     if (response.status === 200) {
       useTransactions.setState((state: State) => {
         const newState = { ...state };
-        newState.transactionsList = [
-          ...newState.transactionsList,
-          ...response.data,
-        ];
+        newState.transactionsList = isReset
+          ? [...response.data]
+          : [...newState.transactionsList, ...response.data];
+
         if (params.limit && response.data.length < params.limit) {
           newState.isLastPage = true;
         }
