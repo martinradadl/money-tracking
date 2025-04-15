@@ -114,11 +114,10 @@ export const Debts: React.FC = () => {
   }, [user, isInitialLoad]);
 
   useEffect(() => {
-    if (isLastPage) {
-      setLoading(false);
-    } else if (loading === true && !isLastPage) {
+    if (loading === true && !isLastPage) {
       nextPage();
     }
+    setLoading(false);
   }, [loading, isLastPage]);
 
   useEffect(() => {
@@ -130,7 +129,7 @@ export const Debts: React.FC = () => {
       (container.current?.scrollHeight || 0) -
       (container.current?.offsetHeight || 0);
 
-    if (subtraction - (container.current?.scrollTop || 0) === 0 && !loading) {
+    if (subtraction - (container.current?.scrollTop || 0) < 5 && !loading) {
       setLoading(true);
     }
   };
@@ -207,9 +206,10 @@ export const Debts: React.FC = () => {
           {isFilterActive ? (
             <MdFilterListOff
               className="text-4xl text-navy p-1 mr-1 bg-red-pastel justify-center rounded-full cursor-pointer"
-              onClick={() => {
+              onClick={async () => {
                 setIsFilterActive(false);
                 setSelectedFilters(filterFormInitialState);
+                await getDebts({});
               }}
             />
           ) : null}
