@@ -9,25 +9,34 @@ import {
 import { getCategories } from "../data/categories";
 import { user } from "../helpers/cookies";
 import { isExpired } from "../helpers/utils";
+import debounce from "lodash.debounce";
 
 export const SplashScreen = () => {
   const [progress, setProgress] = useState(0);
 
+  const getInitialData = () => {
+    Promise.all([getCurrencies(), getCategories(), getTimezones()])
+      .then(() => {
+        const min = 0.33;
+        const max = 0.66;
+        setProgress(Math.random() * (max - min) + min);
+
+        const userCookieValue = user();
+        if (userCookieValue) {
+          setUser(userCookieValue);
+        }
+
+        setTimeout(() => {
+          setProgress(1);
+        }, 1000);
+      })
+      .catch((err) => console.log(err.message));
+  };
+
+  const debouncedGetInitialData = debounce(getInitialData, 500);
+
   useEffect(() => {
-    Promise.all([getCurrencies(), getCategories(), getTimezones()]).then(() => {
-      const min = 0.33;
-      const max = 0.66;
-      setProgress(Math.random() * (max - min) + min);
-
-      const userCookieValue = user();
-      if (userCookieValue) {
-        setUser(userCookieValue);
-      }
-
-      setTimeout(() => {
-        setProgress(1);
-      }, 1000);
-    });
+    debouncedGetInitialData();
   }, []);
 
   useEffect(() => {
