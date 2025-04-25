@@ -1,3 +1,6 @@
+import { CategoryI } from "../data/categories";
+import { noCategory } from "./categories";
+
 export type GetMovementsParams = {
   page?: number;
   limit?: number;
@@ -5,6 +8,7 @@ export type GetMovementsParams = {
   startDate?: string;
   endDate?: string;
   selectedDate?: string;
+  category?: string;
 };
 
 export type GetAmountsSumParams = {
@@ -42,6 +46,7 @@ export type FilterMovementForm = {
   timePeriod: string;
   date: Date | null;
   dateRange: (Date | null)[];
+  category: CategoryI;
 };
 
 export const filterFormInitialState: FilterMovementForm = {
@@ -49,6 +54,7 @@ export const filterFormInitialState: FilterMovementForm = {
   timePeriod: timePeriods.day,
   date: null,
   dateRange: [null, null],
+  category: noCategory,
 };
 
 export const splitDate = (fullDate: string) => {
