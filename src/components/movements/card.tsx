@@ -4,6 +4,7 @@ import { getCurrencyFormat } from "../../helpers/currency";
 import { CurrencyI } from "../../data/authentication";
 import { DebtI } from "../../data/debts";
 import { splitDate } from "../../helpers/movements";
+import { DEFAULT_CATEGORY } from "../../helpers/categories";
 
 interface TransactionProps {
   content: TransactionI | DebtI;
@@ -57,10 +58,12 @@ export const Card = ({ content, currency }: TransactionProps) => {
       <div
         className={classNames(
           "flex ",
-          category?.label !== "Other" ? "place-content-between" : "justify-end"
+          category?.label !== DEFAULT_CATEGORY.label
+            ? "place-content-between"
+            : "justify-end"
         )}
       >
-        {category?.label !== "Other" ? (
+        {category?.label !== DEFAULT_CATEGORY.label ? (
           <p className="px-2 rounded-md bg-yellow-category text-navy">
             {category?.label}{" "}
           </p>
