@@ -21,15 +21,15 @@ import { removeCookie } from "../../helpers/cookies";
 import { NoDataChart } from "../../components/no-data-chart";
 import { useCategories } from "../../data/categories";
 import { MdCancel } from "react-icons/md";
-import { noCategory } from "../../helpers/categories";
+import { NO_CATEGORY } from "../../helpers/categories";
 
 export const GraphPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const graphCode = searchParams.get("graphCode") || "";
-  const [selectedFilters, setSelectedFilters] = useState<FilterMovementForm>(
+  const [filters, setFilters] = useState<FilterMovementForm>(
     filterFormInitialState
   );
-  const { timePeriod, date, dateRange, category, type } = selectedFilters;
+  const { timePeriod, date, dateRange, category, type } = filters;
   const [startDate, endDate] = dateRange;
   const navigate = useNavigate();
   const { mappedDataAndOptions } = useGraphs();
@@ -55,7 +55,7 @@ export const GraphPage: React.FC = () => {
   };
 
   const getAmountsSumParams = () => {
-    if (!date && !dateRange[0] && !dateRange[1] && category === noCategory) {
+    if (!date && !dateRange[0] && !dateRange[1] && category === NO_CATEGORY) {
       return {};
     }
     const timePeriodKey = timePeriod.toLowerCase();
@@ -112,30 +112,30 @@ export const GraphPage: React.FC = () => {
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     if (event?.target.value === filterTypes.singleDate) {
-      setSelectedFilters({
-        ...selectedFilters,
+      setFilters({
+        ...filters,
         dateRange: filterFormInitialState.dateRange,
       });
     } else {
-      setSelectedFilters({
-        ...selectedFilters,
+      setFilters({
+        ...filters,
         date: filterFormInitialState.date,
       });
     }
-    setSelectedFilters({ ...selectedFilters, type: event?.target.value });
+    setFilters({ ...filters, type: event?.target.value });
   };
 
   const handleChangeTimePeriod = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setSelectedFilters({ ...selectedFilters, timePeriod: event?.target.value });
+    setFilters({ ...filters, timePeriod: event?.target.value });
   };
 
   const handleChangeCategory = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setSelectedFilters({
-      ...selectedFilters,
+    setFilters({
+      ...filters,
       category: { _id: event.target.value, label: "" },
     });
   };
@@ -188,7 +188,7 @@ export const GraphPage: React.FC = () => {
           placeholderText="Select a Date"
           selected={date}
           onChange={(date) => {
-            setSelectedFilters({ ...selectedFilters, date });
+            setFilters({ ...filters, date });
           }}
           dateFormat={
             timePeriod === timePeriods.day
@@ -210,7 +210,7 @@ export const GraphPage: React.FC = () => {
           startDate={startDate}
           endDate={endDate}
           onChange={(dateRange) =>
-            setSelectedFilters({ ...selectedFilters, dateRange })
+            setFilters({ ...filters, dateRange })
           }
           dateFormat={
             timePeriod === timePeriods.day
@@ -243,13 +243,13 @@ export const GraphPage: React.FC = () => {
             );
           })}
         </Select>
-        {selectedFilters.category._id !== "" ? (
+        {filters.category._id !== "" ? (
           <MdCancel
             className="text-2xl text-beige"
             onClick={() => {
-              setSelectedFilters({
-                ...selectedFilters,
-                category: noCategory,
+              setFilters({
+                ...filters,
+                category: NO_CATEGORY,
               });
             }}
           />
@@ -259,7 +259,7 @@ export const GraphPage: React.FC = () => {
       <Button
         className="w-full rounded-md bg-yellow-category text-navy py-1 px-3 text-xl font-semibold"
         onClick={() => {
-          setSelectedFilters(filterFormInitialState);
+          setFilters(filterFormInitialState);
         }}
       >
         Clear Filter

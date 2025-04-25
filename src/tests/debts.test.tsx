@@ -117,7 +117,7 @@ describe("useDebts", () => {
       await act(async () => {
         getDebts({
           timePeriod: timePeriods.day,
-          selectedDate: "2020/02/02",
+          date: "2020/02/02",
         });
       });
       expect(result.current.debtsList).toEqual([newDebt]);
@@ -318,7 +318,7 @@ describe("useDebts", () => {
       await act(async () => {
         getTotalLoans({
           timePeriod: timePeriods.day,
-          selectedDate: "2020/02/02",
+          date: "2020/02/02",
         });
       });
       expect(result.current.totalLoans).toEqual(100);
@@ -341,8 +341,8 @@ describe("useDebts", () => {
       await act(async () => {
         getTotalLoans({
           timePeriod: timePeriods.day,
-          selectedStartDate: "2020/02/02",
-          selectedEndDate: "2020/02/20",
+          startDate: "2020/02/02",
+          endDate: "2020/02/20",
         });
       });
       expect(result.current.totalLoans).toEqual(100);
@@ -409,7 +409,7 @@ describe("useDebts", () => {
       await act(async () => {
         getTotalDebts({
           timePeriod: timePeriods.day,
-          selectedDate: "2020/02/02",
+          date: "2020/02/02",
         });
       });
       expect(result.current.totalDebts).toEqual(100);
@@ -432,8 +432,8 @@ describe("useDebts", () => {
       await act(async () => {
         getTotalDebts({
           timePeriod: timePeriods.day,
-          selectedStartDate: "2020/02/02",
-          selectedEndDate: "2020/02/20",
+          startDate: "2020/02/02",
+          endDate: "2020/02/20",
         });
       });
       expect(result.current.totalDebts).toEqual(100);

@@ -19,14 +19,14 @@ import { getDebts } from "../../data/debts";
 import { useCategories } from "../../data/categories";
 import { useShallow } from "zustand/shallow";
 import { MdCancel, MdOutlineExpandMore, MdClose } from "react-icons/md";
-import { noCategory } from "../../helpers/categories";
+import { NO_CATEGORY } from "../../helpers/categories";
 import { useState } from "react";
 
 interface props {
   close: () => void;
   isOpen: boolean;
-  selectedFilters: FilterMovementForm;
-  setSelectedFilters: React.Dispatch<React.SetStateAction<FilterMovementForm>>;
+  filters: FilterMovementForm;
+  setFilters: React.Dispatch<React.SetStateAction<FilterMovementForm>>;
   isFilterActive: boolean;
   setIsFilterActive: React.Dispatch<React.SetStateAction<boolean>>;
   isDebts?: boolean;
@@ -35,12 +35,12 @@ interface props {
 export const FilterMovementsModal = ({
   close,
   isOpen,
-  selectedFilters,
-  setSelectedFilters,
+  filters,
+  setFilters,
   setIsFilterActive,
   isDebts,
 }: props) => {
-  const [startDate, endDate] = selectedFilters.dateRange;
+  const [startDate, endDate] = filters.dateRange;
   const { categories } = useCategories(
     useShallow((state) => ({
       categories: state.categories,
@@ -57,16 +57,16 @@ export const FilterMovementsModal = ({
       event.target.value === filterTypes.singleDate
         ? filterFormInitialState.date
         : filterFormInitialState.dateRange;
-    setSelectedFilters({
-      ...selectedFilters,
+    setFilters({
+      ...filters,
       [event.target.name]: event.target.value,
       [dateKey]: dateNewValue,
     });
   };
 
   const handleChangeFilter = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedFilters({
-      ...selectedFilters,
+    setFilters({
+      ...filters,
       [event.target.name]: event.target.value,
     });
   };
@@ -76,8 +76,8 @@ export const FilterMovementsModal = ({
     isSingleDate: boolean
   ) => {
     const key = isSingleDate ? "date" : "dateRange";
-    setSelectedFilters({
-      ...selectedFilters,
+    setFilters({
+      ...filters,
       [key]: date,
     });
   };
@@ -85,23 +85,34 @@ export const FilterMovementsModal = ({
   const handleChangeCategory = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setSelectedFilters({
-      ...selectedFilters,
+    setFilters({
+      ...filters,
       category: { _id: event.target.value, label: "" },
     });
   };
 
+  const handleOpenFiltersByDate = () => {
+    setFilters({
+      ...filters,
+      type: filterTypes.singleDate,
+      timePeriod: timePeriods.day,
+    });
+    setIsDateFormOpen(true);
+  };
+
   const handleCloseFiltersByDate = () => {
     setIsDateFormOpen(false);
-    setSelectedFilters({
-      ...selectedFilters,
+    setFilters({
+      ...filters,
+      type: filterFormInitialState.type,
+      timePeriod: filterFormInitialState.timePeriod,
       date: filterFormInitialState.date,
       dateRange: filterFormInitialState.dateRange,
     });
   };
 
   const handleSubmit = async () => {
-    const { timePeriod, date, dateRange, category } = selectedFilters;
+    const { timePeriod, date, dateRange, category } = filters;
     if (
       date === filterFormInitialState.date &&
       dateRange === filterFormInitialState.dateRange &&
@@ -109,24 +120,25 @@ export const FilterMovementsModal = ({
     ) {
       setIsFilterActive(false);
       if (isDebts) {
-        await getDebts({}, true);
+        await getDebts({ page: 1, limit: 10 }, true);
       } else {
-        await getTransactions({}, true);
+        await getTransactions({ page: 1, limit: 10 }, true);
       }
     } else {
       setIsFilterActive(true);
       const timePeriodKey = timePeriod.toLowerCase();
       const params = {
         timePeriod: timePeriodKey,
-        selectedDate: "",
+        date: "",
         startDate: "",
         endDate: "",
         category: "",
         page: 1,
+        limit: 10,
       };
       if (date) {
         const formattedDate = formatDateByPeriod(timePeriodKey, date);
-        params.selectedDate = formattedDate;
+        params.date = formattedDate;
       }
       if (dateRange[0])
         params.startDate = formatDateByPeriod(timePeriodKey, dateRange[0]);
@@ -160,7 +172,7 @@ export const FilterMovementsModal = ({
                 <AiOutlineArrowLeft
                   className="text-3xl my-2"
                   onClick={() => {
-                    setSelectedFilters(filterFormInitialState);
+                    setFilters(filterFormInitialState);
                     setIsDateFormOpen(false);
                     close();
                   }}
@@ -172,12 +184,12 @@ export const FilterMovementsModal = ({
 
                 <div className="flex flex-col gap-4 mt-2">
                   <div
-                    className="flex items-center"
+                    className="flex items-center cursor-pointer"
                     onClick={() => {
                       if (isDateFormOpen) {
                         handleCloseFiltersByDate();
                       } else {
-                        setIsDateFormOpen(true);
+                        handleOpenFiltersByDate();
                       }
                     }}
                   >
@@ -195,7 +207,7 @@ export const FilterMovementsModal = ({
                         <Select
                           name="type"
                           id="type"
-                          value={selectedFilters.type}
+                          value={filters.type}
                           onChange={handleChangeFilterType}
                           className="w-full h-9 border-navy rounded bg-green border-b-2"
                         >
@@ -214,7 +226,7 @@ export const FilterMovementsModal = ({
                         <Select
                           name="timePeriod"
                           id="timePeriod"
-                          value={selectedFilters.timePeriod}
+                          value={filters.timePeriod}
                           onChange={handleChangeFilter}
                           className="w-full h-9 border-navy rounded bg-green border-b-2"
                         >
@@ -230,29 +242,28 @@ export const FilterMovementsModal = ({
 
                       <label>
                         <p className="capitalize text-xl mb-2">date</p>
-                        {selectedFilters.type === filterTypes.singleDate ? (
+                        {filters.type === filterTypes.singleDate ? (
                           <DatePicker
                             className="w-full h-9 px-2 border-navy bg-green text-navy border-b-2"
-                            selected={selectedFilters.date}
+                            selected={filters.date}
                             onChange={(date) => {
                               handleChangeDate(date, true);
                             }}
                             dateFormat={
-                              selectedFilters.timePeriod === timePeriods.day
+                              filters.timePeriod === timePeriods.day
                                 ? undefined
-                                : selectedFilters.timePeriod ===
-                                  timePeriods.month
+                                : filters.timePeriod === timePeriods.month
                                 ? "MM/yyyy"
                                 : "yyyy"
                             }
                             showMonthYearPicker={
-                              selectedFilters.timePeriod === timePeriods.month
+                              filters.timePeriod === timePeriods.month
                             }
                             showYearPicker={
-                              selectedFilters.timePeriod === timePeriods.year
+                              filters.timePeriod === timePeriods.year
                             }
                             showYearDropdown={
-                              selectedFilters.timePeriod === timePeriods.day
+                              filters.timePeriod === timePeriods.day
                             }
                             isClearable
                           />
@@ -266,21 +277,20 @@ export const FilterMovementsModal = ({
                               handleChangeDate(update, false);
                             }}
                             dateFormat={
-                              selectedFilters.timePeriod === timePeriods.day
+                              filters.timePeriod === timePeriods.day
                                 ? undefined
-                                : selectedFilters.timePeriod ===
-                                  timePeriods.month
+                                : filters.timePeriod === timePeriods.month
                                 ? "MM/yyyy"
                                 : "yyyy"
                             }
                             showMonthYearPicker={
-                              selectedFilters.timePeriod === timePeriods.month
+                              filters.timePeriod === timePeriods.month
                             }
                             showYearPicker={
-                              selectedFilters.timePeriod === timePeriods.year
+                              filters.timePeriod === timePeriods.year
                             }
                             showYearDropdown={
-                              selectedFilters.timePeriod === timePeriods.day
+                              filters.timePeriod === timePeriods.day
                             }
                             isClearable
                           />
@@ -291,12 +301,11 @@ export const FilterMovementsModal = ({
 
                   <p className="text-2xl">Filter by Category</p>
                   <label>
-                    <p className="text-xl mb-2">Category</p>
                     <div className="flex items-center gap-1">
                       <Select
                         name="category"
                         id="category"
-                        value={selectedFilters.category._id}
+                        value={filters.category._id}
                         onChange={handleChangeCategory}
                         className="w-full h-9 border-navy rounded bg-green border-b-2 flex-1"
                       >
@@ -309,13 +318,13 @@ export const FilterMovementsModal = ({
                           );
                         })}
                       </Select>
-                      {selectedFilters.category._id !== "" ? (
+                      {filters.category._id !== "" ? (
                         <MdCancel
                           className="text-2xl"
                           onClick={() => {
-                            setSelectedFilters({
-                              ...selectedFilters,
-                              category: noCategory,
+                            setFilters({
+                              ...filters,
+                              category: NO_CATEGORY,
                             });
                           }}
                         />
