@@ -209,7 +209,7 @@ export const Debts: React.FC = () => {
               onClick={async () => {
                 setIsFilterActive(false);
                 setSelectedFilters(filterFormInitialState);
-                await getDebts({});
+                await getDebts({}, true);
               }}
             />
           ) : null}
