@@ -3,7 +3,7 @@ import { CategoryI } from "./categories";
 import { API_URL } from "../helpers/env";
 import { create } from "zustand";
 import axios, { AxiosError } from "axios";
-import { noCategory } from "../helpers/categories";
+import { defaultCategory } from "../helpers/categories";
 import {
   expensesCache,
   incomeCache,
@@ -35,7 +35,7 @@ export interface TransactionFormI
 export const newTransactionInitialState: TransactionFormI = {
   type: "income",
   concept: "",
-  category: noCategory,
+  category: defaultCategory,
   amount: "",
   date: null,
 };

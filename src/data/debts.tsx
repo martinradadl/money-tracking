@@ -2,7 +2,7 @@ import { CategoryI } from "./categories";
 import axios, { AxiosError } from "axios";
 import { createToastify } from "../helpers/toastify";
 import { API_URL } from "../helpers/env";
-import { noCategory } from "../helpers/categories";
+import { defaultCategory } from "../helpers/categories";
 import { create } from "zustand";
 import {
   debtsCache,
@@ -36,7 +36,7 @@ export const newDebtInitialState: DebtFormI = {
   type: "loan",
   entity: "",
   concept: "",
-  category: noCategory,
+  category: defaultCategory,
   amount: "",
   date: null,
 };

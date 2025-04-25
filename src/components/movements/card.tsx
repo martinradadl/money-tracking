@@ -57,10 +57,10 @@ export const Card = ({ content, currency }: TransactionProps) => {
       <div
         className={classNames(
           "flex ",
-          category?.label !== "N/A" ? "place-content-between" : "justify-end"
+          category?.label !== "Other" ? "place-content-between" : "justify-end"
         )}
       >
-        {category?.label !== "N/A" ? (
+        {category?.label !== "Other" ? (
           <p className="px-2 rounded-md bg-yellow-category text-navy">
             {category?.label}{" "}
           </p>
