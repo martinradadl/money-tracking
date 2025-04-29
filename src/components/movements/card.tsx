@@ -57,7 +57,7 @@ export const Card = ({ content, currency }: TransactionProps) => {
 
       <div
         className={classNames(
-          "flex ",
+          "flex",
           category?.label !== DEFAULT_CATEGORY.label
             ? "place-content-between"
             : "justify-end"
