@@ -15,6 +15,7 @@ import {
   filterTypes,
   formatDateByPeriod,
   GetAmountsSumParams,
+  TimePeriod,
   timePeriods,
 } from "../../helpers/movements";
 import { removeCookie } from "../../helpers/cookies";
@@ -58,21 +59,23 @@ export const GraphPage: React.FC = () => {
     if (!date && !dateRange[0] && !dateRange[1] && category === NO_CATEGORY) {
       return {};
     }
-    const timePeriodKey = timePeriod.toLowerCase();
     const params = {
-      timePeriod: timePeriodKey,
+      timePeriod: undefined,
       date: "",
       startDate: "",
       endDate: "",
       category: category._id,
     };
-    if (date) params.date = formatDateByPeriod(timePeriodKey, date);
-    else if (dateRange[0] && dateRange[1]) {
-      params.startDate = formatDateByPeriod(timePeriodKey, dateRange[0]);
-      params.endDate = formatDateByPeriod(timePeriodKey, dateRange[1]);
-    }
+    if ((date || dateRange?.every(Boolean)) && timePeriod)
+      if (date) params.date = formatDateByPeriod(timePeriod, date);
+      else if (dateRange[0] && dateRange[1]) {
+        params.startDate = formatDateByPeriod(timePeriod, dateRange[0]);
+        params.endDate = formatDateByPeriod(timePeriod, dateRange[1]);
+      }
     return params;
   };
+
+  const timePeriodsFormats = { day: undefined, month: "MM/yyyy", year: "yyyy" };
 
   useEffect(() => {
     if (!graphCode) {
@@ -128,7 +131,7 @@ export const GraphPage: React.FC = () => {
   const handleChangeTimePeriod = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setFilters({ ...filters, timePeriod: event?.target.value });
+    setFilters({ ...filters, timePeriod: event?.target.value as TimePeriod });
   };
 
   const handleChangeCategory = (
@@ -173,7 +176,7 @@ export const GraphPage: React.FC = () => {
         id="time-period"
         value={timePeriod}
         onChange={handleChangeTimePeriod}
-        className="w-full text-xl rounded bg-navy text-beige border-b-2"
+        className="w-full text-xl rounded bg-navy text-beige border-b-2 capitalize"
       >
         {Object.values(timePeriods).map((elem, i) => {
           return (
@@ -191,13 +194,7 @@ export const GraphPage: React.FC = () => {
           onChange={(date) => {
             setFilters({ ...filters, date });
           }}
-          dateFormat={
-            timePeriod === timePeriods.day
-              ? undefined
-              : timePeriod === timePeriods.month
-              ? "MM/yyyy"
-              : "yyyy"
-          }
+          dateFormat={timePeriodsFormats[timePeriod as TimePeriod]}
           showMonthYearPicker={timePeriod === timePeriods.month}
           showYearPicker={timePeriod === timePeriods.year}
           showYearDropdown={timePeriod === timePeriods.day}
@@ -211,13 +208,7 @@ export const GraphPage: React.FC = () => {
           startDate={startDate}
           endDate={endDate}
           onChange={(dateRange) => setFilters({ ...filters, dateRange })}
-          dateFormat={
-            timePeriod === timePeriods.day
-              ? undefined
-              : timePeriod === timePeriods.month
-              ? "MM/yyyy"
-              : "yyyy"
-          }
+          dateFormat={timePeriodsFormats[timePeriod as TimePeriod]}
           isClearable
           showMonthYearPicker={timePeriod === timePeriods.month}
           showYearPicker={timePeriod === timePeriods.year}

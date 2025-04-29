@@ -127,9 +127,8 @@ export const FilterMovementsModal = ({
       }
     } else {
       setIsFilterActive(true);
-      const timePeriodKey = timePeriod?.toLowerCase();
       const params: GetMovementsParams = {
-        timePeriod: "",
+        timePeriod: undefined,
         date: "",
         startDate: "",
         endDate: "",
@@ -138,18 +137,16 @@ export const FilterMovementsModal = ({
         limit: 10,
       };
 
-      if ((date || dateRange?.every(Boolean)) && timePeriodKey) {
-        params.timePeriod = timePeriodKey;
-        params.date = date
-          ? formatDateByPeriod(timePeriodKey, date)
-          : undefined;
+      if ((date || dateRange?.every(Boolean)) && timePeriod) {
+        params.timePeriod = timePeriod;
+        params.date = date ? formatDateByPeriod(timePeriod, date) : undefined;
         params.startDate =
           dateRange && dateRange[0]
-            ? formatDateByPeriod(timePeriodKey, dateRange[0])
+            ? formatDateByPeriod(timePeriod, dateRange[0])
             : undefined;
         params.endDate =
-          dateRange && dateRange[1]
-            ? formatDateByPeriod(timePeriodKey, dateRange[1])
+          dateRange && dateRange[1] && timePeriod
+            ? formatDateByPeriod(timePeriod, dateRange[1])
             : undefined;
       }
 
@@ -237,7 +234,7 @@ export const FilterMovementsModal = ({
                           id="timePeriod"
                           value={filters.timePeriod}
                           onChange={handleChangeFilter}
-                          className="w-full h-9 border-navy rounded bg-green border-b-2"
+                          className="w-full h-9 border-navy rounded bg-green border-b-2 capitalize"
                         >
                           {Object.values(timePeriods).map((elem, i) => {
                             return (
