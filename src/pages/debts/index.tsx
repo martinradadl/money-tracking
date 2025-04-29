@@ -63,7 +63,7 @@ export const Debts: React.FC = () => {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [selectedFilters, setSelectedFilters] = useState<FilterMovementForm>(
+  const [filters, setFilters] = useState<FilterMovementForm>(
     filterFormInitialState
   );
   const [isFilterActive, setIsFilterActive] = useState<boolean>(false);
@@ -208,8 +208,8 @@ export const Debts: React.FC = () => {
               className="text-4xl text-navy p-1 mr-1 bg-red-pastel justify-center rounded-full cursor-pointer"
               onClick={async () => {
                 setIsFilterActive(false);
-                setSelectedFilters(filterFormInitialState);
-                await getDebts({});
+                setFilters(filterFormInitialState);
+                await getDebts({ page: 1, limit: 10 }, true);
               }}
             />
           ) : null}
@@ -219,8 +219,8 @@ export const Debts: React.FC = () => {
                 setIsFilterModalOpen(false);
               },
               isOpen: isFilterModalOpen,
-              selectedFilters,
-              setSelectedFilters,
+              filters,
+              setFilters,
               isFilterActive,
               setIsFilterActive,
             }}

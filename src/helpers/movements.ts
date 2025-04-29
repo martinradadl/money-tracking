@@ -1,17 +1,21 @@
+import { CategoryI } from "../data/categories";
+import { NO_CATEGORY } from "./categories";
+
 export type GetMovementsParams = {
   page?: number;
   limit?: number;
-  timePeriod?: string;
+  timePeriod?: TimePeriod;
   startDate?: string;
   endDate?: string;
-  selectedDate?: string;
+  date?: string;
+  category?: string;
 };
 
 export type GetAmountsSumParams = {
-  timePeriod?: string;
-  selectedDate?: string | null;
-  selectedStartDate?: string | null;
-  selectedEndDate?: string | null;
+  timePeriod?: TimePeriod;
+  date?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
 };
 
 export const filterTypes = {
@@ -19,36 +23,38 @@ export const filterTypes = {
   dateRange: "Date Range",
 };
 
-export type TimePeriod = "Day" | "Month" | "Year";
+export type TimePeriod = "day" | "month" | "year";
 export type TimePeriodObject = { [key in string]: TimePeriod };
 
 export const timePeriods: TimePeriodObject = {
-  day: "Day",
-  month: "Month",
-  year: "Year",
+  day: "day",
+  month: "month",
+  year: "year",
 };
 
-export const formatDateByPeriod = (timePeriod: string, date: Date) => {
+export const formatDateByPeriod = (timePeriod: TimePeriod, date: Date) => {
   const formattedDates = {
     year: date.toISOString().slice(0, 4),
     month: date.toISOString().slice(0, 7),
     day: date.toISOString().slice(0, 10),
   };
-  return formattedDates[timePeriod as "year" | "month" | "day"];
+  return formattedDates[timePeriod];
 };
 
 export type FilterMovementForm = {
   type: string;
-  timePeriod: string;
+  timePeriod: TimePeriod | "";
   date: Date | null;
   dateRange: (Date | null)[];
+  category: CategoryI;
 };
 
 export const filterFormInitialState: FilterMovementForm = {
   type: filterTypes.singleDate,
-  timePeriod: timePeriods.day,
+  timePeriod: "",
   date: null,
   dateRange: [null, null],
+  category: NO_CATEGORY,
 };
 
 export const splitDate = (fullDate: string) => {

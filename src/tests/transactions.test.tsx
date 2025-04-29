@@ -116,7 +116,7 @@ describe("useTransactions", () => {
       await act(async () => {
         getTransactions({
           timePeriod: timePeriods.day,
-          selectedDate: "2020/02/02",
+          date: "2020/02/02",
         });
       });
       expect(result.current.transactionsList).toEqual([newTransaction]);
@@ -317,7 +317,7 @@ describe("useTransactions", () => {
       await act(async () => {
         getTotalIncome({
           timePeriod: timePeriods.day,
-          selectedDate: "2020/02/02",
+          date: "2020/02/02",
         });
       });
       expect(result.current.totalIncome).toEqual(100);
@@ -340,8 +340,8 @@ describe("useTransactions", () => {
       await act(async () => {
         getTotalIncome({
           timePeriod: timePeriods.day,
-          selectedStartDate: "2020/02/02",
-          selectedEndDate: "2020/02/20",
+          startDate: "2020/02/02",
+          endDate: "2020/02/20",
         });
       });
       expect(result.current.totalIncome).toEqual(100);
@@ -408,7 +408,7 @@ describe("useTransactions", () => {
       await act(async () => {
         getTotalExpenses({
           timePeriod: timePeriods.day,
-          selectedDate: "2020/02/02",
+          date: "2020/02/02",
         });
       });
       expect(result.current.totalExpenses).toEqual(100);
@@ -431,8 +431,8 @@ describe("useTransactions", () => {
       await act(async () => {
         getTotalExpenses({
           timePeriod: timePeriods.day,
-          selectedStartDate: "2020/02/02",
-          selectedEndDate: "2020/02/20",
+          startDate: "2020/02/02",
+          endDate: "2020/02/20",
         });
       });
       expect(result.current.totalExpenses).toEqual(100);
