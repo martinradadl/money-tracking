@@ -146,6 +146,7 @@ export const GraphPage: React.FC = () => {
         <AiOutlineArrowLeft
           className="text-3xl text-beige cursor-pointer"
           onClick={() => {
+            setFilters(filterFormInitialState);
             navigate(-1);
           }}
         />
@@ -209,9 +210,7 @@ export const GraphPage: React.FC = () => {
           selectsRange
           startDate={startDate}
           endDate={endDate}
-          onChange={(dateRange) =>
-            setFilters({ ...filters, dateRange })
-          }
+          onChange={(dateRange) => setFilters({ ...filters, dateRange })}
           dateFormat={
             timePeriod === timePeriods.day
               ? undefined

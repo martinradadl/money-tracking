@@ -11,6 +11,7 @@ import {
   FilterMovementForm,
   filterTypes,
   formatDateByPeriod,
+  GetMovementsParams,
   timePeriods,
 } from "../../helpers/movements";
 import DatePicker from "react-datepicker";
@@ -126,9 +127,9 @@ export const FilterMovementsModal = ({
       }
     } else {
       setIsFilterActive(true);
-      const timePeriodKey = timePeriod.toLowerCase();
-      const params = {
-        timePeriod: timePeriodKey,
+      const timePeriodKey = timePeriod?.toLowerCase();
+      const params: GetMovementsParams = {
+        timePeriod: "",
         date: "",
         startDate: "",
         endDate: "",
@@ -136,14 +137,22 @@ export const FilterMovementsModal = ({
         page: 1,
         limit: 10,
       };
-      if (date) {
-        const formattedDate = formatDateByPeriod(timePeriodKey, date);
-        params.date = formattedDate;
+
+      if ((date || dateRange?.every(Boolean)) && timePeriodKey) {
+        params.timePeriod = timePeriodKey;
+        params.date = date
+          ? formatDateByPeriod(timePeriodKey, date)
+          : undefined;
+        params.startDate =
+          dateRange && dateRange[0]
+            ? formatDateByPeriod(timePeriodKey, dateRange[0])
+            : undefined;
+        params.endDate =
+          dateRange && dateRange[1]
+            ? formatDateByPeriod(timePeriodKey, dateRange[1])
+            : undefined;
       }
-      if (dateRange[0])
-        params.startDate = formatDateByPeriod(timePeriodKey, dateRange[0]);
-      if (dateRange[1])
-        params.endDate = formatDateByPeriod(timePeriodKey, dateRange[1]);
+
       if (category) params.category = category._id;
       if (isDebts) {
         await getDebts(params, true);
