@@ -1,4 +1,6 @@
 import { CategoryI } from "../data/categories";
+import { DebtType } from "../data/debts";
+import { TransactionType } from "../data/transactions";
 import { NO_CATEGORY } from "./categories";
 
 export type GetMovementsParams = {
@@ -9,6 +11,7 @@ export type GetMovementsParams = {
   endDate?: string;
   date?: string;
   category?: string;
+  isTotalBalance?: boolean;
 };
 
 export type GetAmountsSumParams = {
@@ -16,6 +19,12 @@ export type GetAmountsSumParams = {
   date?: string | null;
   startDate?: string | null;
   endDate?: string | null;
+};
+
+export type MovementChartDataI = {
+  group: TransactionType | DebtType | "Transaction" | "Debt";
+  amount: number;
+  date: string;
 };
 
 export const filterTypes = {

@@ -11,14 +11,18 @@ import {
   setCookie,
   user,
 } from "../helpers/cookies";
-import { GetAmountsSumParams, GetMovementsParams } from "../helpers/movements";
+import {
+  GetAmountsSumParams,
+  GetMovementsParams,
+  MovementChartDataI,
+} from "../helpers/movements";
 import { parseObjectToQueryParams } from "../helpers/utils";
 
-type TranscationType = "income" | "expenses";
+export type TransactionType = "income" | "expenses";
 
 export interface TransactionI {
   _id?: string;
-  type: TranscationType;
+  type: TransactionType;
   concept: string;
   category: CategoryI;
   amount: number;
@@ -44,6 +48,8 @@ type State = {
   newTransaction: TransactionFormI | null;
   selectedTransaction: TransactionFormI | null;
   transactionsList: TransactionI[];
+  transactionsChartDataList: MovementChartDataI[];
+  transactionsTotalBalanceChartDataList: MovementChartDataI[];
   totalIncome: number;
   totalExpenses: number;
   isLastPage: boolean;
@@ -55,6 +61,8 @@ const initialState = {
   newTransaction: null,
   selectedTransaction: null,
   transactionsList: [] as TransactionI[],
+  transactionsChartDataList: [] as MovementChartDataI[],
+  transactionsTotalBalanceChartDataList: [] as MovementChartDataI[],
   totalIncome: 0,
   totalExpenses: 0,
   isLastPage: false,
@@ -160,6 +168,46 @@ export const getTransactions = async (
           newState.isLastPage = true;
         }
         return newState;
+      });
+    } else {
+      createToastify({ text: "Transactions not found", type: "error" });
+    }
+  } catch (err: unknown) {
+    if (err instanceof Error || err instanceof AxiosError) {
+      createToastify({
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
+        type: "error",
+      });
+      throw new Error(err.message);
+    }
+  }
+};
+
+export const getTransactionsChartData = async (params: GetMovementsParams) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/transactions/${
+        user()?._id
+      }/chart-data${parseObjectToQueryParams(params)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${jwt()}`,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      useTransactions.setState((state: State) => {
+        return {
+          ...state,
+          transactionsChartDataList: params.isTotalBalance
+            ? state.transactionsChartDataList
+            : [...response.data],
+          transactionsTotalBalanceChartDataList: params.isTotalBalance
+            ? [...response.data]
+            : state.transactionsTotalBalanceChartDataList,
+        };
       });
     } else {
       createToastify({ text: "Transactions not found", type: "error" });
