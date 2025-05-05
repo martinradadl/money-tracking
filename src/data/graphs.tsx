@@ -2,11 +2,32 @@ import { useDebts } from "./debts";
 import { useTransactions } from "./transactions";
 import { useAuth } from "./authentication";
 import { getCurrencyFormat } from "../helpers/currency";
-import { ChartTabularData, DonutChartOptions } from "@carbon/charts-react";
+import {
+  StackedBarChartOptions,
+  ChartTabularData,
+  DonutChartOptions,
+} from "@carbon/charts-react";
+import { ScaleTypes } from "@carbon/charts/interfaces";
 import { useShallow } from "zustand/shallow";
 
 export interface DonutChartSetupI {
-  [key: string]: { data: ChartTabularData; options: DonutChartOptions };
+  [key: string]: {
+    data: ChartTabularData;
+    options: DonutChartOptions;
+  };
+}
+
+export interface StackedBarChartSetupI {
+  [key: string]: {
+    data: StackedBarChartDataI[];
+    options: StackedBarChartOptions;
+  };
+}
+
+export interface StackedBarChartDataI {
+  group: string;
+  date: string;
+  amount: number;
 }
 
 const GREEN = "#41B06E";
@@ -47,21 +68,48 @@ const donutChartOptions = {
   },
 };
 
+const stackedBarChartOptions = (mainTitle: string): StackedBarChartOptions => ({
+  title: mainTitle,
+  axes: {
+    bottom: {
+      title: "Date",
+      mapsTo: "date",
+      scaleType: ScaleTypes.TIME,
+    },
+    left: {
+      title: "Amount",
+      mapsTo: "amount",
+      stacked: true,
+    },
+  },
+  height: "400px",
+});
+
 export const useGraphs = () => {
-  const { totalIncome, totalExpenses } = useTransactions();
-  const { totalLoans, totalDebts } = useDebts();
+  const {
+    totalIncome,
+    totalExpenses,
+    transactionsChartDataList,
+    transactionsTotalBalanceChartDataList,
+  } = useTransactions();
+  const {
+    totalLoans,
+    totalDebts,
+    debtsChartDataList,
+    debtsTotalBalanceChartDataList,
+  } = useDebts();
   const { user } = useAuth(
     useShallow((state) => ({
       user: state.user,
     }))
   );
 
-  const totalBalanceData = [
+  const totalBalanceDonutChartData = [
     { group: "Transactions", value: Math.abs(totalIncome - totalExpenses) },
     { group: "Debts", value: Math.abs(totalLoans - totalDebts) },
   ];
 
-  const transactionsData = [
+  const transactionsBalanceDonutChartData = [
     {
       group: "Income",
       value: totalIncome,
@@ -72,7 +120,7 @@ export const useGraphs = () => {
     },
   ];
 
-  const debtsData = [
+  const debtsBalanceDonutChartData = [
     {
       group: "Loans",
       value: totalLoans,
@@ -83,7 +131,10 @@ export const useGraphs = () => {
     },
   ];
 
-  const totalBalanceDetailedData = [...transactionsData, ...debtsData];
+  const totalBalanceDetailedDonutChartData = [
+    ...transactionsBalanceDonutChartData,
+    ...debtsBalanceDonutChartData,
+  ];
 
   const valueFormatted = (value: number) => {
     return user
@@ -94,7 +145,7 @@ export const useGraphs = () => {
       : "0";
   };
 
-  const totalBalanceOptions = {
+  const totalBalanceDonutChartOptions = {
     ...donutChartOptions,
     color: {
       scale: totalBalanceColors,
@@ -108,7 +159,7 @@ export const useGraphs = () => {
     },
   };
 
-  const totalBalanceDetailedOptions = {
+  const totalBalanceDetailedDonutChartOptions = {
     ...donutChartOptions,
     color: {
       scale: totalBalanceDetailedColors,
@@ -122,7 +173,7 @@ export const useGraphs = () => {
     },
   };
 
-  const transactionsOptions = {
+  const transactionsBalanceDonutChartOptions = {
     ...donutChartOptions,
     color: {
       scale: transactionsColors,
@@ -136,7 +187,7 @@ export const useGraphs = () => {
     },
   };
 
-  const debtsOptions = {
+  const debtsBalanceDonutChartOptions = {
     ...donutChartOptions,
     color: {
       scale: debtsColors,
@@ -150,26 +201,68 @@ export const useGraphs = () => {
     },
   };
 
-  const mappedDataAndOptions: DonutChartSetupI = {
+  const donutChartMappedDataAndOptions: DonutChartSetupI = {
     TOTAL_BALANCE: {
-      data: totalBalanceData,
-      options: totalBalanceOptions,
+      data: totalBalanceDonutChartData,
+      options: totalBalanceDonutChartOptions,
     },
     TOTAL_BALANCE_DETAILED: {
-      data: totalBalanceDetailedData,
-      options: totalBalanceDetailedOptions,
+      data: totalBalanceDetailedDonutChartData,
+      options: totalBalanceDetailedDonutChartOptions,
     },
     TRANSACTIONS_BALANCE: {
-      data: transactionsData,
-      options: transactionsOptions,
+      data: transactionsBalanceDonutChartData,
+      options: transactionsBalanceDonutChartOptions,
     },
     DEBTS_BALANCE: {
-      data: debtsData,
-      options: debtsOptions,
+      data: debtsBalanceDonutChartData,
+      options: debtsBalanceDonutChartOptions,
+    },
+  };
+
+  const totalBalanceDetailedStackedBarChartData = [
+    ...transactionsChartDataList,
+    ...debtsChartDataList,
+  ];
+
+  const totalBalanceStackedBarChartData = [
+    ...transactionsTotalBalanceChartDataList,
+    ...debtsTotalBalanceChartDataList,
+  ];
+
+  const transactionsBalanceStackedBarChartOptions =
+    stackedBarChartOptions("Transactions");
+
+  const debtsBalanceStackedBarChartOptions = stackedBarChartOptions("Debts");
+
+  const totalBalanceDetailedStackedBarChartOptions = stackedBarChartOptions(
+    "Total Balance Detailed"
+  );
+
+  const totalBalanceStackedBarChartOptions =
+    stackedBarChartOptions("Total Balance");
+
+  const stackedBarChartMappedDataAndOptions: StackedBarChartSetupI = {
+    TOTAL_BALANCE: {
+      data: totalBalanceStackedBarChartData,
+      options: totalBalanceStackedBarChartOptions,
+    },
+    TOTAL_BALANCE_DETAILED: {
+      data: totalBalanceDetailedStackedBarChartData,
+      options: totalBalanceDetailedStackedBarChartOptions,
+    },
+    TRANSACTIONS_BALANCE: {
+      data: transactionsChartDataList,
+      options: transactionsBalanceStackedBarChartOptions,
+    },
+    DEBTS_BALANCE: {
+      data: debtsChartDataList,
+      options: debtsBalanceStackedBarChartOptions,
     },
   };
 
   return {
-    mappedDataAndOptions,
+    donutChartMappedDataAndOptions,
+    stackedBarChartMappedDataAndOptions,
   };
 };
