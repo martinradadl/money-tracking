@@ -12,6 +12,7 @@ import { NonAuthLayout } from "./non-auth-layout";
 import { ResetPassword } from "./auth/reset-password";
 import { ForgotPassword } from "./auth/forgot-password";
 import { GraphPage } from "./dashboard/graph";
+import { AuthWrapper } from "./auth-wrapper";
 
 const router = createBrowserRouter([
   {
@@ -35,7 +36,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/graph",
-    element: <GraphPage />,
+    element: (
+      <AuthWrapper>
+        <GraphPage />
+      </AuthWrapper>
+    ),
   },
   {
     path: "/",
