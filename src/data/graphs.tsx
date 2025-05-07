@@ -236,30 +236,22 @@ export const useGraphs = () => {
     ...debtsTotalBalanceChartDataList,
   ];
 
-  const transactionsBalanceStackedBarChartOptions = stackedBarChartOptions;
-
-  const debtsBalanceStackedBarChartOptions = stackedBarChartOptions;
-
-  const totalBalanceDetailedStackedBarChartOptions = stackedBarChartOptions;
-
-  const totalBalanceStackedBarChartOptions = stackedBarChartOptions;
-
   const stackedBarChartMappedDataAndOptions: StackedBarChartSetupI = {
     TOTAL_BALANCE: {
       data: totalBalanceStackedBarChartData,
-      options: totalBalanceStackedBarChartOptions,
+      options: stackedBarChartOptions,
     },
     TOTAL_BALANCE_DETAILED: {
       data: totalBalanceDetailedStackedBarChartData,
-      options: totalBalanceDetailedStackedBarChartOptions,
+      options: stackedBarChartOptions,
     },
     TRANSACTIONS_BALANCE: {
       data: transactionsChartDataList,
-      options: transactionsBalanceStackedBarChartOptions,
+      options: stackedBarChartOptions,
     },
     DEBTS_BALANCE: {
       data: debtsChartDataList,
-      options: debtsBalanceStackedBarChartOptions,
+      options: stackedBarChartOptions,
     },
   };
 
