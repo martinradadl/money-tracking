@@ -1,12 +1,18 @@
 import { renderHook, act } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import axios from "axios";
-import { newDebt, updatedDebt } from "./utils.js";
+import {
+  fakeDebtChartData,
+  fakeDebtChartData2,
+  newDebt,
+  updatedDebt,
+} from "./utils.js";
 import {
   addDebt,
   deleteDebt,
   editDebt,
   getDebts,
+  getDebtsChartData,
   getTotalDebts,
   getTotalLoans,
   useDebts,
@@ -144,6 +150,96 @@ describe("useDebts", () => {
         });
       });
       expect(result.current.debtsList).toEqual([newDebt]);
+    });
+  });
+
+  describe("getChartData", () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
+    it("should return empty debts chart data list when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsChartDataList: state.debtsChartDataList,
+          }))
+        )
+      );
+      await act(async () => {
+        getDebtsChartData({});
+      });
+      expect(result.current.debtsChartDataList).toEqual([]);
+    });
+
+    it("should return debts chart data list with elements and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [fakeDebtChartData, fakeDebtChartData2],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsChartDataList: state.debtsChartDataList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getDebtsChartData({});
+      });
+      expect(result.current.debtsChartDataList).toEqual([
+        fakeDebtChartData,
+        fakeDebtChartData2,
+      ]);
+    });
+
+    it("should return debts chart data list with elements in a selected date and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [fakeDebtChartData],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsChartDataList: state.debtsChartDataList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getDebtsChartData({
+          timePeriod: timePeriods.day,
+          date: "2020/02/02",
+        });
+      });
+      expect(result.current.debtsChartDataList).toEqual([fakeDebtChartData]);
+    });
+
+    it("should return debts list with elements in a selected date range and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [fakeDebtChartData],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useDebts(
+          useShallow((state) => ({
+            debtsChartDataList: state.debtsChartDataList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getDebtsChartData({
+          timePeriod: timePeriods.day,
+          startDate: "2020/02/02",
+          endDate: "2020/02/20",
+        });
+      });
+      expect(result.current.debtsChartDataList).toEqual([fakeDebtChartData]);
     });
   });
 

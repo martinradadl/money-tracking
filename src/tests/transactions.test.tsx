@@ -7,10 +7,16 @@ import {
   getTotalExpenses,
   getTotalIncome,
   getTransactions,
+  getTransactionsChartData,
   useTransactions,
 } from "../data/transactions.js";
 import axios from "axios";
-import { newTransaction, updatedTransaction } from "./utils.js";
+import {
+  fakeTransactionChartData,
+  fakeTransactionChartData2,
+  newTransaction,
+  updatedTransaction,
+} from "./utils.js";
 import { useShallow } from "zustand/shallow";
 import { timePeriods } from "../helpers/movements.js";
 
@@ -143,6 +149,100 @@ describe("useTransactions", () => {
         });
       });
       expect(result.current.transactionsList).toEqual([newTransaction]);
+    });
+  });
+
+  describe("getChartData", () => {
+    beforeEach(() => {
+      vi.resetAllMocks();
+    });
+    it("should return empty transactions chart data list when status is not 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        status: 500,
+      });
+
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            transactionsChartDataList: state.transactionsChartDataList,
+          }))
+        )
+      );
+      await act(async () => {
+        getTransactionsChartData({});
+      });
+      expect(result.current.transactionsChartDataList).toEqual([]);
+    });
+
+    it("should return transactions chart data list with elements and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [fakeTransactionChartData, fakeTransactionChartData2],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            transactionsChartDataList: state.transactionsChartDataList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTransactionsChartData({});
+      });
+      expect(result.current.transactionsChartDataList).toEqual([
+        fakeTransactionChartData,
+        fakeTransactionChartData2,
+      ]);
+    });
+
+    it("should return transactions chart data list with elements in a selected date and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [fakeTransactionChartData],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            transactionsChartDataList: state.transactionsChartDataList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTransactionsChartData({
+          timePeriod: timePeriods.day,
+          date: "2020/02/02",
+        });
+      });
+      expect(result.current.transactionsChartDataList).toEqual([
+        fakeTransactionChartData,
+      ]);
+    });
+
+    it("should return transactions list with elements in a selected date range and statusCode 200", async () => {
+      vi.mocked(axios, true).get.mockResolvedValueOnce({
+        data: [fakeTransactionChartData],
+        status: 200,
+      });
+      const { result } = renderHook(() =>
+        useTransactions(
+          useShallow((state) => ({
+            transactionsChartDataList: state.transactionsChartDataList,
+          }))
+        )
+      );
+
+      await act(async () => {
+        getTransactionsChartData({
+          timePeriod: timePeriods.day,
+          startDate: "2020/02/02",
+          endDate: "2020/02/20",
+        });
+      });
+      expect(result.current.transactionsChartDataList).toEqual([
+        fakeTransactionChartData,
+      ]);
     });
   });
 
