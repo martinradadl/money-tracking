@@ -11,10 +11,14 @@ import {
   setCookie,
   user,
 } from "../helpers/cookies";
-import { GetAmountsSumParams, GetMovementsParams } from "../helpers/movements";
+import {
+  GetAmountsSumParams,
+  GetMovementsParams,
+  MovementChartDataI,
+} from "../helpers/movements";
 import { parseObjectToQueryParams } from "../helpers/utils";
 
-type DebtType = "debt" | "loan";
+export type DebtType = "debt" | "loan";
 
 export interface DebtI {
   _id?: string;
@@ -45,6 +49,8 @@ type State = {
   newDebt: DebtFormI | null;
   selectedDebt: DebtFormI | null;
   debtsList: DebtI[];
+  debtsChartDataList: MovementChartDataI[];
+  debtsTotalBalanceChartDataList: MovementChartDataI[];
   totalLoans: number;
   totalDebts: number;
   isLastPage: boolean;
@@ -56,6 +62,8 @@ const initialState = {
   newDebt: null,
   selectedDebt: null,
   debtsList: [] as DebtI[],
+  debtsChartDataList: [] as MovementChartDataI[],
+  debtsTotalBalanceChartDataList: [] as MovementChartDataI[],
   totalLoans: 0,
   totalDebts: 0,
   isLastPage: false,
@@ -160,6 +168,46 @@ export const getDebts = async (
       });
     } else {
       createToastify({ text: "Debt or Loan not found", type: "error" });
+    }
+  } catch (err: unknown) {
+    if (err instanceof Error || err instanceof AxiosError) {
+      createToastify({
+        text:
+          err instanceof AxiosError ? err.response?.data.message : err.message,
+        type: "error",
+      });
+      throw new Error(err.message);
+    }
+  }
+};
+
+export const getDebtsChartData = async (params: GetMovementsParams) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/debts/${user()?._id}/chart-data${parseObjectToQueryParams(
+        params
+      )}`,
+      {
+        headers: {
+          Authorization: `Bearer ${jwt()}`,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      useDebts.setState((state: State) => {
+        return {
+          ...state,
+          debtsChartDataList: params.isTotalBalance
+            ? state.debtsChartDataList
+            : [...response.data],
+          debtsTotalBalanceChartDataList: params.isTotalBalance
+            ? [...response.data]
+            : state.debtsTotalBalanceChartDataList,
+        };
+      });
+    } else {
+      createToastify({ text: "Debts not found", type: "error" });
     }
   } catch (err: unknown) {
     if (err instanceof Error || err instanceof AxiosError) {

@@ -2,10 +2,18 @@ import { Button, Select } from "@headlessui/react";
 import React, { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { DonutChart } from "@carbon/charts-react";
-import { useGraphs } from "../../data/graphs";
-import { getTotalIncome, getTotalExpenses } from "../../data/transactions";
-import { getTotalLoans, getTotalDebts } from "../../data/debts";
+import { StackedBarChart, DonutChart } from "@carbon/charts-react";
+import { graphPageTitles, useGraphs } from "../../data/graphs";
+import {
+  getTotalIncome,
+  getTotalExpenses,
+  getTransactionsChartData,
+} from "../../data/transactions";
+import {
+  getTotalLoans,
+  getTotalDebts,
+  getDebtsChartData,
+} from "../../data/debts";
 import { useAuth } from "../../data/authentication";
 import { useShallow } from "zustand/shallow";
 import DatePicker from "react-datepicker";
@@ -15,6 +23,7 @@ import {
   filterTypes,
   formatDateByPeriod,
   GetAmountsSumParams,
+  GetMovementsParams,
   TimePeriod,
   timePeriods,
 } from "../../helpers/movements";
@@ -27,14 +36,25 @@ import { NO_CATEGORY } from "../../helpers/categories";
 export const GraphPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const graphCode = searchParams.get("graphCode") || "";
+  const pageTitle = graphPageTitles[graphCode as keyof typeof graphPageTitles];
+  const graphPageFilterFormInitialState = {
+    ...filterFormInitialState,
+    timePeriod: timePeriods.day,
+  };
   const [filters, setFilters] = useState<FilterMovementForm>(
-    filterFormInitialState
+    graphPageFilterFormInitialState
   );
   const { timePeriod, date, dateRange, category, type } = filters;
   const [startDate, endDate] = dateRange;
   const navigate = useNavigate();
-  const { mappedDataAndOptions } = useGraphs();
-  const { data, options } = mappedDataAndOptions[graphCode];
+  const {
+    donutChartMappedDataAndOptions,
+    stackedBarChartMappedDataAndOptions,
+  } = useGraphs();
+  const { data: donutChartData, options: donutChartOptions } =
+    donutChartMappedDataAndOptions[graphCode];
+  const { data: stackedBarChartData, options: stackedBarChartOptions } =
+    stackedBarChartMappedDataAndOptions[graphCode];
   const { user } = useAuth(
     useShallow((state) => ({
       user: state.user,
@@ -55,12 +75,43 @@ export const GraphPage: React.FC = () => {
     ]);
   };
 
+  const getChartDataLists = async (params: GetMovementsParams) => {
+    Promise.all([getTransactionsChartData(params), getDebtsChartData(params)]);
+  };
+
+  const getMovementsParams = () => {
+    if (!date && !dateRange[0] && !dateRange[1] && category === NO_CATEGORY) {
+      return { isTotalBalance: graphCode === "TOTAL_BALANCE" };
+    }
+    const params: GetMovementsParams = {
+      timePeriod:
+        (date || dateRange?.every(Boolean)) && timePeriod
+          ? timePeriod
+          : undefined,
+      date: "",
+      startDate: "",
+      endDate: "",
+      category: category._id,
+      isTotalBalance: graphCode === "TOTAL_BALANCE",
+    };
+    if ((date || dateRange?.every(Boolean)) && timePeriod)
+      if (date) params.date = formatDateByPeriod(timePeriod, date);
+      else if (dateRange[0] && dateRange[1]) {
+        params.startDate = formatDateByPeriod(timePeriod, dateRange[0]);
+        params.endDate = formatDateByPeriod(timePeriod, dateRange[1]);
+      }
+    return params;
+  };
+
   const getAmountsSumParams = () => {
     if (!date && !dateRange[0] && !dateRange[1] && category === NO_CATEGORY) {
       return {};
     }
     const params = {
-      timePeriod: undefined,
+      timePeriod:
+        (date || dateRange?.every(Boolean)) && timePeriod
+          ? timePeriod
+          : undefined,
       date: "",
       startDate: "",
       endDate: "",
@@ -85,12 +136,6 @@ export const GraphPage: React.FC = () => {
 
   useEffect(() => {
     if (user?._id) {
-      getBalances({});
-    }
-  }, [user?._id]);
-
-  useEffect(() => {
-    if (user?._id) {
       if (
         graphCode === "TOTAL_BALANCE" ||
         graphCode === "TOTAL_BALANCE_DETAILED"
@@ -106,10 +151,10 @@ export const GraphPage: React.FC = () => {
         removeCookie("incomeCache");
         removeCookie("expensesCache");
       }
-      const params = getAmountsSumParams();
-      getBalances(params);
+      getBalances(getAmountsSumParams());
+      getChartDataLists(getMovementsParams());
     }
-  }, [date, dateRange, category]);
+  }, [date, dateRange, category, timePeriod]);
 
   const handleChangeFilterType = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -155,6 +200,7 @@ export const GraphPage: React.FC = () => {
         />
       </div>
 
+      <h1 className="text-beige text-3xl font-semibold my-2">{pageTitle} </h1>
       <h1 className="text-2xl text-beige">Filter by Date:</h1>
       <Select
         name="filter-type"
@@ -249,16 +295,28 @@ export const GraphPage: React.FC = () => {
       <Button
         className="w-full rounded-md bg-yellow-category text-navy py-1 px-3 text-xl font-semibold"
         onClick={() => {
-          setFilters(filterFormInitialState);
+          setFilters(graphPageFilterFormInitialState);
         }}
       >
         Clear Filter
       </Button>
-      {data.every((elem) => elem.value === 0) ? (
+      {donutChartData.every((elem) => elem.value === 0) ? (
         <NoDataChart />
       ) : (
-        <div className="bg-beige w-full aspect-square rounded p-6 mt-4">
-          <DonutChart {...{ data, options }} />
+        <div>
+          <div className="bg-beige w-full aspect-square rounded p-6 mt-4">
+            <DonutChart
+              {...{ data: donutChartData, options: donutChartOptions }}
+            />
+          </div>
+          <div className="bg-beige w-full rounded p-6 mt-4">
+            <StackedBarChart
+              {...{
+                data: stackedBarChartData,
+                options: stackedBarChartOptions,
+              }}
+            />
+          </div>
         </div>
       )}
     </div>

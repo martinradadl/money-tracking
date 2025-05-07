@@ -1,6 +1,7 @@
 import { LoginI, UserI } from "../data/authentication";
 import { TransactionFormI } from "../data/transactions";
 import { DebtFormI } from "../data/debts";
+import { MovementChartDataI } from "../helpers/movements";
 
 // USERS
 
@@ -56,6 +57,18 @@ export const updatedTransaction: TransactionFormI = {
   userId: "fakeUpdatedUserId",
 };
 
+export const fakeTransactionChartData: MovementChartDataI = {
+  group: "income",
+  date: "2000-02-02T12:30:00",
+  amount: 100,
+};
+
+export const fakeTransactionChartData2: MovementChartDataI = {
+  group: "expenses",
+  date: "2000-04-04T12:30:00",
+  amount: 200,
+};
+
 export const categories = [{ _id: "fakeId", label: "fakeLabel" }];
 
 // DEBTS
@@ -80,4 +93,16 @@ export const updatedDebt: DebtFormI = {
   amount: "fakeAmount",
   date: new Date("2000-02-10T12:30:00"),
   userId: "fakeUserId",
+};
+
+export const fakeDebtChartData: MovementChartDataI = {
+  group: "loan",
+  date: "2000-02-02T12:30:00",
+  amount: 100,
+};
+
+export const fakeDebtChartData2: MovementChartDataI = {
+  group: "debt",
+  date: "2000-04-04T12:30:00",
+  amount: 200,
 };
