@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../data/authentication";
 import {
   getTotalIncome,
@@ -24,10 +24,13 @@ export const Dashboard: React.FC = () => {
       user: state.user,
     }))
   );
+
+  const [barChartWidth, setBarChartWidth] = useState(window.innerWidth);
   const {
     donutChartMappedDataAndOptions,
     stackedBarChartMappedDataAndOptions,
   } = useGraphs();
+
   const {
     TOTAL_BALANCE: DONUT_TOTAL_BALANCE,
     TOTAL_BALANCE_DETAILED: DONUT_TOTAL_BALANCE_DETAILED,
@@ -67,13 +70,24 @@ export const Dashboard: React.FC = () => {
     }
   }, [user?._id]);
 
+  useEffect(() => {
+    addEventListener("resize", () => {
+      setBarChartWidth(window.innerWidth);
+    });
+    return () => {
+      removeEventListener("resize", () => {
+        setBarChartWidth(window.innerWidth);
+      });
+    };
+  }, []);
+
   return (
     <div className="flex flex-col w-full items-center overflow-y-auto">
       <div className="flex flex-col flex-1 pt-2 pb-14 px-5 gap-4 entrance-anim max-md:block	 md:w-4/5 max-w-[1000px]">
         <h1 className="page-title text-beige">Hi, {user?.name}</h1>
         <h2 className="text-beige text-2xl font-semibold">Your Balances: </h2>
-        <div className="bg-beige rounded p-2 flex flex-wrap gap-1">
-          <div className="w-full md:flex-1 pb-2">
+        <div className="bg-beige rounded p-2 flex flex-wrap gap-4 mb-4">
+          <div className="w-full flex flex-col md:flex-1 pb-2">
             <h3 className="text-navy text-xl font-semibold text-center">
               Total Balance{" "}
             </h3>
@@ -90,7 +104,10 @@ export const Dashboard: React.FC = () => {
                     options={DONUT_TOTAL_BALANCE.options}
                   />
                 </div>
-                <div className="flex w-full p-2 md:flex-1 md:w-auto">
+                <div
+                  className="flex w-full p-2 md:flex-1 md:w-auto"
+                  style={{ maxWidth: barChartWidth - 40 }}
+                >
                   <StackedBarChart
                     {...{
                       data: STACKED_BAR_TOTAL_BALANCE.data,
@@ -109,7 +126,7 @@ export const Dashboard: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="w-full md:flex-1 pb-2">
+          <div className="w-full flex flex-col md:flex-1 pb-2">
             <h3 className="text-navy text-xl font-semibold text-center">
               Detailed Balance
             </h3>
@@ -120,13 +137,16 @@ export const Dashboard: React.FC = () => {
               </div>
             ) : (
               <div className="w-full md:flex-1 pb-2">
-                <div className="flex w-full aspect-square p-2 md:flex-1 md:w-auto">
+                <div className="flex w-full aspect-square p-2 max-md:flex-1 md:w-auto">
                   <DonutChart
                     data={DONUT_TOTAL_BALANCE_DETAILED.data}
                     options={DONUT_TOTAL_BALANCE_DETAILED.options}
                   />
                 </div>
-                <div className="flex w-full p-2 md:flex-1 md:w-auto">
+                <div
+                  className="flex w-full p-2 md:flex-1 md:w-auto"
+                  style={{ maxWidth: barChartWidth - 40 }}
+                >
                   <StackedBarChart
                     {...{
                       data: STACKED_BAR_TOTAL_BALANCE_DETAILED.data,
@@ -146,8 +166,8 @@ export const Dashboard: React.FC = () => {
             )}
           </div>
         </div>
-        <div className="bg-beige rounded p-2 flex flex-wrap gap-1">
-          <div className="w-full md:flex-1 pb-2">
+        <div className="bg-beige rounded p-2 flex flex-wrap gap-4">
+          <div className="w-full flex flex-col md:flex-1 pb-2">
             <h3 className="text-navy text-xl font-semibold text-center">
               Transactions{" "}
             </h3>
@@ -165,7 +185,10 @@ export const Dashboard: React.FC = () => {
                     options={DONUT_TRANSACTIONS_BALANCE.options}
                   />
                 </div>
-                <div className="flex w-full p-2 md:flex-1 md:w-auto">
+                <div
+                  className="flex w-full p-2 md:flex-1 md:w-auto"
+                  style={{ maxWidth: barChartWidth - 40 }}
+                >
                   <StackedBarChart
                     {...{
                       data: STACKED_BAR_TRANSACTIONS_BALANCE.data,
@@ -184,7 +207,7 @@ export const Dashboard: React.FC = () => {
               </>
             )}
           </div>
-          <div className="w-full md:flex-1 pb-2">
+          <div className="w-full flex flex-col md:flex-1 pb-2">
             <h3 className="text-navy text-xl font-semibold text-center">
               Debts{" "}
             </h3>
@@ -201,7 +224,10 @@ export const Dashboard: React.FC = () => {
                     options={DONUT_DEBTS_BALANCE.options}
                   />
                 </div>
-                <div className="flex w-full p-2 md:flex-1 md:w-auto">
+                <div
+                  className="flex w-full p-2 md:flex-1 md:w-auto"
+                  style={{ maxWidth: barChartWidth - 40 }}
+                >
                   <StackedBarChart
                     {...{
                       data: STACKED_BAR_DEBTS_BALANCE.data,

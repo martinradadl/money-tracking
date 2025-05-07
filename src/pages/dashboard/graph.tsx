@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { StackedBarChart, DonutChart } from "@carbon/charts-react";
-import { useGraphs } from "../../data/graphs";
+import { graphPageTitles, useGraphs } from "../../data/graphs";
 import {
   getTotalIncome,
   getTotalExpenses,
@@ -36,6 +36,7 @@ import { NO_CATEGORY } from "../../helpers/categories";
 export const GraphPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const graphCode = searchParams.get("graphCode") || "";
+  const pageTitle = graphPageTitles[graphCode as keyof typeof graphPageTitles];
   const graphPageFilterFormInitialState = {
     ...filterFormInitialState,
     timePeriod: timePeriods.day,
@@ -199,6 +200,7 @@ export const GraphPage: React.FC = () => {
         />
       </div>
 
+      <h1 className="text-beige text-3xl font-semibold my-2">{pageTitle} </h1>
       <h1 className="text-2xl text-beige">Filter by Date:</h1>
       <Select
         name="filter-type"
@@ -307,7 +309,7 @@ export const GraphPage: React.FC = () => {
               {...{ data: donutChartData, options: donutChartOptions }}
             />
           </div>
-          <div className="bg-beige w-full aspect-square rounded p-6 mt-4">
+          <div className="bg-beige w-full rounded p-6 mt-4">
             <StackedBarChart
               {...{
                 data: stackedBarChartData,

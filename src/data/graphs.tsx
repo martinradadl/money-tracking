@@ -68,8 +68,7 @@ const donutChartOptions = {
   },
 };
 
-const stackedBarChartOptions = (mainTitle: string): StackedBarChartOptions => ({
-  title: mainTitle,
+const stackedBarChartOptions: StackedBarChartOptions = {
   axes: {
     bottom: {
       title: "Date",
@@ -83,7 +82,14 @@ const stackedBarChartOptions = (mainTitle: string): StackedBarChartOptions => ({
     },
   },
   height: "400px",
-});
+};
+
+export const graphPageTitles = {
+  TOTAL_BALANCE: "Total Balance",
+  TOTAL_BALANCE_DETAILED: "Total Balance Detailed",
+  TRANSACTIONS_BALANCE: "Transactions Balance",
+  DEBTS_BALANCE: "Debts Balance",
+};
 
 export const useGraphs = () => {
   const {
@@ -230,17 +236,13 @@ export const useGraphs = () => {
     ...debtsTotalBalanceChartDataList,
   ];
 
-  const transactionsBalanceStackedBarChartOptions =
-    stackedBarChartOptions("Transactions");
+  const transactionsBalanceStackedBarChartOptions = stackedBarChartOptions;
 
-  const debtsBalanceStackedBarChartOptions = stackedBarChartOptions("Debts");
+  const debtsBalanceStackedBarChartOptions = stackedBarChartOptions;
 
-  const totalBalanceDetailedStackedBarChartOptions = stackedBarChartOptions(
-    "Total Balance Detailed"
-  );
+  const totalBalanceDetailedStackedBarChartOptions = stackedBarChartOptions;
 
-  const totalBalanceStackedBarChartOptions =
-    stackedBarChartOptions("Total Balance");
+  const totalBalanceStackedBarChartOptions = stackedBarChartOptions;
 
   const stackedBarChartMappedDataAndOptions: StackedBarChartSetupI = {
     TOTAL_BALANCE: {
