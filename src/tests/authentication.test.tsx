@@ -24,8 +24,10 @@ import {
 } from "./utils";
 import * as createToastify from "../helpers/toastify";
 import { useShallow } from "zustand/shallow";
+import { parseProfilePicToUser } from "../helpers/authentication";
 
 vi.mock("axios");
+vi.mock("../helpers/authentication");
 
 describe("useAuthentication", () => {
   afterAll(() => {
@@ -103,6 +105,8 @@ describe("useAuthentication", () => {
         data: { user: newUser },
         status: 200,
       });
+      const parsedUser = { ...newUser, profilePic: "uploads/fakeProfilePic" };
+      vi.mocked(parseProfilePicToUser, true).mockReturnValue(parsedUser);
 
       const { result } = renderHook(() =>
         useAuth(
@@ -114,7 +118,7 @@ describe("useAuthentication", () => {
       await act(async () => {
         login(loggedUser);
       });
-      expect(result.current.user).toEqual(newUser);
+      expect(result.current.user).toEqual(parsedUser);
     });
   });
 
@@ -148,6 +152,8 @@ describe("useAuthentication", () => {
         data: updatedUser,
         status: 200,
       });
+      const parsedUser = { ...newUser, profilePic: "uploads/fakeProfilePic" };
+      vi.mocked(parseProfilePicToUser, true).mockReturnValue(parsedUser);
 
       const { result } = renderHook(() =>
         useAuth(
@@ -161,7 +167,7 @@ describe("useAuthentication", () => {
           editUser(newUser._id, updatedUser);
         }
       });
-      expect(result.current.user).toEqual(updatedUser);
+      expect(result.current.user).toEqual(parsedUser);
     });
   });
 

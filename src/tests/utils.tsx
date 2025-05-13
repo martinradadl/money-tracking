@@ -15,6 +15,7 @@ export const newUser: UserI = {
   password: "fakePassword",
   currency: currencies[0],
   timezone: timezones[0],
+  profilePic: "fakeProfilePic",
 };
 
 export const updatedUser: UserI = {
@@ -24,6 +25,7 @@ export const updatedUser: UserI = {
   password: "fakeUpdatedPassword",
   currency: currencies[0],
   timezone: timezones[0],
+  profilePic: "fakeUpdatedProfilePic",
 };
 
 export const loggedUser: LoginI = {
