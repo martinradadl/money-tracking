@@ -120,6 +120,27 @@ describe("useAuthentication", () => {
       });
       expect(result.current.user).toEqual(parsedUser);
     });
+
+    it("should return 200 and logged user without a profile picture", async () => {
+      vi.mocked(axios, true).post.mockResolvedValueOnce({
+        data: { user: newUser },
+        status: 200,
+      });
+      const parsedUser = { ...newUser, profilePic: "fakeDefaultProfilePic" };
+      vi.mocked(parseProfilePicToUser, true).mockReturnValue(parsedUser);
+
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
+      await act(async () => {
+        login(loggedUser);
+      });
+      expect(result.current.user).toEqual(parsedUser);
+    });
   });
 
   describe("edit user", async () => {
@@ -153,6 +174,33 @@ describe("useAuthentication", () => {
         status: 200,
       });
       const parsedUser = { ...newUser, profilePic: "uploads/fakeProfilePic" };
+      vi.mocked(parseProfilePicToUser, true).mockReturnValue(parsedUser);
+
+      const { result } = renderHook(() =>
+        useAuth(
+          useShallow((state) => ({
+            user: state.user,
+          }))
+        )
+      );
+      await act(async () => {
+        if (newUser._id) {
+          editUser(newUser._id, updatedUser);
+        }
+      });
+      expect(result.current.user).toEqual(parsedUser);
+    });
+
+    it("Should delete profile pic and return updated User", async () => {
+      const userWithoutProfilePic = { ...updatedUser, profilePic: undefined };
+      vi.mocked(axios, true).put.mockResolvedValueOnce({
+        data: userWithoutProfilePic,
+        status: 200,
+      });
+      const parsedUser = {
+        ...updatedUser,
+        profilePic: "fakeDefaultProfilePic",
+      };
       vi.mocked(parseProfilePicToUser, true).mockReturnValue(parsedUser);
 
       const { result } = renderHook(() =>
