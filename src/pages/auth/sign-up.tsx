@@ -12,6 +12,7 @@ export const SignUp: React.FC = () => {
     password: "",
     currency: { name: "Colombian Peso", code: "COP" },
     timezone: { name: "CO - Colombia - America/Bogota", offset: "-05:00" },
+    profilePic: "",
   });
   const { currencies, timezones } = useAuth(
     useShallow((state) => ({
