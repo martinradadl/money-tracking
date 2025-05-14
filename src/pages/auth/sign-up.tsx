@@ -149,7 +149,7 @@ export const SignUp: React.FC = () => {
           Sign Up
         </button>
         <p
-          className="text-lg cursor-pointer"
+          className="text-lg cursor-pointer mb-5"
           onClick={() => {
             navigate(`/login`);
           }}
