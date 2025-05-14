@@ -5,7 +5,7 @@ import {
   checkPassword,
   deleteUser,
   editUser,
-  UserI,
+  UserFormI,
 } from "../../data/authentication";
 import { createToastify } from "../../helpers/toastify";
 
@@ -13,7 +13,7 @@ export interface props {
   isOpen: boolean;
   close: () => void;
   userId?: string;
-  accountForm?: UserI;
+  accountForm?: UserFormI;
   isDelete?: boolean;
   closeAccountSettings?: () => void;
 }

@@ -6,6 +6,7 @@ import { setTransactionsInitialState } from "./transactions";
 import { clearCookies, jwt, setCookie } from "../helpers/cookies";
 import { setDebtsInitialState } from "./debts";
 import { isExpired, setExpiresOn } from "../helpers/utils";
+import { parseProfilePicToUser } from "../helpers/authentication";
 
 export interface UserI {
   _id?: string;
@@ -14,6 +15,16 @@ export interface UserI {
   password?: string;
   currency: CurrencyI;
   timezone: TimezoneI;
+  profilePic: string;
+}
+
+export interface UserFormI {
+  name?: string;
+  email?: string;
+  password?: string;
+  currency?: CurrencyI;
+  timezone?: TimezoneI;
+  profilePic?: string;
 }
 
 export interface LoginI {
@@ -155,13 +166,14 @@ export const login = async (loggedUser: LoginI) => {
     const response = await axios.post(`${API_URL}/auth/login`, loggedUser);
     if (response.status === 200) {
       useAuth.setState((state: State) => {
+        const user = parseProfilePicToUser(response.data.user);
+        setCookie("user", user);
+        setCookie("jwt", response.data.token);
         return {
           ...state,
-          user: response.data.user,
+          user,
         };
       });
-      setCookie("user", response.data.user);
-      setCookie("jwt", response.data.token);
       setExpiresOn(response.data.expiration);
     } else {
       createToastify({ text: "Login not successful", type: "error" });
@@ -271,7 +283,10 @@ export const resetPassword = async (
   }
 };
 
-export const editUser = async (id: string, updatedItem: UserI) => {
+export const editUser = async (
+  id: string,
+  updatedItem: UserFormI | FormData
+) => {
   try {
     const response = await axios.put(`${API_URL}/auth/${id}`, updatedItem, {
       headers: {
@@ -279,8 +294,9 @@ export const editUser = async (id: string, updatedItem: UserI) => {
       },
     });
     if (response.status === 200) {
-      setUser(response.data);
-      setCookie("user", response.data);
+      const user = parseProfilePicToUser(response.data);
+      setUser(user);
+      setCookie("user", user);
     } else {
       createToastify({ text: "Edit not successful", type: "error" });
     }
