@@ -135,7 +135,7 @@ export const logout = () => {
   setUser(null);
 };
 
-export const register = async (newUser: UserI | UserFormI) => {
+export const register = async (newUser: UserI) => {
   try {
     const response = await axios.post(`${API_URL}/auth/register`, newUser);
     if (response.status === 200) {
